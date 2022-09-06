@@ -6,12 +6,27 @@ const {
   deleteStarContact,
   disconnectionHandlers,
 } = require('./utils/socket_handlers');
+const es = require('./utils/es');
 const { jwtVerify } = require('./utils/helper');
 
 require('dotenv').config();
 
-function connect(server) {
+async function connect(server) {
   const io = new Server(server);
+
+  console.log('Socket Server is running');
+
+  //reset socket id of all users
+  await es.updateByQuery({
+    index: 'user',
+    script: {
+      lang: 'painless',
+      source: 'ctx._source["socket_id"] = null',
+    },
+    query: {
+      match_all: {},
+    },
+  });
 
   io.use(async (socket, next) => {
     const { jwtToken } = socket.handshake.query;

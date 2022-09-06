@@ -5,6 +5,10 @@ let jwtToken = localStorage.getItem('token');
 
 const socket = io({ query: { jwtToken } });
 
+socket.on('connect', () => {
+  console.log(socket.id);
+});
+
 socket.on('msg', (msg, senderSocketId) => {
   console.log('From server:' + senderSocketId);
 
@@ -79,10 +83,6 @@ socket.on('deleteStarContact', response => {
 });
 
 socket.on('onlineStatus', (socketId, status) => {
-  console.log(socketId, status);
-
-  console.log(socketId, status);
-
   //append new star to star block
   const contactDivs = document.querySelectorAll(`.contact[data-socket-id="${socketId}"]`);
 
@@ -94,6 +94,20 @@ socket.on('onlineStatus', (socketId, status) => {
       statusDiv.classList.remove('on');
       div.setAttribute('data-socket-id', '');
     }
+  });
+});
+
+//Change online status to 'off' when disonnected
+socket.on('disconnect', () => {
+  console.log('Server down');
+
+  const contactDivs = document.querySelectorAll(`.contact`);
+
+  contactDivs.forEach(div => {
+    const statusDiv = div.querySelector('.contact-status');
+
+    statusDiv.classList.remove('on');
+    div.setAttribute('data-socket-id', '');
   });
 });
 
