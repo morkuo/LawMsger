@@ -90,7 +90,10 @@ socket.on('onlineStatus', (socketId, status) => {
     const statusDiv = div.querySelector('.contact-status');
 
     if (status === 'on') statusDiv.classList.add('on');
-    else statusDiv.classList.remove('on');
+    else {
+      statusDiv.classList.remove('on');
+      div.setAttribute('data-socket-id', '');
+    }
   });
 });
 
