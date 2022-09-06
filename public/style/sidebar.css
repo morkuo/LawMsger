@@ -31,10 +31,10 @@
 }
 
 .contact-picture {
+  margin-right: 1rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 1rem;
   width: 15%;
   border-right: 1px solid black;
 }
@@ -62,4 +62,10 @@
 .contact-add-star-button:hover,
 .contact-delete-star-button:hover {
   background-color: rgb(145, 189, 157);
+}
+
+.contact-status {
+  width: 0.65rem;
+  background-color: rgb(145, 189, 157);
+  border-right: 1px solid black;
 }

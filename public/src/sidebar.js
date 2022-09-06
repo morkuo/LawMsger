@@ -85,21 +85,25 @@ function drawContactDivs(contacts, category) {
   for (let contact of contacts) {
     const contactDiv = document.createElement('div');
     const pictureDiv = document.createElement('div');
+    const statusDiv = document.createElement('div');
     const infoDiv = document.createElement('div');
     const nameDiv = document.createElement('div');
     const emailDiv = document.createElement('div');
 
     addClass('contact', contactDiv);
     addClass('contact-picture', pictureDiv);
+    addClass('contact-status', statusDiv);
     addClass('contact-info', infoDiv);
 
-    if (contact.picture === '') pictureDiv.innerText = contact.name[0].toUpperCase();
+    //if picture not url, then show initial
+    if (contact.picture.length <= 1) pictureDiv.innerText = contact.name[0].toUpperCase();
     nameDiv.innerText = contact.name;
     emailDiv.innerText = contact.email;
 
     contactDiv.setAttribute('data-id', contact.id);
     contactDiv.setAttribute('data-socket-id', contact.socket_id);
 
+    contactDiv.appendChild(statusDiv);
     contactDiv.appendChild(pictureDiv);
     contactDiv.appendChild(infoDiv);
     infoDiv.appendChild(nameDiv);
@@ -151,3 +155,5 @@ function listenToChatWindow() {
     subtree: true,
   });
 }
+
+export { drawContactDivs };

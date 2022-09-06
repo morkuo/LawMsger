@@ -1,4 +1,5 @@
 import { addClass, setMessage } from './helper.js';
+import { drawContactDivs } from './sidebar.js';
 
 let jwtToken = localStorage.getItem('token');
 
@@ -31,39 +32,20 @@ socket.on('createStarContact', response => {
   const contactNameDiv = createdDiv.querySelector('.contact-info div:first-child');
   const contactEmailDiv = createdDiv.querySelector('.contact-info div:last-child');
 
-  const contactSocketId = createdDiv.dataset.socketId;
+  const contacts = [
+    {
+      id: targetContactUserId,
+      name: contactNameDiv.innerText,
+      email: contactEmailDiv.innerText,
+      picture: contactPictureDiv.innerText,
+      socket_id: createdDiv.dataset.socketId,
+    },
+  ];
 
-  const contactPicture = contactPictureDiv.innerText;
-  const contactName = contactNameDiv.innerText;
-  const contactEmail = contactEmailDiv.innerText;
-
-  const contactDiv = document.createElement('div');
-  const pictureDiv = document.createElement('div');
-  const infoDiv = document.createElement('div');
-  const nameDiv = document.createElement('div');
-  const emailDiv = document.createElement('div');
-
-  addClass('contact', contactDiv);
-  addClass('contact-picture', pictureDiv);
-  addClass('contact-info', infoDiv);
-
-  pictureDiv.innerText = contactPicture;
-  nameDiv.innerText = contactName;
-  emailDiv.innerText = contactEmail;
-
-  contactDiv.setAttribute('data-id', targetContactUserId);
-  contactDiv.setAttribute('data-socket-id', contactSocketId);
-
-  contactDiv.appendChild(pictureDiv);
-  contactDiv.appendChild(infoDiv);
-  infoDiv.appendChild(nameDiv);
-  infoDiv.appendChild(emailDiv);
-
-  const starContactsDiv = document.querySelector('#star .contacts');
-
-  starContactsDiv.appendChild(contactDiv);
+  drawContactDivs(contacts, 'star');
 
   //add delete star button
+  const contactDiv = document.querySelector(`#star div.contact[data-id="${targetContactUserId}"]`);
   const deleteStarButton = document.createElement('div');
   deleteStarButton.setAttribute('class', 'contact-delete-star-button');
   contactDiv.appendChild(deleteStarButton);
