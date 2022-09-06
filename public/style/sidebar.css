@@ -1,0 +1,65 @@
+#sidebar .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  border-bottom: 1px solid black;
+}
+
+.header div:last-child {
+  cursor: pointer;
+}
+
+#all {
+  flex-grow: 1;
+  max-height: 50%;
+}
+
+#star {
+  border-top: 1px solid black;
+}
+
+.contact {
+  display: flex;
+  height: 4rem;
+  border-bottom: 1px solid black;
+  cursor: pointer;
+}
+
+.contact:hover {
+  background-color: pink;
+}
+
+.contact-picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1rem;
+  width: 15%;
+  border-right: 1px solid black;
+}
+
+.contact-info,
+.contact-add-star-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.contact-info {
+  flex-grow: 1;
+}
+
+.contact-add-star-button,
+.contact-delete-star-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 10%;
+  border-left: 1px solid black;
+}
+
+.contact-add-star-button:hover,
+.contact-delete-star-button:hover {
+  background-color: rgb(145, 189, 157);
+}
