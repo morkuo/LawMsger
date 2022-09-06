@@ -66,6 +66,10 @@
 
 .contact-status {
   width: 0.65rem;
-  background-color: rgb(145, 189, 157);
+  background-color: grey;
   border-right: 1px solid black;
+}
+
+.contact-status.on {
+  background-color: rgb(145, 189, 157);
 }

@@ -50,7 +50,7 @@ const signIn = async (req, res) => {
   });
 
   //email does not exist
-  if (!result) res.status(403).json({ error: 'Wrong email or password' });
+  if (!result) return res.status(403).json({ error: 'Wrong email or password' });
 
   //check password is correct or not
   const isCorrectPassword = await bcrypt.compare(password, result._source.password);

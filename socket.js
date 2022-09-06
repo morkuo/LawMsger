@@ -4,6 +4,7 @@ const {
   idHandler,
   createStarContact,
   deleteStarContact,
+  disconnectionHandlers,
 } = require('./utils/socket_handlers');
 const { jwtVerify } = require('./utils/helper');
 
@@ -26,10 +27,7 @@ function connect(server) {
     msgHandler(io, socket);
     createStarContact(io, socket);
     deleteStarContact(io, socket);
-
-    socket.on('disconnect', () => {
-      console.log('user disconnected');
-    });
+    disconnectionHandlers(io, socket);
   });
 
   return io;

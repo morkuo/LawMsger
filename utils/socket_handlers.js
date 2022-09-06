@@ -38,7 +38,24 @@ async function idHandler(io, socket) {
 
   socket.broadcast.emit('contactSocketIds', user.id, socket.id);
 
+  socket.broadcast.emit('onlineStatus', socket.id, 'on');
+
   console.log('socket connected (user socket id updated): ' + socket.id);
+}
+
+async function disconnectionHandlers(io, socket) {
+  socket.on('disconnect', async () => {
+    const result = await es.update({
+      index: 'user',
+      id: socket.userdata.id,
+      doc: {
+        socket_id: null,
+      },
+    });
+
+    socket.broadcast.emit('onlineStatus', socket.id, 'off');
+    console.log('user disconnected: ' + socket.id);
+  });
 }
 
 async function createStarContact(io, socket) {
@@ -107,4 +124,10 @@ async function deleteStarContact(io, socket) {
   });
 }
 
-module.exports = { msgHandler, idHandler, createStarContact, deleteStarContact };
+module.exports = {
+  msgHandler,
+  idHandler,
+  createStarContact,
+  deleteStarContact,
+  disconnectionHandlers,
+};

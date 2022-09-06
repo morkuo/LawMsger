@@ -103,6 +103,10 @@ function drawContactDivs(contacts, category) {
     contactDiv.setAttribute('data-id', contact.id);
     contactDiv.setAttribute('data-socket-id', contact.socket_id);
 
+    console.log(contact.socket_id);
+
+    if (contact.socket_id) statusDiv.classList.add('on');
+
     contactDiv.appendChild(statusDiv);
     contactDiv.appendChild(pictureDiv);
     contactDiv.appendChild(infoDiv);
@@ -117,12 +121,14 @@ async function updateContactSocketIds() {
   socket.on('contactSocketIds', (contactUserId, newSocketId) => {
     // console.log(`Contact ${contactUserId} changed to new socketId: ${newSocketId}`);
 
-    const contactDiv = document.querySelector(`[data-id="${contactUserId}"]`);
+    const contactDivs = document.querySelectorAll(`[data-id="${contactUserId}"]`);
     const chatWindow = document.getElementById('messages');
 
     if (chatWindow) chatWindow.setAttribute('data-socket-id', newSocketId);
 
-    contactDiv.setAttribute('data-socket-id', newSocketId);
+    contactDivs.forEach(div => {
+      div.setAttribute('data-socket-id', newSocketId);
+    });
   });
 }
 

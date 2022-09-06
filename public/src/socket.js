@@ -78,4 +78,20 @@ socket.on('deleteStarContact', response => {
   });
 });
 
+socket.on('onlineStatus', (socketId, status) => {
+  console.log(socketId, status);
+
+  console.log(socketId, status);
+
+  //append new star to star block
+  const contactDivs = document.querySelectorAll(`.contact[data-socket-id="${socketId}"]`);
+
+  contactDivs.forEach(div => {
+    const statusDiv = div.querySelector('.contact-status');
+
+    if (status === 'on') statusDiv.classList.add('on');
+    else statusDiv.classList.remove('on');
+  });
+});
+
 export { socket };
