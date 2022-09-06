@@ -101,9 +101,8 @@ function drawContactDivs(contacts, category) {
     emailDiv.innerText = contact.email;
 
     contactDiv.setAttribute('data-id', contact.id);
+    if (contact.socket_id === null) contact.socket_id = '';
     contactDiv.setAttribute('data-socket-id', contact.socket_id);
-
-    console.log(contact.socket_id);
 
     if (contact.socket_id) statusDiv.classList.add('on');
 
