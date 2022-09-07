@@ -1,12 +1,12 @@
 import { addClass, setMessage } from './helper.js';
-import { drawContactDivs } from './sidebar.js';
+import { drawContactDivs, drawSidebar } from './sidebar.js';
 
 let jwtToken = localStorage.getItem('token');
 
 const socket = io({ query: { jwtToken } });
 
 socket.on('connect', () => {
-  console.log(socket.id);
+  drawSidebar();
 });
 
 socket.on('msg', (msg, senderSocketId) => {

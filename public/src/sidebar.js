@@ -2,13 +2,14 @@ import { setMsg, addClass, getJwtToken, setMessage, fetchGet } from './helper.js
 import { socket } from './socket.js';
 import { addChatListenerToContactDivs } from './chat.js';
 
-main();
-
-async function main() {
+async function drawSidebar() {
   const contacts = await getContacts();
 
   const allContactsDiv = document.querySelector(`#all .contacts`);
   const starContactsDiv = document.querySelector(`#star .contacts`);
+
+  allContactsDiv.innerHTML = '';
+  starContactsDiv.innerHTML = '';
 
   drawContactDivs(contacts, 'all');
   addChatListenerToContactDivs(allContactsDiv);
@@ -161,4 +162,4 @@ function listenToChatWindow() {
   });
 }
 
-export { drawContactDivs };
+export { drawContactDivs, drawSidebar };
