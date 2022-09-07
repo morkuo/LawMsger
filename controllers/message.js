@@ -127,4 +127,14 @@ const getMatchedClauses = async (req, res) => {
   res.json(result);
 };
 
-module.exports = { getHistoryMessages, getMoreMessages, getSuggestions, getMatchedClauses };
+const uploadFiles = async (req, res) => {
+  res.json('request received');
+};
+
+module.exports = {
+  getHistoryMessages,
+  getMoreMessages,
+  getSuggestions,
+  getMatchedClauses,
+  uploadFiles,
+};

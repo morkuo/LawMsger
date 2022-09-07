@@ -120,3 +120,10 @@ ul {
 #navbar div {
   margin: 0 2rem;
 }
+
+#imagesContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5rem;
+}

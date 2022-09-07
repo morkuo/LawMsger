@@ -36,6 +36,18 @@
         <div id="pane">
           <h1>Welcome Aboard</h1>
         </div>
+        <button id="upload">Upload Picture</button>
+        <div id="imagesContainer">
+          <div class="imageInput">
+            <input type="file" name="images" id="mainImageInput" accept="image/*" /><button
+              id="unloadImage"
+              title="Undo"
+            >
+              X</button
+            ><img id="previewImage" alt=" " />
+          </div>
+          <button id="moreImageInputFieldButton">More Images</button>
+        </div>
       </div>
     </div>
 
@@ -43,5 +55,6 @@
     <script type="module" src="/src/socket.js"></script>
     <script type="module" src="/src/navbar.js"></script>
     <script type="module" src="/src/sidebar.js"></script>
+    <script type="module" src="/src/upload.js"></script>
   </body>
 </html>
