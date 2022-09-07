@@ -5,90 +5,92 @@ function addChatListenerToContactDivs(contactsDiv) {
   /*
     Click Specific Contact then draw Chat Window
     */
-  contactsDiv.addEventListener('click', async e => {
-    // click on add star button, then return
-    if (e.target.classList.contains('contact-add-star-button') && e.target.innerText !== '') return;
-    if (e.target.classList.contains('contact-delete-star-button')) return;
+  contactsDiv.addEventListener('click', chatListener);
+}
 
-    //look for the clicked element's user id
-    let targetContact = e.target;
-    while (!targetContact.hasAttribute('data-socket-id')) {
-      targetContact = targetContact.parentElement;
+async function chatListener(e) {
+  // click on add star button, then return
+  if (e.target.classList.contains('contact-add-star-button') && e.target.innerText !== '') return;
+  if (e.target.classList.contains('contact-delete-star-button')) return;
+
+  //look for the clicked element's user id
+  let targetContact = e.target;
+  while (!targetContact.hasAttribute('data-socket-id')) {
+    targetContact = targetContact.parentElement;
+  }
+
+  drawChatWindow(targetContact.dataset.id, targetContact.dataset.socketId);
+
+  //append history message to chat window
+  const { data: history } = await getMessages(targetContact.dataset.id);
+
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].sender_id !== targetContact.dataset.id) {
+      setMessage(history[i].message, history[i].created_at);
+    } else {
+      setMessage(history[i].message, history[i].created_at, targetContact.dataset.socketId);
     }
+  }
 
-    drawChatWindow(targetContact.dataset.id, targetContact.dataset.socketId);
+  //get more messages when scroll to top
+  const messages = document.getElementById('messages');
 
-    //append history message to chat window
-    const { data: history } = await getMessages(targetContact.dataset.id);
+  messages.addEventListener('scroll', async e => {
+    // console.log(e.target.scrollTop);
 
-    for (let i = history.length - 1; i >= 0; i--) {
-      if (history[i].sender_id !== targetContact.dataset.id) {
-        setMessage(history[i].message, history[i].created_at);
-      } else {
-        setMessage(history[i].message, history[i].created_at, targetContact.dataset.socketId);
-      }
-    }
+    if (e.target.scrollTop === 0) {
+      // console.log('Pull New data');
 
-    //get more messages when scroll to top
-    const messages = document.getElementById('messages');
+      let oldestMessageTimeDiv = messages.querySelector('li:first-child div:last-child');
+      let baselineTime = oldestMessageTimeDiv.innerText;
 
-    messages.addEventListener('scroll', async e => {
-      // console.log(e.target.scrollTop);
+      const { data: moreMessages } = await getMessages(targetContact.dataset.id, baselineTime);
 
-      if (e.target.scrollTop === 0) {
-        // console.log('Pull New data');
+      if (moreMessages.length === 0) return setMsg('No More Messages');
 
-        let oldestMessageTimeDiv = messages.querySelector('li:first-child div:last-child');
-        let baselineTime = oldestMessageTimeDiv.innerText;
-
-        const { data: moreMessages } = await getMessages(targetContact.dataset.id, baselineTime);
-
-        if (moreMessages.length === 0) return setMsg('No More Messages');
-
-        for (let msg of moreMessages) {
-          if (msg.sender_id !== targetContact.dataset.id) {
-            setMessage(msg.message, msg.created_at, null, 'more');
-          } else {
-            setMessage(msg.message, msg.created_at, targetContact.dataset.socketId, 'more');
-          }
+      for (let msg of moreMessages) {
+        if (msg.sender_id !== targetContact.dataset.id) {
+          setMessage(msg.message, msg.created_at, null, 'more');
+        } else {
+          setMessage(msg.message, msg.created_at, targetContact.dataset.socketId, 'more');
         }
       }
-    });
+    }
+  });
 
-    //suggestions
-    const input = document.getElementById('input');
-    const sugesstionsList = document.getElementById('suggestions');
-    const form = document.getElementById('form');
+  //suggestions
+  const input = document.getElementById('input');
+  const sugesstionsList = document.getElementById('suggestions');
+  const form = document.getElementById('form');
 
-    const debouncedDetectInput = debounce(detectInput, 600);
+  const debouncedDetectInput = debounce(detectInput, 600);
 
-    input.addEventListener('keydown', debouncedDetectInput);
+  input.addEventListener('keydown', debouncedDetectInput);
 
-    sugesstionsList.addEventListener('click', async e => {
-      if (e.target.tagName === 'LI') input.value = e.target.innerText;
-    });
+  sugesstionsList.addEventListener('click', async e => {
+    if (e.target.tagName === 'LI') input.value = e.target.innerText;
+  });
 
-    // Send message
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
+  // Send message
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
 
-      const messages = document.getElementById('messages');
-      const contactUserSocketId = messages.dataset.socketId;
-      const contactUserId = messages.dataset.id;
-      const contactDiv = document.querySelector(`[data-id="${contactUserId}"]`);
+    const messages = document.getElementById('messages');
+    const contactUserSocketId = messages.dataset.socketId;
+    const contactUserId = messages.dataset.id;
+    const contactDiv = document.querySelector(`[data-id="${contactUserId}"]`);
 
-      const contactNameDiv = contactDiv.querySelector('.contact-info div:first-child');
-      const contactName = contactNameDiv.innerText;
+    const contactNameDiv = contactDiv.querySelector('.contact-info div:first-child');
+    const contactName = contactNameDiv.innerText;
 
-      if (input.value) {
-        socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName);
+    if (input.value) {
+      socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName);
 
-        setMessage(input.value, Date.now());
+      setMessage(input.value, Date.now());
 
-        //clear input field
-        input.value = '';
-      }
-    });
+      //clear input field
+      input.value = '';
+    }
   });
 }
 
