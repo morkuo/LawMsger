@@ -37,7 +37,7 @@
 .chat-message-file-preview,
 .chat-upload-image-preview,
 .chat-upload-file-preview {
-  margin: 0 0.3rem;
+  margin-right: 0.6rem;
   border: 1px solid black;
 }
 
@@ -46,17 +46,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 3rem;
-  width: 3rem;
+  height: 10rem;
+  width: 14rem;
 }
 
-/*chat-message-image-preview*/
+.chat-message-image-preview,
 .chat-upload-image-preview {
   max-height: 14rem;
   max-width: 14rem;
-}
-
-.chat-message-image-preview {
-  height: 3rem;
-  width: 3rem;
 }

@@ -83,15 +83,17 @@ ul {
 
 #messages > li div {
   display: flex;
-  margin: 0.1rem;
   min-width: 3rem;
   min-height: 3rem;
-
   justify-content: center;
-  align-items: center;
 }
 
-#messages > li div:first-child {
+.chat-sender-picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 3rem;
+  height: 3rem;
   border: 1px solid black;
 }
 
@@ -99,10 +101,13 @@ ul {
   background: #efefef;
 }
 
-#messages > li div.messageTextDiv {
+#messages > li div.chat-message-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
   padding-left: 1rem;
   flex-grow: 1;
-  justify-content: flex-start;
 }
 
 .container {

@@ -39,7 +39,7 @@ function getJwtToken() {
   return authorization;
 }
 
-function setMessage(msg, time, senderSocketId, more, fileUrls) {
+async function setMessage(msg, time, senderSocketId, more, fileUrls) {
   const messages = document.getElementById('messages');
 
   if (!messages) return;
@@ -48,37 +48,46 @@ function setMessage(msg, time, senderSocketId, more, fileUrls) {
 
   const senderDiv = document.createElement('div');
   const messageDiv = document.createElement('div');
+  const messageText = document.createElement('p');
   const filesDiv = document.createElement('div');
   const timeDiv = document.createElement('div');
 
-  messageDiv.innerText = msg;
   timeDiv.innerText = time;
 
-  let urls = null;
-  if (fileUrls) {
-    urls = JSON.parse(fileUrls).data;
-
-    for (let url of urls) {
-      if (isImage(url)) {
-        const image = document.createElement('img');
-        image.setAttribute('class', 'chat-message-image-preview');
-        image.src = url;
-        filesDiv.appendChild(image);
-      } else {
-        const file = document.createElement('div');
-        file.setAttribute('class', 'chat-message-file-preview');
-        file.innerText = 'File';
-        filesDiv.appendChild(file);
-      }
-    }
-  }
-
-  messageDiv.setAttribute('class', 'messageTextDiv');
+  senderDiv.setAttribute('class', 'chat-sender-picture');
+  messageDiv.setAttribute('class', 'chat-message-text');
 
   item.appendChild(senderDiv);
   item.appendChild(messageDiv);
-  item.appendChild(filesDiv);
   item.appendChild(timeDiv);
+
+  if (msg !== '') {
+    messageText.innerText = msg;
+    messageDiv.appendChild(messageText);
+  }
+
+  let urls = null;
+  if (fileUrls) {
+    urls = await JSON.parse(fileUrls).data;
+
+    if (urls.length !== 0) {
+      for (let url of urls) {
+        if (isImage(url)) {
+          const image = document.createElement('img');
+          image.setAttribute('class', 'chat-message-image-preview');
+          image.src = url;
+          filesDiv.appendChild(image);
+        } else {
+          const file = document.createElement('div');
+          file.setAttribute('class', 'chat-message-file-preview');
+          file.innerText = 'File';
+          filesDiv.appendChild(file);
+        }
+      }
+
+      messageDiv.appendChild(filesDiv);
+    }
+  }
 
   if (!more) messages.appendChild(item);
   else messages.insertAdjacentElement('afterbegin', item);
