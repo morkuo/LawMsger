@@ -99,11 +99,13 @@ async function chatListener(e) {
 
     if (input.value || uploadButton.value) {
       const authorization = getJwtToken();
-      const rawfileUrls = await uploadFile(authorization);
+      const response = await uploadFile(authorization);
+
+      if (response.error) return alert(response.error);
 
       // console.log('Got fileUrls from server:', rawfileUrls);
 
-      const fileUrls = JSON.stringify(rawfileUrls);
+      const fileUrls = JSON.stringify(response);
 
       socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName, fileUrls);
 
@@ -124,7 +126,6 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   const uploadButtonWrapper = document.createElement('label');
   const uploadButton = document.createElement('input');
   const previewImageDiv = document.createElement('div');
-  const previewImage = document.createElement('img');
   const unloadButton = document.createElement('div');
 
   pane.innerHTML = '';
@@ -151,9 +152,6 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
 
   previewImageDiv.setAttribute('id', 'previewImageDiv');
   previewImageDiv.setAttribute('data-file', 'false');
-  previewImage.setAttribute('id', 'previewImage');
-  previewImage.setAttribute('alt', ' ');
-  previewImage.setAttribute('src', '');
 
   form.appendChild(input);
   form.appendChild(sendButton);
@@ -166,7 +164,6 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   uploadButtonWrapper.appendChild(uploadButton);
   pane.appendChild(previewImageDiv);
   previewImageDiv.appendChild(unloadButton);
-  previewImageDiv.appendChild(previewImage);
 
   addUploadFileListener();
   addUnloadFileListener();
@@ -383,30 +380,18 @@ function previewFile(filesInput) {
 
 function addUnloadFileListener() {
   const unloadFileButton = document.querySelector('#chatUnloadFileButton');
-  const uploadButton = document.querySelector('#chatUploadButton');
+  // const uploadButton = document.querySelector('#chatUploadButton');
 
   //Remove all selected files
   unloadFileButton.addEventListener('click', e => {
     e.preventDefault();
 
-    const previewImageDiv = document.querySelector('#previewImageDiv');
-    const previewImage = document.querySelectorAll('.previewImage');
-
-    uploadButton.value = '';
-
-    for (let image of previewImage) {
-      image.remove();
-    }
-
-    previewImageDiv.setAttribute('data-file', 'false');
+    clearUploadFiles();
   });
 }
 
 async function uploadFile(authorization) {
   const filesInput = document.querySelector('input[type="file"]');
-  const uploadButton = document.querySelector('#chatUploadButton');
-  const previewImageDiv = document.querySelector('#previewImageDiv');
-  const previewImage = document.querySelector('#previewImage');
 
   const formData = new FormData();
 
@@ -426,15 +411,25 @@ async function uploadFile(authorization) {
     body: formData,
   });
 
+  clearUploadFiles();
+
   const response = await res.json();
 
-  if (response.error) return alert(response.error);
+  return response;
+}
+
+function clearUploadFiles() {
+  const uploadButton = document.querySelector('#chatUploadButton');
+  const previewImageDiv = document.querySelector('#previewImageDiv');
+  const previewImage = document.querySelectorAll('.previewImage');
+
+  for (let image of previewImage) {
+    image.remove();
+  }
 
   uploadButton.value = '';
   previewImage.src = '';
   previewImageDiv.setAttribute('data-file', 'false');
-
-  return response;
 }
 
 export { addChatListenerToContactDivs };
