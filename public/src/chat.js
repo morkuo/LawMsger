@@ -439,7 +439,7 @@ async function uploadFile(authorization) {
 
 function handleFilesPreview(e) {
   for (let i = 0; i < e.target.files.length; i++) {
-    const file = input.files[i];
+    const file = e.target.files[i];
     const reader = new FileReader();
 
     if (file) {
@@ -452,8 +452,6 @@ function handleFilesPreview(e) {
         const previewImage = document.createElement('img');
         previewImage.setAttribute('class', 'previewImage');
         previewImage.src = reader.result;
-
-        previewImageDiv.appendChild(previewImage);
       },
       false
     );
