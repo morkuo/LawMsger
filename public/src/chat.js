@@ -427,13 +427,12 @@ function clearUploadFiles() {
   const uploadButton = document.querySelector('#chatUploadButton');
   const previewImageDiv = document.querySelector('#previewImageDiv');
   const previewImage = document.querySelectorAll('.chat-upload-image-preview');
+  const previewFile = document.querySelectorAll('.chat-upload-file-preview');
 
-  for (let image of previewImage) {
-    image.remove();
-  }
+  for (let image of previewImage) image.remove();
+  for (let file of previewFile) file.remove();
 
   uploadButton.value = '';
-  previewImage.src = '';
   previewImageDiv.setAttribute('data-file', 'false');
 }
 
