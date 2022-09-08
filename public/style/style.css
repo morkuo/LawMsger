@@ -11,6 +11,11 @@ ul {
   list-style: none;
 }
 
+a {
+  text-decoration: none;
+  color: black;
+}
+
 #suggestions {
   position: absolute;
   margin-left: 1rem;

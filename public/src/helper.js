@@ -79,8 +79,10 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo) {
           image.src = url;
           filesDiv.appendChild(image);
         } else {
-          const file = document.createElement('div');
+          const file = document.createElement('a');
           file.setAttribute('class', 'chat-message-file-preview');
+          file.setAttribute('href', `${url}`);
+          file.setAttribute('download', `testname`);
           file.innerText = originalName;
           filesDiv.appendChild(file);
         }

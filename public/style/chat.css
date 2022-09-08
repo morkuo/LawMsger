@@ -55,3 +55,8 @@
   max-height: 14rem;
   max-width: 14rem;
 }
+
+.chat-message-image-preview,
+.chat-message-file-preview {
+  cursor: pointer;
+}
