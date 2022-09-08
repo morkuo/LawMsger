@@ -4,8 +4,7 @@ const { jwtVerify } = require('../utils/helper');
 function msgHandler(io, socket) {
   socket.on('msg', async (msg, targetSocketId, targetUserId, targetUserName, fileUrls) => {
     // console.log('Server receives: ' + msg);
-
-    console.log('received' + fileUrls);
+    // console.log('received' + fileUrls);
 
     const fromSocketId = socket.id;
     socket.to(targetSocketId).emit('msg', msg, fromSocketId, fileUrls);
@@ -18,6 +17,7 @@ function msgHandler(io, socket) {
         receiver_id: targetUserId,
         receiver_name: targetUserName,
         message: msg,
+        files: fileUrls,
       },
     });
 

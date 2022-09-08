@@ -26,9 +26,15 @@ async function chatListener(e) {
 
   for (let i = history.length - 1; i >= 0; i--) {
     if (history[i].sender_id !== targetContact.dataset.id) {
-      setMessage(history[i].message, history[i].created_at);
+      setMessage(history[i].message, history[i].created_at, null, null, history[i].files);
     } else {
-      setMessage(history[i].message, history[i].created_at, targetContact.dataset.socketId);
+      setMessage(
+        history[i].message,
+        history[i].created_at,
+        targetContact.dataset.socketId,
+        null,
+        history[i].files
+      );
     }
   }
 
@@ -50,9 +56,15 @@ async function chatListener(e) {
 
       for (let msg of moreMessages) {
         if (msg.sender_id !== targetContact.dataset.id) {
-          setMessage(msg.message, msg.created_at, null, 'more');
+          setMessage(msg.message, msg.created_at, null, 'more', msg.files);
         } else {
-          setMessage(msg.message, msg.created_at, targetContact.dataset.socketId, 'more');
+          setMessage(
+            msg.message,
+            msg.created_at,
+            targetContact.dataset.socketId,
+            'more',
+            msg.files
+          );
         }
       }
     }
@@ -87,20 +99,15 @@ async function chatListener(e) {
 
     if (input.value || uploadButton.value) {
       const authorization = getJwtToken();
-      const fileUrls = await uploadFile(authorization);
+      const rawfileUrls = await uploadFile(authorization);
 
-      console.log('Got fileUrls from server:', fileUrls);
+      // console.log('Got fileUrls from server:', rawfileUrls);
 
-      socket.emit(
-        'msg',
-        input.value,
-        contactUserSocketId,
-        contactUserId,
-        contactName,
-        JSON.stringify(fileUrls)
-      );
+      const fileUrls = JSON.stringify(rawfileUrls);
 
-      setMessage(input.value, Date.now());
+      socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName, fileUrls);
+
+      setMessage(input.value, Date.now(), null, null, fileUrls);
 
       input.value = '';
     }
