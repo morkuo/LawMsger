@@ -25,6 +25,11 @@
   visibility: hidden;
 }
 
+.previewImage {
+  max-height: 12rem;
+  max-width: 24rem;
+}
+
 #chatUnloadFileButton {
   cursor: pointer;
 }

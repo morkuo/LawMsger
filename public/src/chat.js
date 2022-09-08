@@ -350,26 +350,45 @@ function addUploadFileListener() {
   });
 }
 
-function previewFile(imageInput) {
+function previewFile(filesInput) {
   const previewImageDiv = document.querySelector('#previewImageDiv');
-  const previewImage = document.querySelector('#previewImage');
 
   previewImageDiv.setAttribute('data-file', 'true');
 
-  const file = imageInput.files[0];
-  const reader = new FileReader();
+  for (let i = 0; i < filesInput.files.length; i++) {
+    const file = filesInput.files[i];
+    const reader = new FileReader();
 
-  reader.addEventListener(
-    'load',
-    () => {
-      previewImage.src = reader.result;
-    },
-    false
-  );
+    if (file) {
+      reader.readAsDataURL(file);
+    }
 
-  if (file) {
-    reader.readAsDataURL(file);
+    reader.addEventListener(
+      'load',
+      () => {
+        const previewImage = document.createElement('img');
+        previewImage.setAttribute('class', 'previewImage');
+        previewImage.src = reader.result;
+
+        previewImageDiv.appendChild(previewImage);
+      },
+      false
+    );
   }
+  // const file = imageInput.files[0];
+  // const reader = new FileReader();
+
+  // reader.addEventListener(
+  //   'load',
+  //   () => {
+  //     previewImage.src = reader.result;
+  //   },
+  //   false
+  // );
+
+  // if (file) {
+  //   reader.readAsDataURL(file);
+  // }
 }
 
 function addUnloadFileListener() {
@@ -420,6 +439,29 @@ async function uploadFile(authorization) {
   previewImageDiv.setAttribute('data-file', 'false');
 
   return response;
+}
+
+function handleFilesPreview(e) {
+  for (let i = 0; i < e.target.files.length; i++) {
+    const file = input.files[i];
+    const reader = new FileReader();
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+
+    reader.addEventListener(
+      'load',
+      () => {
+        const previewImage = document.createElement('img');
+        previewImage.setAttribute('class', 'previewImage');
+        previewImage.src = reader.result;
+
+        previewImageDiv.appendChild(previewImage);
+      },
+      false
+    );
+  }
 }
 
 export { addChatListenerToContactDivs };
