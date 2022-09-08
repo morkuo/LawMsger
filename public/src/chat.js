@@ -147,7 +147,7 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   uploadButton.style.visibility = 'hidden';
 
   unloadButton.setAttribute('id', 'chatUnloadFileButton');
-  unloadButton.innerText = 'X';
+  unloadButton.innerText = 'Remove All';
 
   previewImageDiv.setAttribute('id', 'previewImageDiv');
   previewImageDiv.setAttribute('data-file', 'false');
@@ -359,6 +359,10 @@ function previewFile(filesInput) {
     const file = filesInput.files[i];
     const reader = new FileReader();
 
+    // const removeButton = document.createElement('div');
+    // removeButton
+    // removeButton.addEventListener
+
     if (file) {
       reader.readAsDataURL(file);
     }
@@ -375,33 +379,25 @@ function previewFile(filesInput) {
       false
     );
   }
-  // const file = imageInput.files[0];
-  // const reader = new FileReader();
-
-  // reader.addEventListener(
-  //   'load',
-  //   () => {
-  //     previewImage.src = reader.result;
-  //   },
-  //   false
-  // );
-
-  // if (file) {
-  //   reader.readAsDataURL(file);
-  // }
 }
 
 function addUnloadFileListener() {
   const unloadFileButton = document.querySelector('#chatUnloadFileButton');
   const uploadButton = document.querySelector('#chatUploadButton');
-  const previewImageDiv = document.querySelector('#previewImageDiv');
-  const previewImage = document.querySelector('#previewImage');
 
+  //Remove all selected files
   unloadFileButton.addEventListener('click', e => {
     e.preventDefault();
 
+    const previewImageDiv = document.querySelector('#previewImageDiv');
+    const previewImage = document.querySelectorAll('.previewImage');
+
     uploadButton.value = '';
-    previewImage.src = '';
+
+    for (let image of previewImage) {
+      image.remove();
+    }
+
     previewImageDiv.setAttribute('data-file', 'false');
   });
 }
