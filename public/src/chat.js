@@ -437,25 +437,4 @@ async function uploadFile(authorization) {
   return response;
 }
 
-function handleFilesPreview(e) {
-  for (let i = 0; i < e.target.files.length; i++) {
-    const file = e.target.files[i];
-    const reader = new FileReader();
-
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-
-    reader.addEventListener(
-      'load',
-      () => {
-        const previewImage = document.createElement('img');
-        previewImage.setAttribute('class', 'previewImage');
-        previewImage.src = reader.result;
-      },
-      false
-    );
-  }
-}
-
 export { addChatListenerToContactDivs };
