@@ -1,4 +1,4 @@
-import { setMsg, addClass, getJwtToken, setMessage, fetchGet } from './helper.js';
+import { setMsg, addClass, getJwtToken, setMessage, fetchGet, isImage } from './helper.js';
 import { socket } from './socket.js';
 
 function addChatListenerToContactDivs(contactsDiv) {
@@ -148,7 +148,7 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   uploadButton.style.visibility = 'hidden';
 
   unloadButton.setAttribute('id', 'chatUnloadFileButton');
-  unloadButton.innerText = 'Remove All';
+  unloadButton.innerText = 'X';
 
   previewImageDiv.setAttribute('id', 'previewImageDiv');
   previewImageDiv.setAttribute('data-file', 'false');
@@ -356,9 +356,7 @@ function previewFile(filesInput) {
     const file = filesInput.files[i];
     const reader = new FileReader();
 
-    // const removeButton = document.createElement('div');
-    // removeButton
-    // removeButton.addEventListener
+    console.log();
 
     if (file) {
       reader.readAsDataURL(file);
@@ -367,11 +365,18 @@ function previewFile(filesInput) {
     reader.addEventListener(
       'load',
       () => {
-        const previewImage = document.createElement('img');
-        previewImage.setAttribute('class', 'previewImage');
-        previewImage.src = reader.result;
+        if (isImage(file.name)) {
+          const previewImage = document.createElement('img');
+          previewImage.setAttribute('class', 'chat-upload-image-preview');
+          previewImage.src = reader.result;
 
-        previewImageDiv.appendChild(previewImage);
+          previewImageDiv.appendChild(previewImage);
+        } else {
+          const file = document.createElement('div');
+          file.setAttribute('class', 'chat-upload-file-preview');
+          file.innerText = 'File';
+          previewImageDiv.appendChild(file);
+        }
       },
       false
     );
@@ -421,7 +426,7 @@ async function uploadFile(authorization) {
 function clearUploadFiles() {
   const uploadButton = document.querySelector('#chatUploadButton');
   const previewImageDiv = document.querySelector('#previewImageDiv');
-  const previewImage = document.querySelectorAll('.previewImage');
+  const previewImage = document.querySelectorAll('.chat-upload-image-preview');
 
   for (let image of previewImage) {
     image.remove();

@@ -59,10 +59,17 @@ function setMessage(msg, time, senderSocketId, more, fileUrls) {
     urls = JSON.parse(fileUrls).data;
 
     for (let url of urls) {
-      const image = document.createElement('img');
-      image.setAttribute('class', 'chat-message-file-preview');
-      image.src = url;
-      filesDiv.appendChild(image);
+      if (isImage(url)) {
+        const image = document.createElement('img');
+        image.setAttribute('class', 'chat-message-image-preview');
+        image.src = url;
+        filesDiv.appendChild(image);
+      } else {
+        const file = document.createElement('div');
+        file.setAttribute('class', 'chat-message-file-preview');
+        file.innerText = 'File';
+        filesDiv.appendChild(file);
+      }
     }
   }
 
@@ -110,4 +117,8 @@ async function fetchGet(apiPath) {
   return response;
 }
 
-export { setMsg, addClass, storeToken, getJwtToken, setMessage, fetchGet };
+function isImage(url) {
+  return /\.(jpg|jpeg|png|gif|svg)$/.test(url);
+}
+
+export { setMsg, addClass, storeToken, getJwtToken, setMessage, fetchGet, isImage };
