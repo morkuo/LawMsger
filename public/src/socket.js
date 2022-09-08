@@ -9,7 +9,7 @@ socket.on('connect', () => {
   drawSidebar();
 });
 
-socket.on('msg', (msg, senderSocketId) => {
+socket.on('msg', (msg, senderSocketId, fileUrls) => {
   console.log('From server:' + senderSocketId);
 
   //check if current user is at chat window
@@ -20,7 +20,7 @@ socket.on('msg', (msg, senderSocketId) => {
   if (senderSocketId !== messages.dataset.socketId) return;
 
   //append message from the sender to chat window
-  setMessage(msg, Date.now(), senderSocketId);
+  setMessage(msg, Date.now(), senderSocketId, null, fileUrls);
 });
 
 socket.on('createStarContact', response => {
@@ -109,6 +109,10 @@ socket.on('disconnect', () => {
     statusDiv.classList.remove('on');
     div.setAttribute('data-socket-id', '');
   });
+});
+
+socket.on('file', location => {
+  console.log(location);
 });
 
 export { socket };

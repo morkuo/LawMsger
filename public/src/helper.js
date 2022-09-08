@@ -39,7 +39,7 @@ function getJwtToken() {
   return authorization;
 }
 
-function setMessage(msg, time, senderSocketId, more) {
+function setMessage(msg, time, senderSocketId, more, fileUrls) {
   const messages = document.getElementById('messages');
 
   if (!messages) return;
@@ -48,15 +48,29 @@ function setMessage(msg, time, senderSocketId, more) {
 
   const senderDiv = document.createElement('div');
   const messageDiv = document.createElement('div');
+  const filesDiv = document.createElement('div');
   const timeDiv = document.createElement('div');
 
   messageDiv.innerText = msg;
   timeDiv.innerText = time;
 
+  let urls = null;
+  if (fileUrls) {
+    urls = JSON.parse(fileUrls).data;
+
+    for (let url of urls) {
+      const image = document.createElement('img');
+      image.setAttribute('class', 'chat-message-file-preview');
+      image.src = url;
+      filesDiv.appendChild(image);
+    }
+  }
+
   messageDiv.setAttribute('class', 'messageTextDiv');
 
   item.appendChild(senderDiv);
   item.appendChild(messageDiv);
+  item.appendChild(filesDiv);
   item.appendChild(timeDiv);
 
   if (!more) messages.appendChild(item);

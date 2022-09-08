@@ -128,7 +128,9 @@ const getMatchedClauses = async (req, res) => {
 };
 
 const uploadFiles = async (req, res) => {
-  res.json('request received');
+  const fileUrls = req.files.map(file => file.location);
+
+  res.json({ data: fileUrls });
 };
 
 module.exports = {

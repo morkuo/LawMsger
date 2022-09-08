@@ -1,0 +1,36 @@
+#chatUploadButtonWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 1.5rem;
+  width: 1.5rem;
+  cursor: pointer;
+  background-color: #333;
+  color: white;
+  border-radius: 50%;
+}
+
+#previewImageDiv {
+  position: absolute;
+  padding: 1rem;
+  right: 1.5rem;
+  bottom: 5.8rem;
+  border: 1px solid black;
+  background-color: white;
+  border-radius: 10px;
+}
+
+#previewImageDiv[data-file='false'] {
+  visibility: hidden;
+}
+
+#chatUnloadFileButton {
+  cursor: pointer;
+}
+
+.chat-message-file-preview {
+  margin: 0 0.3rem;
+  height: 2.5rem;
+  width: 1.5rem;
+}

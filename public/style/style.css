@@ -17,8 +17,9 @@ ul {
   border: 1px solid black;
   border-radius: 1rem;
   padding: 1rem;
-  bottom: 50px;
+  bottom: 80px;
   background-color: white;
+  border: 1px solid black;
 }
 
 #main {
@@ -37,6 +38,9 @@ ul {
 }
 
 #form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: rgba(0, 0, 0, 0.15);
   padding: 0.25rem;
   display: flex;
@@ -46,6 +50,7 @@ ul {
 #input {
   border: none;
   padding: 0 1rem;
+  min-height: 1.5rem;
   flex-grow: 1;
   border-radius: 2rem;
   margin: 0.25rem;
@@ -58,6 +63,7 @@ ul {
   border: none;
   padding: 0 1rem;
   margin: 0.25rem;
+  min-height: 1.5rem;
   border-radius: 3px;
   outline: none;
   color: #fff;

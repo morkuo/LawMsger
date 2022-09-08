@@ -72,7 +72,7 @@ async function chatListener(e) {
   });
 
   // Send message
-  form.addEventListener('submit', function (e) {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
 
     const messages = document.getElementById('messages');
@@ -83,12 +83,25 @@ async function chatListener(e) {
     const contactNameDiv = contactDiv.querySelector('.contact-info div:first-child');
     const contactName = contactNameDiv.innerText;
 
-    if (input.value) {
-      socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName);
+    const uploadButton = document.querySelector('#chatUploadButton');
+
+    if (input.value || uploadButton.value) {
+      const authorization = getJwtToken();
+      const fileUrls = await uploadFile(authorization);
+
+      console.log('Got fileUrls from server:', fileUrls);
+
+      socket.emit(
+        'msg',
+        input.value,
+        contactUserSocketId,
+        contactUserId,
+        contactName,
+        JSON.stringify(fileUrls)
+      );
 
       setMessage(input.value, Date.now());
 
-      //clear input field
       input.value = '';
     }
   });
@@ -100,7 +113,12 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   const suggestions = document.createElement('ul');
   const input = document.createElement('input');
   const form = document.createElement('form');
-  const button = document.createElement('button');
+  const sendButton = document.createElement('button');
+  const uploadButtonWrapper = document.createElement('label');
+  const uploadButton = document.createElement('input');
+  const previewImageDiv = document.createElement('div');
+  const previewImage = document.createElement('img');
+  const unloadButton = document.createElement('div');
 
   pane.innerHTML = '';
 
@@ -111,14 +129,40 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   form.setAttribute('id', 'form');
   input.setAttribute('id', 'input');
   input.setAttribute('autocomplete', 'off');
-  button.innerText = 'Send';
+
+  sendButton.innerText = 'Send';
+
+  uploadButtonWrapper.setAttribute('id', 'chatUploadButtonWrapper');
+  uploadButton.setAttribute('id', 'chatUploadButton');
+  uploadButton.setAttribute('type', 'file');
+  uploadButton.setAttribute('name', 'images');
+  uploadButton.setAttribute('multiple', '');
+  uploadButton.style.visibility = 'hidden';
+
+  unloadButton.setAttribute('id', 'chatUnloadFileButton');
+  unloadButton.innerText = 'X';
+
+  previewImageDiv.setAttribute('id', 'previewImageDiv');
+  previewImageDiv.setAttribute('data-file', 'false');
+  previewImage.setAttribute('id', 'previewImage');
+  previewImage.setAttribute('alt', ' ');
+  previewImage.setAttribute('src', '');
 
   form.appendChild(input);
-  form.appendChild(button);
+  form.appendChild(sendButton);
 
   pane.appendChild(messages);
   pane.appendChild(suggestions);
   pane.appendChild(form);
+
+  form.appendChild(uploadButtonWrapper);
+  uploadButtonWrapper.appendChild(uploadButton);
+  pane.appendChild(previewImageDiv);
+  previewImageDiv.appendChild(unloadButton);
+  previewImageDiv.appendChild(previewImage);
+
+  addUploadFileListener();
+  addUnloadFileListener();
 }
 
 async function getMessages(targetContactUserId, baselineTime) {
@@ -289,6 +333,86 @@ async function detectInput(e) {
 
     return;
   }
+}
+
+function addUploadFileListener() {
+  const chatUploadButton = document.querySelector('#chatUploadButton');
+
+  chatUploadButton.addEventListener('change', e => {
+    previewFile(e.target);
+  });
+}
+
+function previewFile(imageInput) {
+  const previewImageDiv = document.querySelector('#previewImageDiv');
+  const previewImage = document.querySelector('#previewImage');
+
+  previewImageDiv.setAttribute('data-file', 'true');
+
+  const file = imageInput.files[0];
+  const reader = new FileReader();
+
+  reader.addEventListener(
+    'load',
+    () => {
+      previewImage.src = reader.result;
+    },
+    false
+  );
+
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+}
+
+function addUnloadFileListener() {
+  const unloadFileButton = document.querySelector('#chatUnloadFileButton');
+  const uploadButton = document.querySelector('#chatUploadButton');
+  const previewImageDiv = document.querySelector('#previewImageDiv');
+  const previewImage = document.querySelector('#previewImage');
+
+  unloadFileButton.addEventListener('click', e => {
+    e.preventDefault();
+
+    uploadButton.value = '';
+    previewImage.src = '';
+    previewImageDiv.setAttribute('data-file', 'false');
+  });
+}
+
+async function uploadFile(authorization) {
+  const filesInput = document.querySelector('input[type="file"]');
+  const uploadButton = document.querySelector('#chatUploadButton');
+  const previewImageDiv = document.querySelector('#previewImageDiv');
+  const previewImage = document.querySelector('#previewImage');
+
+  const formData = new FormData();
+
+  for (let file of filesInput.files) {
+    formData.append('images', file);
+  }
+
+  console.log('Going to upload this: ', filesInput);
+
+  const api = `${window.location.origin}/api/1.0/message/upload`;
+
+  const res = await fetch(api, {
+    method: 'POST',
+    headers: {
+      'Authorization': authorization,
+    },
+    body: formData,
+  });
+
+  const response = await res.json();
+
+  if (response.error) return alert(response.error);
+
+  uploadButton.value = '';
+  previewImage.src = '';
+  previewImageDiv.setAttribute('data-file', 'false');
+
+  return response;
 }
 
 export { addChatListenerToContactDivs };

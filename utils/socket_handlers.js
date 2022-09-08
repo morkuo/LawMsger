@@ -2,11 +2,13 @@ const es = require('./es');
 const { jwtVerify } = require('../utils/helper');
 
 function msgHandler(io, socket) {
-  socket.on('msg', async (msg, targetSocketId, targetUserId, targetUserName) => {
+  socket.on('msg', async (msg, targetSocketId, targetUserId, targetUserName, fileUrls) => {
     // console.log('Server receives: ' + msg);
 
+    console.log('received' + fileUrls);
+
     const fromSocketId = socket.id;
-    socket.to(targetSocketId).emit('msg', msg, fromSocketId);
+    socket.to(targetSocketId).emit('msg', msg, fromSocketId, fileUrls);
 
     await es.index({
       index: 'message',
