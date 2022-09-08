@@ -105,11 +105,11 @@ async function chatListener(e) {
 
       // console.log('Got fileUrls from server:', rawfileUrls);
 
-      const fileUrls = JSON.stringify(response);
+      const filesInfo = JSON.stringify(response);
 
-      socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName, fileUrls);
+      socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName, filesInfo);
 
-      setMessage(input.value, Date.now(), null, null, fileUrls);
+      setMessage(input.value, Date.now(), null, null, filesInfo);
 
       input.value = '';
     }
@@ -350,6 +350,7 @@ function addUploadFileListener() {
 function previewFile(filesInput) {
   const previewImageDiv = document.querySelector('#previewImageDiv');
 
+  console.log(filesInput.files);
   previewImageDiv.setAttribute('data-file', 'true');
 
   for (let i = 0; i < filesInput.files.length; i++) {
@@ -372,10 +373,10 @@ function previewFile(filesInput) {
 
           previewImageDiv.appendChild(previewImage);
         } else {
-          const file = document.createElement('div');
-          file.setAttribute('class', 'chat-upload-file-preview');
-          file.innerText = 'File';
-          previewImageDiv.appendChild(file);
+          const fileDiv = document.createElement('div');
+          fileDiv.setAttribute('class', 'chat-upload-file-preview');
+          fileDiv.innerText = file.name;
+          previewImageDiv.appendChild(fileDiv);
         }
       },
       false

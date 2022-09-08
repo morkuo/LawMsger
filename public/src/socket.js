@@ -9,7 +9,7 @@ socket.on('connect', () => {
   drawSidebar();
 });
 
-socket.on('msg', (msg, senderSocketId, fileUrls) => {
+socket.on('msg', (msg, senderSocketId, filesInfo) => {
   console.log('From server:' + senderSocketId);
 
   //check if current user is at chat window
@@ -20,7 +20,7 @@ socket.on('msg', (msg, senderSocketId, fileUrls) => {
   if (senderSocketId !== messages.dataset.socketId) return;
 
   //append message from the sender to chat window
-  setMessage(msg, Date.now(), senderSocketId, null, fileUrls);
+  setMessage(msg, Date.now(), senderSocketId, null, filesInfo);
 });
 
 socket.on('createStarContact', response => {

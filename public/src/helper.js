@@ -39,7 +39,7 @@ function getJwtToken() {
   return authorization;
 }
 
-async function setMessage(msg, time, senderSocketId, more, fileUrls) {
+async function setMessage(msg, time, senderSocketId, more, filesInfo) {
   const messages = document.getElementById('messages');
 
   if (!messages) return;
@@ -66,12 +66,13 @@ async function setMessage(msg, time, senderSocketId, more, fileUrls) {
     messageDiv.appendChild(messageText);
   }
 
-  let urls = null;
-  if (fileUrls) {
-    urls = await JSON.parse(fileUrls).data;
+  if (filesInfo) {
+    const infoArray = await JSON.parse(filesInfo).data;
 
-    if (urls.length !== 0) {
-      for (let url of urls) {
+    if (infoArray.length !== 0) {
+      for (let info of infoArray) {
+        const { location: url, originalName } = info;
+
         if (isImage(url)) {
           const image = document.createElement('img');
           image.setAttribute('class', 'chat-message-image-preview');
@@ -80,7 +81,7 @@ async function setMessage(msg, time, senderSocketId, more, fileUrls) {
         } else {
           const file = document.createElement('div');
           file.setAttribute('class', 'chat-message-file-preview');
-          file.innerText = 'File';
+          file.innerText = originalName;
           filesDiv.appendChild(file);
         }
       }
