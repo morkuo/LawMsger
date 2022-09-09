@@ -322,13 +322,31 @@ async function detectInput(e) {
     //tab listener
     input.addEventListener(
       'keydown',
-      e => {
+      async e => {
         if (e.key === 'Tab') {
           //to stay in the input field
           e.preventDefault();
 
           e.target.value = currentInput.slice(0, matchclausesContent) + suggestions[0].body;
           suggestionsList.innerHTML = '';
+
+          const { title, number } = suggestions[0];
+
+          const now = new Date();
+          const origin = now.toISOString();
+
+          const authorization = getJwtToken();
+
+          const api = `${window.location.origin}/api/1.0/message/match`;
+
+          const res = await fetch(api, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': authorization,
+            },
+            body: JSON.stringify({ origin, title, number }),
+          });
         }
       },
       //once the eventlistener has been fired once, remove itself

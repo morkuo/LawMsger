@@ -36,6 +36,9 @@ async function suggestions(input, index) {
 }
 
 async function matchedClauses(input) {
+  const now = new Date();
+  const origin = now.toISOString();
+
   const {
     hits: { hits: result },
   } = await es.search({
@@ -43,8 +46,25 @@ async function matchedClauses(input) {
     body: {
       size: 5,
       query: {
-        match: {
-          body: `${input}`,
+        function_score: {
+          query: {
+            match: {
+              body: `${input}`,
+            },
+          },
+          functions: [
+            {
+              exp: {
+                last_searched: {
+                  origin,
+                  offset: '7d',
+                  scale: '25d',
+                  decay: 0.2,
+                },
+              },
+            },
+          ],
+          boost_mode: 'multiply',
         },
       },
     },

@@ -174,10 +174,32 @@ const uploadFiles = async (req, res) => {
   res.json({ data: filesInfo });
 };
 
+async function updateMatchedClausesLastSearched(req, res) {
+  const { origin, title, number } = req.body;
+
+  const result = await es.updateByQuery({
+    index: 'matchedclauses',
+    script: {
+      source: `ctx._source.last_searched = '${origin}'`,
+      lang: 'painless',
+    },
+    query: {
+      bool: {
+        filter: [{ term: { title: title } }, { term: { number: number } }],
+      },
+    },
+  });
+
+  if (!result.updated) return res.status(500).json({ error: 'Server Error' });
+
+  res.json(result.updated);
+}
+
 module.exports = {
   getHistoryMessages,
   getMoreMessages,
   getSuggestions,
   getMatchedClauses,
   uploadFiles,
+  updateMatchedClausesLastSearched,
 };

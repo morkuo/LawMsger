@@ -8,6 +8,7 @@ const {
   getSuggestions,
   getMatchedClauses,
   uploadFiles,
+  updateMatchedClausesLastSearched,
 } = require('../controllers/message');
 
 router.get('/message', checkJwt, tryCatch(getHistoryMessages));
@@ -17,6 +18,8 @@ router.get('/message/more', checkJwt, tryCatch(getMoreMessages));
 router.get('/message/suggest', tryCatch(getSuggestions));
 
 router.get('/message/match', tryCatch(getMatchedClauses));
+
+router.post('/message/match', tryCatch(updateMatchedClausesLastSearched));
 
 router.post('/message/upload', upload.any('images'), tryCatch(uploadFiles));
 
