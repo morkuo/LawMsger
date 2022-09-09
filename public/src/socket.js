@@ -5,7 +5,7 @@ let jwtToken = localStorage.getItem('token');
 
 const socket = io({ query: { jwtToken } });
 
-socket.on('connect', () => {
+socket.on('connect', async () => {
   drawSidebar();
 });
 
@@ -82,19 +82,23 @@ socket.on('deleteStarContact', response => {
   });
 });
 
-socket.on('onlineStatus', (socketId, status) => {
-  //append new star to star block
-  const contactDivs = document.querySelectorAll(`.contact[data-socket-id="${socketId}"]`);
+socket.on('onlineStatus', (userId, socketId, status) => {
+  const contactDivs = document.querySelectorAll(`.contact[data-id="${userId}"]`);
 
   contactDivs.forEach(div => {
     const statusDiv = div.querySelector('.contact-status');
 
-    if (status === 'on') statusDiv.classList.add('on');
-    else {
+    if (status === 'on') {
+      statusDiv.classList.add('on');
+      div.dataset.socketId = socketId;
+    } else {
       statusDiv.classList.remove('on');
-      div.setAttribute('data-socket-id', '');
+      div.dataset.socketId = '';
     }
   });
+
+  const chatWindow = document.querySelector('#messages');
+  if (chatWindow) chatWindow.dataset.socketId = socketId;
 });
 
 //Change online status to 'off' when disonnected
@@ -107,12 +111,8 @@ socket.on('disconnect', () => {
     const statusDiv = div.querySelector('.contact-status');
 
     statusDiv.classList.remove('on');
-    div.setAttribute('data-socket-id', '');
+    div.dataset.socketId = '';
   });
-});
-
-socket.on('file', location => {
-  console.log(location);
 });
 
 export { socket };

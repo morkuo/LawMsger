@@ -21,8 +21,14 @@ async function drawSidebar() {
   drawAddStarButton(contacts, starContacts);
   drawDeleteStarButton(starContacts);
 
-  updateContactSocketIds();
   listenToChatWindow();
+
+  //if user is at chat window, renew the socket id of chat window
+  const chatWindow = document.querySelector('#messages');
+  if (chatWindow) {
+    const contactDiv = document.querySelector(`.contact[data-id="${chatWindow.dataset.id}"]`);
+    chatWindow.dataset.socketId = contactDiv.dataset.socketId;
+  }
 }
 
 async function drawAddStarButton(contacts, starContacts) {
@@ -115,21 +121,6 @@ function drawContactDivs(contacts, category) {
 
     contactsDiv.appendChild(contactDiv);
   }
-}
-
-async function updateContactSocketIds() {
-  socket.on('contactSocketIds', (contactUserId, newSocketId) => {
-    // console.log(`Contact ${contactUserId} changed to new socketId: ${newSocketId}`);
-
-    const contactDivs = document.querySelectorAll(`[data-id="${contactUserId}"]`);
-    const chatWindow = document.getElementById('messages');
-
-    if (chatWindow) chatWindow.setAttribute('data-socket-id', newSocketId);
-
-    contactDivs.forEach(div => {
-      div.setAttribute('data-socket-id', newSocketId);
-    });
-  });
 }
 
 //Check whether current user is at chat window. If yes, highlight chatting contact div.

@@ -35,6 +35,8 @@ async function idHandler(io, socket) {
   const { jwtToken } = socket.handshake.query;
   const user = await jwtVerify(jwtToken, process.env.JWT_SECRET);
 
+  socket.broadcast.emit('onlineStatus', user.id, socket.id, 'on');
+
   //partial update user socket_id
   const result = await es.update({
     index: 'user',
@@ -44,14 +46,12 @@ async function idHandler(io, socket) {
     },
   });
 
-  socket.broadcast.emit('contactSocketIds', user.id, socket.id);
-
-  socket.broadcast.emit('onlineStatus', socket.id, 'on');
-
   console.log('socket connected (user socket id updated): ' + socket.id);
 }
 
 async function disconnectionHandlers(io, socket) {
+  socket.broadcast.emit('onlineStatus', null, socket.id, 'off');
+
   socket.on('disconnect', async () => {
     const result = await es.update({
       index: 'user',
@@ -61,7 +61,6 @@ async function disconnectionHandlers(io, socket) {
       },
     });
 
-    socket.broadcast.emit('onlineStatus', socket.id, 'off');
     console.log('user disconnected: ' + socket.id);
   });
 }
