@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@aws-sdk/client-s3": "^3.165.0",
+    "@aws-sdk/s3-request-presigner": "^3.165.0",
     "@elastic/elasticsearch": "^8.2.1",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",

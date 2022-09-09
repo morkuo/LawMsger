@@ -350,14 +350,12 @@ function addUploadFileListener() {
 function previewFile(filesInput) {
   const previewImageDiv = document.querySelector('#previewImageDiv');
 
-  console.log(filesInput.files);
+  // console.log(filesInput.files);
   previewImageDiv.setAttribute('data-file', 'true');
 
   for (let i = 0; i < filesInput.files.length; i++) {
     const file = filesInput.files[i];
     const reader = new FileReader();
-
-    console.log();
 
     if (file) {
       reader.readAsDataURL(file);

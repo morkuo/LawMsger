@@ -9,6 +9,12 @@ function msgHandler(io, socket) {
     const fromSocketId = socket.id;
     socket.to(targetSocketId).emit('msg', msg, fromSocketId, filesInfo);
 
+    const parsedFilesInfo = await JSON.parse(filesInfo);
+    parsedFilesInfo.data.forEach(fileObj => {
+      //S3 presigned url which is going to expires
+      delete fileObj.location;
+    });
+
     await es.index({
       index: 'message',
       document: {
@@ -17,7 +23,7 @@ function msgHandler(io, socket) {
         receiver_id: targetUserId,
         receiver_name: targetUserName,
         message: msg,
-        files: filesInfo,
+        files: JSON.stringify(parsedFilesInfo),
       },
     });
 

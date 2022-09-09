@@ -73,11 +73,17 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo) {
       for (let info of infoArray) {
         const { location: url, originalName } = info;
 
-        if (isImage(url)) {
+        if (isImage(originalName)) {
+          const aTag = document.createElement('a');
+          aTag.setAttribute('href', `${url}`);
+
           const image = document.createElement('img');
           image.setAttribute('class', 'chat-message-image-preview');
           image.src = url;
-          filesDiv.appendChild(image);
+          image.alt = originalName;
+
+          filesDiv.appendChild(aTag);
+          aTag.appendChild(image);
         } else {
           const file = document.createElement('a');
           file.setAttribute('class', 'chat-message-file-preview');

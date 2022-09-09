@@ -1,8 +1,37 @@
 const es = require('../utils/es');
 const { suggestions, matchedClauses } = require('../models/message');
 require('dotenv').config;
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const client = new S3Client({ region: 'ap-northeast-1' });
 
 const messageSize = 15;
+
+async function generateS3PresignedUrl(result) {
+  let filesInfo = [];
+  for (let message of result) {
+    const files = await JSON.parse(message._source.files);
+
+    if (files.data.length !== 0) {
+      for (let file of files.data) {
+        //Generate S3 Presigned url to open an access window (control by expiresIn)
+        const command = new GetObjectCommand({
+          Bucket: 'law-msger',
+          Key: `${file.key}`,
+          Expires: 60 * 60,
+          ResponseContentDisposition: `attachment; filename="${file.originalName}"`,
+        });
+        const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+
+        filesInfo.push({ location: url, key: file.key, originalName: file.originalName });
+      }
+      message._source.files = JSON.stringify({ data: filesInfo });
+      filesInfo = [];
+    }
+  }
+
+  return result.map(doc => doc._source);
+}
 
 const getHistoryMessages = async (req, res) => {
   const { contactUserId } = req.query;
@@ -39,7 +68,7 @@ const getHistoryMessages = async (req, res) => {
     },
   });
 
-  const messages = result.map(doc => doc._source);
+  const messages = await generateS3PresignedUrl(result);
 
   const response = {
     data: messages,
@@ -100,7 +129,7 @@ const getMoreMessages = async (req, res) => {
     },
   });
 
-  const messages = result.map(doc => doc._source);
+  const messages = await generateS3PresignedUrl(result);
 
   const response = {
     data: messages,
@@ -128,10 +157,20 @@ const getMatchedClauses = async (req, res) => {
 };
 
 const uploadFiles = async (req, res) => {
-  const filesInfo = req.files.map(file => ({
-    location: file.location,
-    originalName: file.originalname,
-  }));
+  const filesInfo = [];
+  for (let file of req.files) {
+    //S3 Presigned url
+    const command = new GetObjectCommand({
+      Bucket: file.bucket,
+      Key: `${file.key}`,
+      Expires: 60 * 60,
+      ResponseContentDisposition: `attachment; filename="${file.originalname}"`,
+    });
+    const url = await getSignedUrl(client, command, { expiresIn: 30 });
+
+    filesInfo.push({ location: url, key: file.key, originalName: file.originalname });
+  }
+
   res.json({ data: filesInfo });
 };
 
