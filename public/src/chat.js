@@ -57,7 +57,7 @@ async function chatListener(e) {
       // console.log('Pull New data');
 
       let oldestMessageTimeDiv = messages.querySelector('li:first-child .chat-message-time');
-      let baselineTime = oldestMessageTimeDiv.innerText;
+      let baselineTime = oldestMessageTimeDiv.dataset.rawTime;
 
       const { data: moreMessages } = await getMessages(targetContact.dataset.id, baselineTime);
 

@@ -54,11 +54,14 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead) {
   const filesDiv = document.createElement('div');
   const timeDiv = document.createElement('div');
 
-  timeDiv.innerText = time;
+  //convert time format
+  const relativeTime = changeTimeFormat(time);
+  timeDiv.innerText = relativeTime;
 
   senderDiv.setAttribute('class', 'chat-sender-picture');
   messageDiv.setAttribute('class', 'chat-message-text');
   timeDiv.setAttribute('class', 'chat-message-time');
+  timeDiv.setAttribute('data-raw-time', time);
 
   item.appendChild(senderDiv);
   item.appendChild(messageDiv);
@@ -138,6 +141,42 @@ async function fetchGet(apiPath) {
   if (response.error) return setMsg(response.error, 'error');
 
   return response;
+}
+
+function changeTimeFormat(target) {
+  const now = new Date();
+  const nowYear = now.getFullYear();
+  const nowMonth = now.getMonth() + 1;
+  const nowDate = now.getDate();
+
+  const messageTime = new Date(target);
+  const messageYear = messageTime.getFullYear();
+  const messageMonth = messageTime.getMonth() + 1;
+  const messageDate = messageTime.getDate();
+
+  let outputMonth = messageMonth;
+  let outputDate = messageTime.getDate();
+  let outputHours = messageTime.getHours();
+  let outputMinutes = messageTime.getMinutes();
+
+  if (outputMonth < 10) outputMonth = `0${outputMonth}`;
+  if (outputDate < 10) outputDate = `0${outputDate}`;
+  if (outputHours < 10) outputHours = `0${outputHours}`;
+  if (outputMinutes < 10) outputMinutes = `0${outputMinutes}`;
+
+  // console.log(toutputMinutes);
+
+  if (nowYear === messageYear && nowMonth === messageMonth && nowDate === messageDate) {
+    return `Today ${outputHours}:${outputMinutes}`;
+  }
+
+  const dateDifference = nowDate - messageDate;
+
+  if (nowYear === messageYear && nowMonth === messageMonth && dateDifference === 1) {
+    return `Yesterday ${outputHours}:${outputMinutes}`;
+  }
+
+  return `${messageTime.getFullYear()}-${outputMonth}-${outputDate}`;
 }
 
 function isImage(url) {
