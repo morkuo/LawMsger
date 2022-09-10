@@ -16,6 +16,11 @@ a {
   color: black;
 }
 
+.container {
+  display: flex;
+  height: 100vh;
+}
+
 #suggestions {
   position: absolute;
   margin-left: 1rem;
@@ -32,6 +37,7 @@ a {
   flex-direction: column;
   justify-content: flex-start;
   flex-grow: 1;
+  border-bottom: 1px solid black;
 }
 
 #pane {
@@ -79,6 +85,7 @@ a {
   margin: 0;
   padding: 0;
   overflow-y: auto;
+  border-bottom: 1px solid black;
 }
 
 #messages > li {
@@ -119,11 +126,6 @@ chat-unread-message #messages > li div {
   flex-grow: 1;
 }
 
-.container {
-  display: flex;
-  height: 100vh;
-}
-
 #sidebar {
   display: flex;
   flex-direction: column;
@@ -133,12 +135,12 @@ chat-unread-message #messages > li div {
 
 #navbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   border-bottom: 1px solid black;
 }
 
 #navbar div {
-  margin: 0 2rem;
+  margin: 0 1rem;
 }
 
 #imagesContainer {
