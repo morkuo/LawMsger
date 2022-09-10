@@ -85,7 +85,7 @@ const getHistoryMessages = async (req, res) => {
     },
   });
 
-  console.log(resultUpdate);
+  // console.log(resultUpdate);
 
   const messages = await generateS3PresignedUrl(result);
 

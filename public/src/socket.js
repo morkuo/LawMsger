@@ -23,6 +23,68 @@ socket.on('msg', (msg, senderSocketId, filesInfo) => {
   setMessage(msg, Date.now(), senderSocketId, null, filesInfo);
 });
 
+socket.on(
+  'checkChatWindow',
+  (
+    msg,
+    fromSocketId,
+    fromUserId,
+    fromUserName,
+    targetSocketId,
+    targetUserId,
+    targetUserName,
+    filesInfo
+  ) => {
+    console.log('Check Window!');
+
+    //check if current user is at targetUser's chat window
+    const messages = document.getElementById('messages');
+    let messagesUserId = null;
+    if (messages) messagesUserId = messages.dataset.id;
+
+    if (!messages || messagesUserId !== fromUserId) {
+      socket.emit(
+        'checkChatWindow',
+        msg,
+        fromSocketId,
+        fromUserId,
+        fromUserName,
+        targetSocketId,
+        targetUserId,
+        targetUserName,
+        filesInfo,
+        false
+      );
+
+      const contactDivs = document.querySelectorAll(`[data-id="${fromUserId}"]`);
+
+      contactDivs.forEach(div => {
+        console.log('Incrementing!');
+        const unreadCountDiv = div.querySelector('.contact-unread-count');
+        unreadCountDiv.innerText++;
+      });
+
+      return;
+    }
+
+    socket.emit(
+      'checkChatWindow',
+      msg,
+      fromSocketId,
+      fromUserId,
+      fromUserName,
+      targetSocketId,
+      targetUserId,
+      targetUserName,
+      filesInfo,
+      true
+    );
+
+    //append message from the sender to chat window
+    setMessage(msg, Date.now(), fromSocketId, null, filesInfo);
+  }
+);
+
 socket.on('createStarContact', response => {
   if (response.error) return;
 
@@ -35,6 +97,7 @@ socket.on('createStarContact', response => {
   const contactPictureDiv = createdDiv.querySelector('.contact-picture');
   const contactNameDiv = createdDiv.querySelector('.contact-info div:first-child');
   const contactEmailDiv = createdDiv.querySelector('.contact-info div:last-child');
+  const contactUnreadDiv = createdDiv.querySelector('.contact-unread-count');
 
   const contacts = [
     {
@@ -43,6 +106,7 @@ socket.on('createStarContact', response => {
       email: contactEmailDiv.innerText,
       picture: contactPictureDiv.innerText,
       socket_id: createdDiv.dataset.socketId,
+      unread: contactUnreadDiv.innerText,
     },
   ];
 

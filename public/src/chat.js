@@ -20,8 +20,12 @@ async function chatListener(e) {
   }
 
   //remove unread count
-  const unreadCountDiv = targetContact.querySelector('.contact-unread-count');
-  unreadCountDiv.innerText = '';
+  const unreadCountDivs = document.querySelectorAll(
+    `.contacts [data-id="${targetContact.dataset.id}"] .contact-unread-count`
+  );
+  unreadCountDivs.forEach(div => {
+    div.innerText = '';
+  });
 
   drawChatWindow(targetContact.dataset.id, targetContact.dataset.socketId);
 

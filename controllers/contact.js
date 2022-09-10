@@ -80,12 +80,39 @@ const getStarContacts = async (req, res) => {
     },
   });
 
+  if (stars.length === 0) return res.json(stars);
+
+  const unreadMessagesQueryBody = stars.reduce((querybody, userId) => {
+    querybody.push({ index: 'message' }),
+      querybody.push({
+        query: {
+          bool: {
+            filter: [
+              { term: { sender_id: userId } },
+              { term: { receiver_id: req.userdata.id } },
+              { term: { isRead: false } },
+            ],
+          },
+        },
+      });
+
+    return querybody;
+  }, []);
+
+  const { responses } = await es.msearch({
+    body: unreadMessagesQueryBody,
+  });
+
+  const unreadMessagesCount = responses.map(response => response.hits.total.value);
+
+  let i = 0;
   const starDetails = resultStarDetail.map(star => ({
     id: star._id,
     name: star._source.name,
     email: star._source.email,
     picture: star._source.picture,
     socket_id: star._source.socket_id,
+    unread: unreadMessagesCount[i++],
   }));
 
   res.json(starDetails);

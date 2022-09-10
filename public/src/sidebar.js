@@ -16,6 +16,7 @@ async function drawSidebar() {
 
   const starContacts = await getStarContacts();
   drawContactDivs(starContacts, 'star');
+
   addChatListenerToContactDivs(starContactsDiv);
 
   drawAddStarButton(contacts, starContacts);

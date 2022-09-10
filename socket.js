@@ -1,7 +1,8 @@
 const { Server } = require('socket.io');
 const {
-  msgHandler,
   idHandler,
+  msgHandler,
+  checkChatWindowHandler,
   createStarContact,
   deleteStarContact,
   disconnectionHandlers,
@@ -40,6 +41,7 @@ async function connect(server) {
     //handlers
     idHandler(io, socket);
     msgHandler(io, socket);
+    checkChatWindowHandler(io, socket);
     createStarContact(io, socket);
     deleteStarContact(io, socket);
     disconnectionHandlers(io, socket);

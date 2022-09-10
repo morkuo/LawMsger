@@ -7,32 +7,86 @@ function msgHandler(io, socket) {
     // console.log('received' + fileUrls);
 
     const fromSocketId = socket.id;
-    socket.to(targetSocketId).emit('msg', msg, fromSocketId, filesInfo);
+    const fromUserId = socket.userdata.id;
+    const fromUserName = socket.userdata.name;
 
-    const parsedFilesInfo = await JSON.parse(filesInfo);
-    parsedFilesInfo.data.forEach(fileObj => {
-      //S3 presigned url which is going to expires
-      delete fileObj.location;
-    });
-
-    let isRead = false;
-    if (io.sockets.adapter.rooms.has(targetSocketId)) isRead = true;
-
-    await es.index({
-      index: 'message',
-      document: {
-        sender_id: socket.userdata.id,
-        sender_name: socket.userdata.name,
-        receiver_id: targetUserId,
-        receiver_name: targetUserName,
-        message: msg,
-        files: JSON.stringify(parsedFilesInfo),
-        isRead,
-      },
-    });
+    if (!io.sockets.adapter.rooms.has(targetSocketId)) {
+      const parsedFilesInfo = await JSON.parse(filesInfo);
+      parsedFilesInfo.data.forEach(fileObj => {
+        //S3 presigned url which is going to expires
+        delete fileObj.location;
+      });
+      await es.index({
+        index: 'message',
+        document: {
+          sender_id: fromUserId,
+          sender_name: fromUserName,
+          receiver_id: targetUserId,
+          receiver_name: targetUserName,
+          message: msg,
+          files: JSON.stringify(parsedFilesInfo),
+          isRead: false,
+        },
+      });
+    } else {
+      socket
+        .to(targetSocketId)
+        .emit(
+          'checkChatWindow',
+          msg,
+          fromSocketId,
+          fromUserId,
+          fromUserName,
+          targetSocketId,
+          targetUserId,
+          targetUserName,
+          filesInfo
+        );
+    }
 
     // console.log('Msg has been sent to: ' + targetSocketId);
   });
+}
+
+async function checkChatWindowHandler(io, socket) {
+  socket.on(
+    'checkChatWindow',
+    async (
+      msg,
+      fromSocketId,
+      fromUserId,
+      fromUserName,
+      targetSocketId,
+      targetUserId,
+      targetUserName,
+      filesInfo,
+      isAtWindow
+    ) => {
+      const parsedFilesInfo = await JSON.parse(filesInfo);
+      parsedFilesInfo.data.forEach(fileObj => {
+        //S3 presigned url which is going to expires
+        delete fileObj.location;
+      });
+
+      let isRead = true;
+      if (!isAtWindow) isRead = false;
+
+      socket.to(targetSocketId).emit('msg', msg, fromSocketId, filesInfo);
+
+      await es.index({
+        index: 'message',
+        document: {
+          sender_id: fromUserId,
+          sender_name: fromUserName,
+          receiver_id: targetUserId,
+          receiver_name: targetUserName,
+          message: msg,
+          files: JSON.stringify(parsedFilesInfo),
+          isRead,
+        },
+      });
+    }
+  );
 }
 
 async function idHandler(io, socket) {
@@ -136,8 +190,9 @@ async function deleteStarContact(io, socket) {
 }
 
 module.exports = {
-  msgHandler,
   idHandler,
+  msgHandler,
+  checkChatWindowHandler,
   createStarContact,
   deleteStarContact,
   disconnectionHandlers,
