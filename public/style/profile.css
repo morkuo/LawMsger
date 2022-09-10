@@ -1,0 +1,49 @@
+div.profile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  margin: 4rem 2rem;
+  padding: 2rem 4rem;
+  border: 1px solid #6d665b;
+  height: 70vh;
+}
+
+h3.profile {
+  margin-bottom: 2rem;
+}
+
+input.profile,
+button.profile {
+  background-color: #2b2a33;
+  color: white;
+  border: 1px solid grey;
+  border-radius: 3px;
+  padding: 0.1rem 0.2rem;
+
+  max-width: 15vw;
+}
+
+button.profile {
+  margin-top: 4rem;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+}
+
+#changePasswordDiv {
+  position: absolute;
+  padding: 6.5rem 4.5rem;
+  right: 10%;
+  top: 15%;
+  background-color: white;
+  border: 1px solid black;
+}
+
+#optionDiv {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#optionDiv button {
+  padding: 0.5rem 1rem;
+}

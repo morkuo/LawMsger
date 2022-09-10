@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const es = require('../utils/es');
 require('dotenv').config;
 
+const saltRounds = 10;
+
 const createUser = async (req, res) => {
   if (req.userdata.role !== -1) return res.status(403).json({ error: 'Forbidden' });
 
@@ -11,7 +13,6 @@ const createUser = async (req, res) => {
   const picture = '';
 
   // hash password
-  const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
   const result = await es.index({
@@ -51,6 +52,7 @@ const signIn = async (req, res) => {
     email: result._source.email,
     picture: result._source.picture,
     role: result._source.role,
+    created_at: result._source.created_at,
   };
 
   const jwtToken = await jwtSign(jwtPayload, process.env.JWT_SECRET, {
@@ -75,6 +77,42 @@ const getUserData = async (req, res) => {
   };
 
   res.json(response);
+};
+
+const updateUserData = async (req, res) => {
+  const { oldPassword, newPassword, confirm } = req.body;
+
+  console.log(oldPassword, newPassword, confirm);
+
+  if (!oldPassword || !newPassword || !confirm)
+    return res.status(400).json({ error: 'no empty fields' });
+  if (newPassword !== confirm) return res.status(400).json({ error: 'password shoud match' });
+
+  //get old password
+  const result = await getUserDataByEmail(req.userdata.email);
+
+  //check password is correct or not
+  const isCorrectPassword = await bcrypt.compare(oldPassword, result._source.password);
+  if (!isCorrectPassword) return res.status(403).json({ error: 'wrong password' });
+
+  const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+  const resultUpdate = await es.updateByQuery({
+    index: 'user',
+    script: {
+      lang: 'painless',
+      source: `ctx._source.password = '${hashedPassword}'`,
+    },
+    query: {
+      term: { '_id': req.userdata.id },
+    },
+  });
+
+  if (!resultUpdate.updated) return res.status(500).json({ error: 'failed' });
+
+  res.json({
+    data: 'success',
+  });
 };
 
 const deleteUser = async (req, res) => {
@@ -103,4 +141,4 @@ const deleteUser = async (req, res) => {
   res.json({ data: 'deleted' });
 };
 
-module.exports = { signIn, createUser, getUserData, deleteUser };
+module.exports = { signIn, createUser, getUserData, updateUserData, deleteUser };
