@@ -39,7 +39,7 @@ function getJwtToken() {
   return authorization;
 }
 
-async function setMessage(msg, time, senderSocketId, more, filesInfo) {
+async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead) {
   const messages = document.getElementById('messages');
 
   if (!messages) return;
@@ -98,8 +98,10 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo) {
     }
   }
 
-  if (!more) messages.appendChild(item);
-  else messages.insertAdjacentElement('afterbegin', item);
+  if (!more) {
+    messages.appendChild(item);
+    if (!isRead) item.classList.add('chat-unread-message');
+  } else messages.insertAdjacentElement('afterbegin', item);
 
   if (!senderSocketId) {
     senderDiv.innerText = '自己';

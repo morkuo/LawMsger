@@ -86,7 +86,7 @@ a {
   padding: 0.5rem 1rem;
 }
 
-#messages > li div {
+chat-unread-message #messages > li div {
   display: flex;
   min-width: 3rem;
   min-height: 3rem;
@@ -104,6 +104,10 @@ a {
 
 #messages > li:nth-child(odd) {
   background: #efefef;
+}
+
+#messages > li.chat-unread-message {
+  background-color: bisque;
 }
 
 #messages > li div.chat-message-text {

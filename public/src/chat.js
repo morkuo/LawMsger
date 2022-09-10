@@ -34,14 +34,15 @@ async function chatListener(e) {
 
   for (let i = history.length - 1; i >= 0; i--) {
     if (history[i].sender_id !== targetContact.dataset.id) {
-      setMessage(history[i].message, history[i].created_at, null, null, history[i].files);
+      setMessage(history[i].message, history[i].created_at, null, null, history[i].files, 'read');
     } else {
       setMessage(
         history[i].message,
         history[i].created_at,
         targetContact.dataset.socketId,
         null,
-        history[i].files
+        history[i].files,
+        history[i].isRead
       );
     }
   }
@@ -64,14 +65,15 @@ async function chatListener(e) {
 
       for (let msg of moreMessages) {
         if (msg.sender_id !== targetContact.dataset.id) {
-          setMessage(msg.message, msg.created_at, null, 'more', msg.files);
+          setMessage(msg.message, msg.created_at, null, 'more', msg.files, 'read');
         } else {
           setMessage(
             msg.message,
             msg.created_at,
             targetContact.dataset.socketId,
             'more',
-            msg.files
+            msg.files,
+            msg.isRead
           );
         }
       }
@@ -117,7 +119,7 @@ async function chatListener(e) {
 
       socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName, filesInfo);
 
-      setMessage(input.value, Date.now(), null, null, filesInfo);
+      setMessage(input.value, Date.now(), null, null, filesInfo, 'read');
 
       input.value = '';
     }
@@ -184,7 +186,6 @@ async function getMessages(targetContactUserId, baselineTime) {
   else messageApiPath += `/more?contactUserId=${targetContactUserId}&baselineTime=${baselineTime}`;
 
   const response = await fetchGet(messageApiPath);
-
   return response;
 }
 
@@ -429,7 +430,7 @@ async function uploadFile(authorization) {
     formData.append('images', file);
   }
 
-  console.log('Going to upload this: ', filesInput);
+  // console.log('Going to upload this: ', filesInput);
 
   const api = `${window.location.origin}/api/1.0/message/upload`;
 

@@ -81,7 +81,7 @@ socket.on(
     );
 
     //append message from the sender to chat window
-    setMessage(msg, Date.now(), fromSocketId, null, filesInfo);
+    setMessage(msg, Date.now(), fromSocketId, null, filesInfo, 'read');
   }
 );
 

@@ -68,6 +68,17 @@ const getHistoryMessages = async (req, res) => {
     },
   });
 
+  // console.log(resultUpdate);
+
+  const messages = await generateS3PresignedUrl(result);
+
+  const response = {
+    data: messages,
+  };
+
+  res.json(response);
+
+  //after responsing messages, update isRead to true
   const resultUpdate = await es.updateByQuery({
     index: 'message',
     script: {
@@ -84,16 +95,6 @@ const getHistoryMessages = async (req, res) => {
       },
     },
   });
-
-  // console.log(resultUpdate);
-
-  const messages = await generateS3PresignedUrl(result);
-
-  const response = {
-    data: messages,
-  };
-
-  res.json(response);
 };
 
 const getMoreMessages = async (req, res) => {
