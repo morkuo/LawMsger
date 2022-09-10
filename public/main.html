@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Law Msger</title>
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/sidebar.css" />
+    <link rel="stylesheet" href="/style/chat.css" />
+    <link rel="stylesheet" href="/style/auth.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div id="sidebar">
+        <div id="navbar">
+          <div id="userInfo"><h2></h2></div>
+          <div id="options"></div>
+        </div>
+        <div id="all">
+          <div class="header">
+            <h3>All</h3>
+          </div>
+          <div class="contacts"></div>
+        </div>
+        <div id="star">
+          <div class="header">
+            <div><h3>Starred</h3></div>
+          </div>
+          <div class="contacts"></div>
+        </div>
+      </div>
+      <div id="main">
+        <div id="pane">
+          <h1>Welcome Aboard</h1>
+        </div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="/src/socket.js"></script>
+    <script type="module" src="/src/navbar.js"></script>
+    <script type="module" src="/src/sidebar.js"></script>
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>

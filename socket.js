@@ -30,11 +30,16 @@ async function connect(server) {
   });
 
   io.use(async (socket, next) => {
-    const { jwtToken } = socket.handshake.query;
-    const user = await jwtVerify(jwtToken, process.env.JWT_SECRET);
+    try {
+      const { jwtToken } = socket.handshake.query;
+      const user = await jwtVerify(jwtToken, process.env.JWT_SECRET);
 
-    socket.userdata = user;
-    next();
+      socket.userdata = user;
+      next();
+    } catch (err) {
+      //pass to express error handler and emit connect_error event
+      next(err);
+    }
   });
 
   io.on('connection', async socket => {

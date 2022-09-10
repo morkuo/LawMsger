@@ -9,6 +9,10 @@ socket.on('connect', async () => {
   drawSidebar();
 });
 
+socket.on('connect_error', err => {
+  console.log(err.message);
+});
+
 socket.on('msg', (msg, senderSocketId, filesInfo) => {
   console.log('From server:' + senderSocketId);
 

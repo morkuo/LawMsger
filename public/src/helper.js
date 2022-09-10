@@ -34,7 +34,9 @@ function storeToken(token) {
 function getJwtToken() {
   let authorization = 'Bearer ';
   let tokenJson = localStorage.getItem('token');
-  if (tokenJson) authorization += tokenJson;
+  if (!tokenJson) return (window.location.href = `${window.location.origin}/index.html`);
+
+  authorization += tokenJson;
 
   return authorization;
 }

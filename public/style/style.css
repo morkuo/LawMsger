@@ -139,8 +139,21 @@ chat-unread-message #messages > li div {
   border-bottom: 1px solid black;
 }
 
-#navbar div {
+#userInfo {
   margin: 0 1rem;
+  cursor: pointer;
+}
+
+#options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#options a {
+  display: flex;
+  padding: 0 1rem;
+  cursor: pointer;
 }
 
 #imagesContainer {

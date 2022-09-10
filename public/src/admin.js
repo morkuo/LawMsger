@@ -1,9 +1,7 @@
-import { setMsg, addClass, storeToken, getJwtToken } from './helper.js';
+import { setMsg, addClass, getJwtToken } from './helper.js';
 
-setSignUpField();
-
-function setSignUpField() {
-  const container = document.querySelector('.container');
+function drawCreateUserForm() {
+  const pane = document.querySelector('#pane');
   const signUpDiv = document.createElement('div');
   const header = document.createElement('h3');
   const form = document.createElement('form');
@@ -14,6 +12,8 @@ function setSignUpField() {
   const emailInput = document.createElement('input');
   const passwordInput = document.createElement('input');
   const button = document.createElement('button');
+
+  pane.innerHTML = '';
 
   header.innerText = 'Create User';
   namePTag.innerText = 'Name';
@@ -66,7 +66,7 @@ function setSignUpField() {
     return setMsg(response.data);
   });
 
-  container.appendChild(signUpDiv);
+  pane.appendChild(signUpDiv);
   signUpDiv.appendChild(form);
   form.appendChild(header);
   form.appendChild(namePTag);
@@ -77,3 +77,25 @@ function setSignUpField() {
   form.appendChild(passwordInput);
   form.appendChild(button);
 }
+
+async function checkAdmin() {
+  const profileApi = `${window.location.origin}/api/1.0/user`;
+
+  let authorization = getJwtToken();
+
+  const res = await fetch(profileApi, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': authorization,
+    },
+  });
+
+  const response = await res.json();
+
+  if (response.error || response.data.role !== -1) return false;
+
+  return true;
+}
+
+export { drawCreateUserForm, checkAdmin };

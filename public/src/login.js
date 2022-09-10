@@ -55,7 +55,7 @@ function setSignInField() {
     if (response.error) return setMsg(response.error, 'error');
 
     storeToken(response.data.access_token);
-    window.location.href = `${window.location.origin}/index.html`;
+    window.location.href = `${window.location.origin}/main.html`;
   });
 
   container.appendChild(signInDiv);

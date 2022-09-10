@@ -33,7 +33,7 @@ const signIn = async (req, res) => {
 
   //check password
 
-  //check whether the email has been used for signing up
+  //check whether the email exists
   const {
     hits: {
       hits: [result],
