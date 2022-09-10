@@ -15,6 +15,9 @@ function msgHandler(io, socket) {
       delete fileObj.location;
     });
 
+    let isRead = false;
+    if (io.sockets.adapter.rooms.has(targetSocketId)) isRead = true;
+
     await es.index({
       index: 'message',
       document: {
@@ -24,6 +27,7 @@ function msgHandler(io, socket) {
         receiver_name: targetUserName,
         message: msg,
         files: JSON.stringify(parsedFilesInfo),
+        isRead,
       },
     });
 

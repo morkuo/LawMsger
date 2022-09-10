@@ -96,6 +96,7 @@ function drawContactDivs(contacts, category) {
     const infoDiv = document.createElement('div');
     const nameDiv = document.createElement('div');
     const emailDiv = document.createElement('div');
+    const unreadCountDiv = document.createElement('div');
 
     addClass('contact', contactDiv);
     addClass('contact-picture', pictureDiv);
@@ -106,6 +107,7 @@ function drawContactDivs(contacts, category) {
     if (contact.picture.length <= 1) pictureDiv.innerText = contact.name[0].toUpperCase();
     nameDiv.innerText = contact.name;
     emailDiv.innerText = contact.email;
+    unreadCountDiv.innerText = contact.unread;
 
     contactDiv.setAttribute('data-id', contact.id);
     if (contact.socket_id === null) contact.socket_id = '';
@@ -116,6 +118,7 @@ function drawContactDivs(contacts, category) {
     contactDiv.appendChild(statusDiv);
     contactDiv.appendChild(pictureDiv);
     contactDiv.appendChild(infoDiv);
+    contactDiv.appendChild(unreadCountDiv);
     infoDiv.appendChild(nameDiv);
     infoDiv.appendChild(emailDiv);
 

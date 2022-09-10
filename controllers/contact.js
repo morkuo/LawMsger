@@ -13,17 +13,42 @@ const getAllContacts = async (req, res) => {
     },
   });
 
-  const users = result
-    .filter(user => user._id !== req.userdata.id)
-    .map(user => ({
-      id: user._id,
-      name: user._source.name,
-      email: user._source.email,
-      picture: user._source.picture,
-      socket_id: user._source.socket_id,
-    }));
+  const users = result.filter(user => user._id !== req.userdata.id);
 
-  res.json(users);
+  const unreadMessagesQueryBody = users.reduce((querybody, user) => {
+    querybody.push({ index: 'message' }),
+      querybody.push({
+        query: {
+          bool: {
+            filter: [
+              { term: { sender_id: user._id } },
+              { term: { receiver_id: req.userdata.id } },
+              { term: { isRead: false } },
+            ],
+          },
+        },
+      });
+
+    return querybody;
+  }, []);
+
+  const { responses } = await es.msearch({
+    body: unreadMessagesQueryBody,
+  });
+
+  const unreadMessagesCount = responses.map(response => response.hits.total.value);
+
+  let i = 0;
+  const contacts = users.map(user => ({
+    id: user._id,
+    name: user._source.name,
+    email: user._source.email,
+    picture: user._source.picture,
+    socket_id: user._source.socket_id,
+    unread: unreadMessagesCount[i++],
+  }));
+
+  res.json(contacts);
 };
 
 const getStarContacts = async (req, res) => {

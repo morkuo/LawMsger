@@ -68,6 +68,25 @@ const getHistoryMessages = async (req, res) => {
     },
   });
 
+  const resultUpdate = await es.updateByQuery({
+    index: 'message',
+    script: {
+      source: `ctx._source.isRead = true`,
+      lang: 'painless',
+    },
+    query: {
+      bool: {
+        filter: [
+          { term: { sender_id: contactUserId } },
+          { term: { receiver_id: req.userdata.id } },
+          { term: { isRead: false } },
+        ],
+      },
+    },
+  });
+
+  console.log(resultUpdate);
+
   const messages = await generateS3PresignedUrl(result);
 
   const response = {
