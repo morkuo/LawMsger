@@ -1,5 +1,5 @@
 import { setMsg, getJwtToken } from './helper.js';
-import { drawCreateUserForm, checkAdmin } from './admin.js';
+import { drawCreateUserForm, drawDeleteUserForm, checkAdmin } from './admin.js';
 
 main();
 
@@ -43,6 +43,7 @@ async function setNavbar() {
       if (!isAdmin) return setMsg(response.error, 'error');
 
       drawCreateUserForm();
+      drawDeleteUserForm();
     });
 
     navbarOptions.appendChild(adminButton);

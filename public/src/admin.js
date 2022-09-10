@@ -98,4 +98,56 @@ async function checkAdmin() {
   return true;
 }
 
-export { drawCreateUserForm, checkAdmin };
+function drawDeleteUserForm() {
+  const pane = document.querySelector('#pane');
+  const manageDive = pane.querySelector('div');
+  const header = document.createElement('h3');
+  const form = document.createElement('form');
+  const emailPTag = document.createElement('p');
+  const emailInput = document.createElement('input');
+  const button = document.createElement('button');
+
+  header.innerText = 'Delete User';
+
+  emailPTag.innerText = 'Email';
+
+  button.innerText = 'Delete';
+
+  addClass('auth', header, form, emailPTag, emailInput, button);
+
+  const signUpApi = `${window.location.origin}/api/1.0/user`;
+
+  button.addEventListener('click', async e => {
+    e.preventDefault();
+
+    const payload = {
+      email: emailInput.value,
+    };
+
+    let authorization = getJwtToken();
+
+    const res = await fetch(signUpApi, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authorization,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const response = await res.json();
+
+    if (response.error) return setMsg(response.error, 'error');
+
+    return setMsg(response.data);
+  });
+
+  manageDive.appendChild(form);
+
+  form.appendChild(header);
+  form.appendChild(emailPTag);
+  form.appendChild(emailInput);
+  form.appendChild(button);
+}
+
+export { drawCreateUserForm, drawDeleteUserForm, checkAdmin };

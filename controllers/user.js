@@ -1,4 +1,5 @@
 const { jwtSign, jwtVerify } = require('../utils/helper');
+const { getUserDataByEmail, deleteUserByEmail } = require('../models/user');
 const bcrypt = require('bcrypt');
 const es = require('../utils/es');
 require('dotenv').config;
@@ -34,20 +35,7 @@ const signIn = async (req, res) => {
   //check password
 
   //check whether the email exists
-  const {
-    hits: {
-      hits: [result],
-    },
-  } = await es.search({
-    index: 'user',
-    body: {
-      query: {
-        term: {
-          'email.keyword': email,
-        },
-      },
-    },
-  });
+  const result = await getUserDataByEmail(email);
 
   //email does not exist
   if (!result) return res.status(403).json({ error: 'Wrong email or password' });
@@ -89,4 +77,30 @@ const getUserData = async (req, res) => {
   res.json(response);
 };
 
-module.exports = { signIn, createUser, getUserData };
+const deleteUser = async (req, res) => {
+  if (req.userdata.role !== -1) return res.status(403).json({ error: 'forbidden' });
+
+  const { email } = req.body;
+
+  //check whether the email exists
+  const resultEmail = await getUserDataByEmail(email);
+
+  if (!resultEmail) return res.status(400).json({ error: 'email not found' });
+
+  const resultUser = await deleteUserByEmail('user', email);
+
+  const resultStarred = await es.deleteByQuery({
+    index: 'star',
+    body: {
+      query: {
+        term: { 'contact_user_id': resultEmail._id },
+      },
+    },
+  });
+
+  if (!resultUser.deleted) return res.status(400).json({ error: 'failed' });
+
+  res.json({ data: 'deleted' });
+};
+
+module.exports = { signIn, createUser, getUserData, deleteUser };
