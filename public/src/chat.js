@@ -19,6 +19,10 @@ async function chatListener(e) {
     targetContact = targetContact.parentElement;
   }
 
+  //remove unread count
+  const unreadCountDiv = targetContact.querySelector('.contact-unread-count');
+  unreadCountDiv.innerText = '';
+
   drawChatWindow(targetContact.dataset.id, targetContact.dataset.socketId);
 
   //append history message to chat window

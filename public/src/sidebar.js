@@ -102,6 +102,7 @@ function drawContactDivs(contacts, category) {
     addClass('contact-picture', pictureDiv);
     addClass('contact-status', statusDiv);
     addClass('contact-info', infoDiv);
+    addClass('contact-unread-count', unreadCountDiv);
 
     //if picture not url, then show initial
     if (contact.picture.length <= 1) pictureDiv.innerText = contact.name[0].toUpperCase();
