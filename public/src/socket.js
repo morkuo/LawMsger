@@ -85,6 +85,8 @@ socket.on('deleteStarContact', response => {
 socket.on('onlineStatus', (userId, socketId, status) => {
   const contactDivs = document.querySelectorAll(`.contact[data-id="${userId}"]`);
 
+  console.log(userId, socketId, status);
+
   contactDivs.forEach(div => {
     const statusDiv = div.querySelector('.contact-status');
 

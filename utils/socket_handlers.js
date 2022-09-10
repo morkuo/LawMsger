@@ -54,9 +54,9 @@ async function idHandler(io, socket) {
 }
 
 async function disconnectionHandlers(io, socket) {
-  socket.broadcast.emit('onlineStatus', null, socket.id, 'off');
-
   socket.on('disconnect', async () => {
+    socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
+
     const result = await es.update({
       index: 'user',
       id: socket.userdata.id,
