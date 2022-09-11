@@ -89,14 +89,16 @@ const getUserData = async (req, res) => {
   res.json(response);
 };
 
-const updateUserData = async (req, res) => {
+const updateUserPassword = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(400).json({ error: errors.array() });
+  }
+
   const { oldPassword, newPassword, confirm } = req.body;
 
-  console.log(oldPassword, newPassword, confirm);
-
-  if (!oldPassword || !newPassword || !confirm)
-    return res.status(400).json({ error: 'no empty fields' });
-  if (newPassword !== confirm) return res.status(400).json({ error: 'password shoud match' });
+  if (newPassword !== confirm) return res.status(400).json({ error: 'password should match' });
 
   //get old password
   const result = await getUserDataByEmail(req.userdata.email);
@@ -121,7 +123,7 @@ const updateUserData = async (req, res) => {
   if (!resultUpdate.updated) return res.status(500).json({ error: 'failed' });
 
   res.json({
-    data: 'success',
+    data: 'updated',
   });
 };
 
@@ -151,4 +153,4 @@ const deleteUser = async (req, res) => {
   res.json({ data: 'deleted' });
 };
 
-module.exports = { signIn, createUser, getUserData, updateUserData, deleteUser };
+module.exports = { signIn, createUser, getUserData, updateUserPassword, deleteUser };

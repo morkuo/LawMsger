@@ -6,7 +6,7 @@ const {
   signIn,
   createUser,
   getUserData,
-  updateUserData,
+  updateUserPassword,
   deleteUser,
 } = require('../controllers/user');
 require('dotenv').config();
@@ -32,8 +32,7 @@ router
       )
       .bail()
       .isAlphanumeric()
-      .withMessage('only english letters and number')
-      .bail(),
+      .withMessage('only english letters and number'),
     check('email')
       .isEmail()
       .withMessage('wrong email format')
@@ -43,18 +42,42 @@ router
       .isString()
       .withMessage('string not found')
       .bail()
-      .trim()
       .isLength({
         min: process.env.AUTH_PASSWORD_MIN_LENGTH,
         max: process.env.AUTH_PASSWORD_MAX_LENGTH,
       })
       .withMessage(
         `min length: ${process.env.AUTH_PASSWORD_MIN_LENGTH}, max length: ${process.env.AUTH_PASSWORD_MAX_LENGTH}`
-      )
-      .bail(),
+      ),
     tryCatch(createUser)
   )
-  .put(tryCatch(checkJwt), tryCatch(updateUserData))
+  .put(
+    tryCatch(checkJwt),
+    tryCatch(checkJson),
+    check('oldPassword')
+      .isString()
+      .withMessage('string not found')
+      .bail()
+      .isLength({
+        min: process.env.AUTH_PASSWORD_MIN_LENGTH,
+        max: process.env.AUTH_PASSWORD_MAX_LENGTH,
+      })
+      .withMessage(
+        `min length: ${process.env.AUTH_PASSWORD_MIN_LENGTH}, max length: ${process.env.AUTH_PASSWORD_MAX_LENGTH}`
+      ),
+    check('newPassword')
+      .isString()
+      .withMessage('string not found')
+      .bail()
+      .isLength({
+        min: process.env.AUTH_PASSWORD_MIN_LENGTH,
+        max: process.env.AUTH_PASSWORD_MAX_LENGTH,
+      })
+      .withMessage(
+        `min length: ${process.env.AUTH_PASSWORD_MIN_LENGTH}, max length: ${process.env.AUTH_PASSWORD_MAX_LENGTH}`
+      ),
+    tryCatch(updateUserPassword)
+  )
   .delete(tryCatch(checkJwt), tryCatch(deleteUser));
 
 router.post('/user/signin', tryCatch(signIn));
