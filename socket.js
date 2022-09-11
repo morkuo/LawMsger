@@ -3,6 +3,7 @@ const {
   idHandler,
   msgHandler,
   suggestionsHandler,
+  matchedClausesHandler,
   checkChatWindowHandler,
   createStarContact,
   deleteStarContact,
@@ -48,6 +49,7 @@ async function connect(server) {
     idHandler(io, socket);
     msgHandler(io, socket);
     suggestionsHandler(io, socket);
+    matchedClausesHandler(io, socket);
     checkChatWindowHandler(io, socket);
     createStarContact(io, socket);
     deleteStarContact(io, socket);

@@ -241,34 +241,6 @@ async function detectInput(e) {
 
   if (clauseSuggestion > -1) {
     socket.emit('suggestion', currentInput.slice(clauseSuggestion + 2), 'clauses');
-    // const res = await fetch(
-    //   `/api/1.0/message/suggest?input=${currentInput.slice(clauseSuggestion + 2)}&index=clauses`
-    // );
-    // const sugesstions = await res.json();
-
-    // suggestionsList.innerHTML = '';
-
-    // console.log(sugesstions);
-
-    // no suggestion, then no need to do anything at this point
-    // if (sugesstions.length === 0) return;
-
-    // for (let suggestion of sugesstions) {
-    //   const li = document.createElement('li');
-
-    //   if (suggestion) {
-    //     const clauseTitle = suggestion.title;
-    //     const clauseBody = suggestion.body;
-
-    //     if (clauseBody.length > 15) {
-    //       li.innerText = `${clauseTitle} ${clauseBody.slice(0, 15)}...`;
-    //     } else {
-    //       li.innerText = `${clauseTitle} ${clauseBody}`;
-    //     }
-    //   } else li.innerText = suggestion;
-
-    //   suggestionsList.appendChild(li);
-    // }
 
     //tab listener
     input.addEventListener(
@@ -293,32 +265,33 @@ async function detectInput(e) {
   }
 
   if (matchclausesContent > -1) {
-    const res = await fetch(
-      `/api/1.0/message/match?input=${currentInput.slice(matchclausesContent + 1)}`
-    );
-    const suggestions = await res.json();
+    socket.emit('matchedClauses', currentInput.slice(matchclausesContent + 1));
+    // const res = await fetch(
+    //   `/api/1.0/message/match?input=${currentInput.slice(matchclausesContent + 1)}`
+    // );
+    // const suggestions = await res.json();
 
-    suggestionsList.innerHTML = '';
+    // suggestionsList.innerHTML = '';
 
     // no suggestion, then no need to do anything at this point
-    if (suggestions.length === 0) return;
+    // if (suggestions.length === 0) return;
 
-    for (let suggestion of suggestions) {
-      const li = document.createElement('li');
+    // for (let suggestion of suggestions) {
+    //   const li = document.createElement('li');
 
-      if (suggestion) {
-        const clauseTitle = suggestion.title;
-        const clauseBody = suggestion.body;
+    //   if (suggestion) {
+    //     const clauseTitle = suggestion.title;
+    //     const clauseBody = suggestion.body;
 
-        if (clauseBody.length > 15) {
-          li.innerText = `${clauseBody.slice(0, 15)}...`;
-        } else {
-          li.innerText = `${clauseBody}`;
-        }
-      } else li.innerText = suggestion;
+    //     if (clauseBody.length > 15) {
+    //       li.innerText = `${clauseBody.slice(0, 15)}...`;
+    //     } else {
+    //       li.innerText = `${clauseBody}`;
+    //     }
+    //   } else li.innerText = suggestion;
 
-      suggestionsList.appendChild(li);
-    }
+    //   suggestionsList.appendChild(li);
+    // }
 
     //tab listener
     input.addEventListener(
@@ -328,10 +301,13 @@ async function detectInput(e) {
           //to stay in the input field
           e.preventDefault();
 
-          e.target.value = currentInput.slice(0, matchclausesContent) + suggestions[0].body;
+          const sugesstion = suggestionsList.querySelector('li');
+
+          e.target.value = currentInput.slice(0, matchclausesContent) + sugesstion.dataset.body;
           suggestionsList.innerHTML = '';
 
-          const { title, number } = suggestions[0];
+          const title = sugesstion.dataset.title;
+          const number = sugesstion.dataset.number;
 
           const now = new Date();
           const origin = now.toISOString();

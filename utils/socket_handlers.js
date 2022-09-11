@@ -199,10 +199,20 @@ async function suggestionsHandler(io, socket) {
   });
 }
 
+async function matchedClausesHandler(io, socket) {
+  socket.on('matchedClauses', async input => {
+    if (!input) return;
+    const result = await matchedClauses(input);
+
+    socket.emit('matchedClauses', result);
+  });
+}
+
 module.exports = {
   idHandler,
   msgHandler,
   suggestionsHandler,
+  matchedClausesHandler,
   checkChatWindowHandler,
   createStarContact,
   deleteStarContact,

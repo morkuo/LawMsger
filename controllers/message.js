@@ -158,23 +158,23 @@ const getMoreMessages = async (req, res) => {
   res.json(response);
 };
 
-const getSuggestions = async (req, res) => {
-  const { input, index } = req.query;
+// const getSuggestions = async (req, res) => {
+//   const { input, index } = req.query;
 
-  const result = await suggestions(input, index);
+//   const result = await suggestions(input, index);
 
-  res.json(result);
-};
+//   res.json(result);
+// };
 
-const getMatchedClauses = async (req, res) => {
-  const { input } = req.query;
+// const getMatchedClauses = async (req, res) => {
+//   const { input } = req.query;
 
-  if (!input) return res.status(400).json({ error: 'input should not be empty' });
+//   if (!input) return res.status(400).json({ error: 'input should not be empty' });
 
-  const result = await matchedClauses(input);
+//   const result = await matchedClauses(input);
 
-  res.json(result);
-};
+//   res.json(result);
+// };
 
 const uploadFiles = async (req, res) => {
   const filesInfo = [];
@@ -218,8 +218,8 @@ async function updateMatchedClausesLastSearched(req, res) {
 module.exports = {
   getHistoryMessages,
   getMoreMessages,
-  getSuggestions,
-  getMatchedClauses,
+  // getSuggestions,
+  // getMatchedClauses,
   uploadFiles,
   updateMatchedClausesLastSearched,
 };

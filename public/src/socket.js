@@ -71,6 +71,38 @@ socket.on('clauses', suggestions => {
   }
 });
 
+socket.on('matchedClauses', suggestions => {
+  const suggestionsList = document.getElementById('suggestions');
+  // const input = document.getElementById('input');
+  suggestionsList.innerHTML = '';
+
+  if (suggestions.length === 0) return;
+
+  for (let suggestion of suggestions) {
+    const li = document.createElement('li');
+
+    if (suggestion) {
+      const clauseTitle = suggestion.title;
+      const clauseBody = suggestion.body;
+      const clauseNumber = suggestion.number;
+
+      if (clauseBody.length > 15) {
+        li.innerText = `${clauseBody.slice(0, 15)}...`;
+        li.setAttribute('data-body', clauseBody);
+        li.setAttribute('data-title', clauseTitle);
+        li.setAttribute('data-number', clauseNumber);
+      } else {
+        li.innerText = `${clauseBody}`;
+        li.setAttribute('data-body', clauseBody);
+        li.setAttribute('data-title', clauseTitle);
+        li.setAttribute('data-number', clauseNumber);
+      }
+    } else li.innerText = suggestion;
+
+    suggestionsList.appendChild(li);
+  }
+});
+
 socket.on(
   'checkChatWindow',
   (
