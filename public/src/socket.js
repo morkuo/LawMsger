@@ -244,7 +244,9 @@ socket.on('onlineStatus', (userId, socketId, status) => {
   });
 
   const chatWindow = document.querySelector('#messages');
-  if (chatWindow) chatWindow.dataset.socketId = socketId;
+  if (chatWindow && chatWindow.dataset.id === userId) {
+    chatWindow.dataset.socketId = socketId;
+  }
 });
 
 //Change online status to 'off' when disonnected
