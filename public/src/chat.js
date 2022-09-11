@@ -1,6 +1,8 @@
 import { setMsg, addClass, getJwtToken, setMessage, fetchGet, isImage } from './helper.js';
 import { socket } from './socket.js';
 
+let uploadfilesQueue = [];
+
 function addChatListenerToContactDivs(contactsDiv) {
   /*
     Click Specific Contact then draw Chat Window
@@ -397,11 +399,13 @@ function previewFile(filesInput) {
           previewImage.src = reader.result;
 
           previewImageDiv.appendChild(previewImage);
+          uploadfilesQueue.push(file);
         } else {
           const fileDiv = document.createElement('div');
           fileDiv.setAttribute('class', 'chat-upload-file-preview');
           fileDiv.innerText = file.name;
           previewImageDiv.appendChild(fileDiv);
+          uploadfilesQueue.push(file);
         }
       },
       false
@@ -409,26 +413,18 @@ function previewFile(filesInput) {
   }
 }
 
-function addUnloadFileListener() {
-  const unloadFileButton = document.querySelector('#chatUnloadFileButton');
-  // const uploadButton = document.querySelector('#chatUploadButton');
-
-  //Remove all selected files
-  unloadFileButton.addEventListener('click', e => {
-    e.preventDefault();
-
-    clearUploadFiles();
-  });
-}
-
 async function uploadFile(authorization) {
-  const filesInput = document.querySelector('input[type="file"]');
-
   const formData = new FormData();
 
-  for (let file of filesInput.files) {
-    formData.append('images', file);
+  console.log('before:' + uploadfilesQueue.length);
+
+  const uploadfilesQueueLength = uploadfilesQueue.length;
+
+  for (let i = 0; i < uploadfilesQueueLength; i++) {
+    formData.append('images', uploadfilesQueue.shift());
   }
+
+  console.log('after:' + uploadfilesQueue.length);
 
   // console.log('Going to upload this: ', filesInput);
 
@@ -449,6 +445,18 @@ async function uploadFile(authorization) {
   return response;
 }
 
+function addUnloadFileListener() {
+  const unloadFileButton = document.querySelector('#chatUnloadFileButton');
+  // const uploadButton = document.querySelector('#chatUploadButton');
+
+  //Remove all selected files
+  unloadFileButton.addEventListener('click', e => {
+    e.preventDefault();
+
+    clearUploadFiles();
+  });
+}
+
 function clearUploadFiles() {
   const uploadButton = document.querySelector('#chatUploadButton');
   const previewImageDiv = document.querySelector('#previewImageDiv');
@@ -459,6 +467,7 @@ function clearUploadFiles() {
   for (let file of previewFile) file.remove();
 
   uploadButton.value = '';
+  uploadfilesQueue = [];
   previewImageDiv.setAttribute('data-file', 'false');
 }
 
