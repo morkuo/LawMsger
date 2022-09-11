@@ -1,9 +1,8 @@
-const { jwtSign, jwtVerify } = require('../utils/helper');
 const { validationResult } = require('express-validator');
-const { getUserDataByEmail, deleteUserByEmail } = require('../models/user');
-
 const bcrypt = require('bcrypt');
 const es = require('../utils/es');
+const { jwtSign } = require('../utils/helper');
+const { getUserDataByEmail, deleteUserByEmail } = require('../models/user');
 require('dotenv').config;
 
 const saltRounds = 10;

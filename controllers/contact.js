@@ -65,6 +65,8 @@ const getStarContacts = async (req, res) => {
     },
   });
 
+  if (resultStar.length === 0) return res.json(resultStar);
+
   const stars = resultStar.map(star => star._source.contact_user_id);
 
   const {
