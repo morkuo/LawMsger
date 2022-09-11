@@ -1,5 +1,7 @@
 const { jwtSign, jwtVerify } = require('../utils/helper');
+const { validationResult } = require('express-validator');
 const { getUserDataByEmail, deleteUserByEmail } = require('../models/user');
+
 const bcrypt = require('bcrypt');
 const es = require('../utils/es');
 require('dotenv').config;
@@ -7,10 +9,18 @@ require('dotenv').config;
 const saltRounds = 10;
 
 const createUser = async (req, res) => {
-  if (req.userdata.role !== -1) return res.status(403).json({ error: 'Forbidden' });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(400).json({ error: errors.array() });
+  }
 
   const { name, email, password } = req.body;
   const picture = '';
+
+  //check whether the email exists
+  const resultEmail = await getUserDataByEmail(email);
+  if (resultEmail) return res.status(409).json({ error: 'email exists' });
 
   // hash password
   const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -27,7 +37,7 @@ const createUser = async (req, res) => {
     },
   });
 
-  res.json({ data: 'Success' });
+  res.status(201).json({ data: 'created' });
 };
 
 const signIn = async (req, res) => {

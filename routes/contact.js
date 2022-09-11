@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const checkJwt = require('../middlewares/checkJwt');
+const { checkJwt } = require('../middlewares/validation');
 const { tryCatch } = require('../utils/helper');
 const { getAllContacts, getStarContacts } = require('../controllers/contact');
 

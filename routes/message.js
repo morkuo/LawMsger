@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const checkJwt = require('../middlewares/checkJwt');
+const { checkJwt } = require('../middlewares/validation');
 const { upload } = require('../middlewares/multer');
 const { tryCatch } = require('../utils/helper');
 const {
