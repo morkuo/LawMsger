@@ -13,6 +13,7 @@ require('dotenv').config();
 
 router
   .route('/user')
+  .get(tryCatch(checkJwt), tryCatch(getUserData))
   .post(
     tryCatch(checkJwt),
     tryCatch(checkRole),
@@ -22,8 +23,13 @@ router
       .withMessage('string not found')
       .bail()
       .trim()
-      .isLength({ min: process.env.AUTH_USERNAME_MIN_LENGTH })
-      .withMessage(`min length is ${process.env.AUTH_USERNAME_MIN_LENGTH}`)
+      .isLength({
+        min: process.env.AUTH_USERNAME_MIN_LENGTH,
+        max: process.env.AUTH_USERNAME_MAX_LENGTH,
+      })
+      .withMessage(
+        `min length: ${process.env.AUTH_USERNAME_MIN_LENGTH}, max length: ${process.env.AUTH_USERNAME_MAX_LENGTH}`
+      )
       .bail()
       .isAlphanumeric()
       .withMessage('only english letters and number')
@@ -38,17 +44,18 @@ router
       .withMessage('string not found')
       .bail()
       .trim()
-      .isLength({ min: process.env.AUTH_USERNAME_MIN_LENGTH })
-      .withMessage(`min length is ${process.env.AUTH_USERNAME_MIN_LENGTH}`)
+      .isLength({
+        min: process.env.AUTH_PASSWORD_MIN_LENGTH,
+        max: process.env.AUTH_PASSWORD_MAX_LENGTH,
+      })
+      .withMessage(
+        `min length: ${process.env.AUTH_PASSWORD_MIN_LENGTH}, max length: ${process.env.AUTH_PASSWORD_MAX_LENGTH}`
+      )
       .bail(),
     tryCatch(createUser)
-  );
-
-router.get('/user', tryCatch(checkJwt), tryCatch(getUserData));
-
-router.put('/user', tryCatch(checkJwt), tryCatch(updateUserData));
-
-router.delete('/user', tryCatch(checkJwt), tryCatch(deleteUser));
+  )
+  .put(tryCatch(checkJwt), tryCatch(updateUserData))
+  .delete(tryCatch(checkJwt), tryCatch(deleteUser));
 
 router.post('/user/signin', tryCatch(signIn));
 
