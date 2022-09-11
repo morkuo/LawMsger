@@ -90,6 +90,26 @@ router
     tryCatch(deleteUser)
   );
 
-router.post('/user/signin', tryCatch(signIn));
+router.post(
+  '/user/signin',
+  tryCatch(checkJson),
+  check('email')
+    .isEmail()
+    .withMessage('wrong email format')
+    .bail()
+    .normalizeEmail({ gmail_remove_dots: false }),
+  check('password')
+    .isString()
+    .withMessage('string not found')
+    .bail()
+    .isLength({
+      min: process.env.AUTH_PASSWORD_MIN_LENGTH,
+      max: process.env.AUTH_PASSWORD_MAX_LENGTH,
+    })
+    .withMessage(
+      `min length: ${process.env.AUTH_PASSWORD_MIN_LENGTH}, max length: ${process.env.AUTH_PASSWORD_MAX_LENGTH}`
+    ),
+  tryCatch(signIn)
+);
 
 module.exports = router;

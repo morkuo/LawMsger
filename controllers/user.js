@@ -41,19 +41,23 @@ const createUser = async (req, res) => {
 };
 
 const signIn = async (req, res) => {
-  const { email, password } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(400).json({ error: errors.array() });
+  }
 
-  //check password
+  const { email, password } = req.body;
 
   //check whether the email exists
   const result = await getUserDataByEmail(email);
 
   //email does not exist
-  if (!result) return res.status(403).json({ error: 'Wrong email or password' });
+  if (!result) return res.status(401).json({ error: 'wrong email or password' });
 
   //check password is correct or not
   const isCorrectPassword = await bcrypt.compare(password, result._source.password);
-  if (!isCorrectPassword) return res.status(403).json({ error: 'Wrong email or password' });
+  if (!isCorrectPassword) return res.status(401).json({ error: 'wrong email or password' });
 
   // Generate Token String
   const jwtPayload = {
@@ -98,14 +102,14 @@ const updateUserPassword = async (req, res) => {
 
   const { oldPassword, newPassword, confirm } = req.body;
 
-  if (newPassword !== confirm) return res.status(400).json({ error: 'password should match' });
+  if (newPassword !== confirm) return res.status(400).json({ error: 'new password should match' });
 
   //get old password
   const result = await getUserDataByEmail(req.userdata.email);
 
   //check password is correct or not
   const isCorrectPassword = await bcrypt.compare(oldPassword, result._source.password);
-  if (!isCorrectPassword) return res.status(403).json({ error: 'wrong password' });
+  if (!isCorrectPassword) return res.status(401).json({ error: 'wrong current password' });
 
   const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
