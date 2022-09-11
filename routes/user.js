@@ -78,7 +78,17 @@ router
       ),
     tryCatch(updateUserPassword)
   )
-  .delete(tryCatch(checkJwt), tryCatch(deleteUser));
+  .delete(
+    tryCatch(checkJwt),
+    tryCatch(checkRole),
+    tryCatch(checkJson),
+    check('email')
+      .isEmail()
+      .withMessage('wrong email format')
+      .bail()
+      .normalizeEmail({ gmail_remove_dots: false }),
+    tryCatch(deleteUser)
+  );
 
 router.post('/user/signin', tryCatch(signIn));
 

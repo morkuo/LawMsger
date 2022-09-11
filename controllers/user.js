@@ -128,7 +128,11 @@ const updateUserPassword = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  if (req.userdata.role !== -1) return res.status(403).json({ error: 'forbidden' });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(400).json({ error: errors.array() });
+  }
 
   const { email } = req.body;
 
@@ -139,6 +143,8 @@ const deleteUser = async (req, res) => {
 
   const resultUser = await deleteUserByEmail('user', email);
 
+  if (!resultUser.deleted) return res.status(500).json({ error: 'failed' });
+
   const resultStarred = await es.deleteByQuery({
     index: 'star',
     body: {
@@ -147,8 +153,6 @@ const deleteUser = async (req, res) => {
       },
     },
   });
-
-  if (!resultUser.deleted) return res.status(400).json({ error: 'failed' });
 
   res.json({ data: 'deleted' });
 };
