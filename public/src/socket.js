@@ -44,6 +44,33 @@ socket.on('suggestion', suggestions => {
   }
 });
 
+socket.on('clauses', suggestions => {
+  const suggestionsList = document.getElementById('suggestions');
+  // const input = document.getElementById('input');
+  suggestionsList.innerHTML = '';
+
+  if (suggestions.length === 0) return;
+
+  for (let suggestion of suggestions) {
+    const li = document.createElement('li');
+
+    if (suggestion) {
+      const clauseTitle = suggestion.title;
+      const clauseBody = suggestion.body;
+
+      if (clauseBody.length > 15) {
+        li.innerText = `${clauseTitle} ${clauseBody.slice(0, 15)}...`;
+        li.setAttribute('data-body', clauseBody);
+      } else {
+        li.innerText = `${clauseTitle} ${clauseBody}`;
+        li.setAttribute('data-body', clauseBody);
+      }
+    } else li.innerText = suggestion;
+
+    suggestionsList.appendChild(li);
+  }
+});
+
 socket.on(
   'checkChatWindow',
   (

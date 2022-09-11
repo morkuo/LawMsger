@@ -192,9 +192,10 @@ async function deleteStarContact(io, socket) {
 
 async function suggestionsHandler(io, socket) {
   socket.on('suggestion', async (input, index) => {
-    const result = await suggestions(input);
+    const result = await suggestions(input, index);
 
-    socket.emit('suggestion', result);
+    if (!index) socket.emit('suggestion', result);
+    else socket.emit('clauses', result);
   });
 }
 

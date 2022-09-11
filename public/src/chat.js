@@ -216,25 +216,6 @@ async function detectInput(e) {
   if (wordSuggestion > -1 && clauseSuggestion === -1) {
     socket.emit('suggestion', currentInput.slice(wordSuggestion + 1));
 
-    // const res = await fetch(
-    //   `/api/1.0/message/suggest?input=${currentInput.slice(wordSuggestion + 1)}`
-    // );
-    // const sugesstions = await res.json();
-
-    // suggestionsList.innerHTML = '';
-
-    // no suggestion, then no need to do anything at this point
-    // if (sugesstions.length === 0) return;
-
-    // for (let suggestion of sugesstions) {
-    //   const li = document.createElement('li');
-
-    //   if (suggestion) li.innerText = suggestion;
-    //   else li.innerText = suggestion;
-
-    //   suggestionsList.appendChild(li);
-    // }
-
     //tab listener
     input.addEventListener(
       'keydown',
@@ -259,34 +240,35 @@ async function detectInput(e) {
   }
 
   if (clauseSuggestion > -1) {
-    const res = await fetch(
-      `/api/1.0/message/suggest?input=${currentInput.slice(clauseSuggestion + 2)}&index=clauses`
-    );
-    const sugesstions = await res.json();
+    socket.emit('suggestion', currentInput.slice(clauseSuggestion + 2), 'clauses');
+    // const res = await fetch(
+    //   `/api/1.0/message/suggest?input=${currentInput.slice(clauseSuggestion + 2)}&index=clauses`
+    // );
+    // const sugesstions = await res.json();
 
-    suggestionsList.innerHTML = '';
+    // suggestionsList.innerHTML = '';
 
     // console.log(sugesstions);
 
     // no suggestion, then no need to do anything at this point
-    if (sugesstions.length === 0) return;
+    // if (sugesstions.length === 0) return;
 
-    for (let suggestion of sugesstions) {
-      const li = document.createElement('li');
+    // for (let suggestion of sugesstions) {
+    //   const li = document.createElement('li');
 
-      if (suggestion) {
-        const clauseTitle = suggestion.title;
-        const clauseBody = suggestion.body;
+    //   if (suggestion) {
+    //     const clauseTitle = suggestion.title;
+    //     const clauseBody = suggestion.body;
 
-        if (clauseBody.length > 15) {
-          li.innerText = `${clauseTitle} ${clauseBody.slice(0, 15)}...`;
-        } else {
-          li.innerText = `${clauseTitle} ${clauseBody}`;
-        }
-      } else li.innerText = suggestion;
+    //     if (clauseBody.length > 15) {
+    //       li.innerText = `${clauseTitle} ${clauseBody.slice(0, 15)}...`;
+    //     } else {
+    //       li.innerText = `${clauseTitle} ${clauseBody}`;
+    //     }
+    //   } else li.innerText = suggestion;
 
-      suggestionsList.appendChild(li);
-    }
+    //   suggestionsList.appendChild(li);
+    // }
 
     //tab listener
     input.addEventListener(
@@ -295,8 +277,11 @@ async function detectInput(e) {
         if (e.key === 'Tab') {
           //to stay in the input field
           e.preventDefault();
-          if (sugesstions[0] !== 'undefined') {
-            e.target.value = currentInput.slice(0, clauseSuggestion) + sugesstions[0].body;
+
+          const sugesstion = suggestionsList.querySelector('li');
+
+          if (sugesstion.innerText !== 'undefined') {
+            e.target.value = currentInput.slice(0, clauseSuggestion) + sugesstion.dataset.body;
             suggestionsList.innerHTML = '';
           }
         }
