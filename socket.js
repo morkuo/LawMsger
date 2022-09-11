@@ -4,6 +4,7 @@ const {
   msgHandler,
   suggestionsHandler,
   matchedClausesHandler,
+  updateMatchedClausesHandler,
   checkChatWindowHandler,
   createStarContact,
   deleteStarContact,
@@ -50,6 +51,7 @@ async function connect(server) {
     msgHandler(io, socket);
     suggestionsHandler(io, socket);
     matchedClausesHandler(io, socket);
+    updateMatchedClausesHandler(io, socket);
     checkChatWindowHandler(io, socket);
     createStarContact(io, socket);
     deleteStarContact(io, socket);

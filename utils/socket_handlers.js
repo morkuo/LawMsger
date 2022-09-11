@@ -208,11 +208,29 @@ async function matchedClausesHandler(io, socket) {
   });
 }
 
+async function updateMatchedClausesHandler(io, socket) {
+  socket.on('updateMatchedClauses', async (origin, title, number) => {
+    await es.updateByQuery({
+      index: 'matchedclauses',
+      script: {
+        source: `ctx._source.last_searched = '${origin}'`,
+        lang: 'painless',
+      },
+      query: {
+        bool: {
+          filter: [{ term: { title: title } }, { term: { number: number } }],
+        },
+      },
+    });
+  });
+}
+
 module.exports = {
   idHandler,
   msgHandler,
   suggestionsHandler,
   matchedClausesHandler,
+  updateMatchedClausesHandler,
   checkChatWindowHandler,
   createStarContact,
   deleteStarContact,

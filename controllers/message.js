@@ -158,24 +158,6 @@ const getMoreMessages = async (req, res) => {
   res.json(response);
 };
 
-// const getSuggestions = async (req, res) => {
-//   const { input, index } = req.query;
-
-//   const result = await suggestions(input, index);
-
-//   res.json(result);
-// };
-
-// const getMatchedClauses = async (req, res) => {
-//   const { input } = req.query;
-
-//   if (!input) return res.status(400).json({ error: 'input should not be empty' });
-
-//   const result = await matchedClauses(input);
-
-//   res.json(result);
-// };
-
 const uploadFiles = async (req, res) => {
   const filesInfo = [];
   for (let file of req.files) {
@@ -194,32 +176,30 @@ const uploadFiles = async (req, res) => {
   res.json({ data: filesInfo });
 };
 
-async function updateMatchedClausesLastSearched(req, res) {
-  const { origin, title, number } = req.body;
+// async function updateMatchedClausesLastSearched(req, res) {
+//   const { origin, title, number } = req.body;
 
-  const result = await es.updateByQuery({
-    index: 'matchedclauses',
-    script: {
-      source: `ctx._source.last_searched = '${origin}'`,
-      lang: 'painless',
-    },
-    query: {
-      bool: {
-        filter: [{ term: { title: title } }, { term: { number: number } }],
-      },
-    },
-  });
+//   const result = await es.updateByQuery({
+//     index: 'matchedclauses',
+//     script: {
+//       source: `ctx._source.last_searched = '${origin}'`,
+//       lang: 'painless',
+//     },
+//     query: {
+//       bool: {
+//         filter: [{ term: { title: title } }, { term: { number: number } }],
+//       },
+//     },
+//   });
 
-  if (!result.updated) return res.status(500).json({ error: 'Server Error' });
+//   if (!result.updated) return res.status(500).json({ error: 'Server Error' });
 
-  res.json(result.updated);
-}
+//   res.json(result.updated);
+// }
 
 module.exports = {
   getHistoryMessages,
   getMoreMessages,
-  // getSuggestions,
-  // getMatchedClauses,
   uploadFiles,
-  updateMatchedClausesLastSearched,
+  // updateMatchedClausesLastSearched,
 };

@@ -247,7 +247,6 @@ async function detectInput(e) {
       'keydown',
       e => {
         if (e.key === 'Tab') {
-          //to stay in the input field
           e.preventDefault();
 
           const sugesstion = suggestionsList.querySelector('li');
@@ -258,7 +257,6 @@ async function detectInput(e) {
           }
         }
       },
-      //once the eventlistener has been fired once, remove itself
       { once: true }
     );
     return;
@@ -266,39 +264,12 @@ async function detectInput(e) {
 
   if (matchclausesContent > -1) {
     socket.emit('matchedClauses', currentInput.slice(matchclausesContent + 1));
-    // const res = await fetch(
-    //   `/api/1.0/message/match?input=${currentInput.slice(matchclausesContent + 1)}`
-    // );
-    // const suggestions = await res.json();
-
-    // suggestionsList.innerHTML = '';
-
-    // no suggestion, then no need to do anything at this point
-    // if (suggestions.length === 0) return;
-
-    // for (let suggestion of suggestions) {
-    //   const li = document.createElement('li');
-
-    //   if (suggestion) {
-    //     const clauseTitle = suggestion.title;
-    //     const clauseBody = suggestion.body;
-
-    //     if (clauseBody.length > 15) {
-    //       li.innerText = `${clauseBody.slice(0, 15)}...`;
-    //     } else {
-    //       li.innerText = `${clauseBody}`;
-    //     }
-    //   } else li.innerText = suggestion;
-
-    //   suggestionsList.appendChild(li);
-    // }
 
     //tab listener
     input.addEventListener(
       'keydown',
       async e => {
         if (e.key === 'Tab') {
-          //to stay in the input field
           e.preventDefault();
 
           const sugesstion = suggestionsList.querySelector('li');
@@ -312,21 +283,9 @@ async function detectInput(e) {
           const now = new Date();
           const origin = now.toISOString();
 
-          const authorization = getJwtToken();
-
-          const api = `${window.location.origin}/api/1.0/message/match`;
-
-          const res = await fetch(api, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': authorization,
-            },
-            body: JSON.stringify({ origin, title, number }),
-          });
+          socket.emit('updateMatchedClauses', origin, title, number);
         }
       },
-      //once the eventlistener has been fired once, remove itself
       { once: true }
     );
 
