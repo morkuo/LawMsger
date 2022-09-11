@@ -2,6 +2,7 @@ const { Server } = require('socket.io');
 const {
   idHandler,
   msgHandler,
+  suggestionsHandler,
   checkChatWindowHandler,
   createStarContact,
   deleteStarContact,
@@ -46,6 +47,7 @@ async function connect(server) {
     //handlers
     idHandler(io, socket);
     msgHandler(io, socket);
+    suggestionsHandler(io, socket);
     checkChatWindowHandler(io, socket);
     createStarContact(io, socket);
     deleteStarContact(io, socket);

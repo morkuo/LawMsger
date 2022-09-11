@@ -27,6 +27,23 @@ socket.on('msg', (msg, senderSocketId, filesInfo) => {
   setMessage(msg, Date.now(), senderSocketId, null, filesInfo);
 });
 
+socket.on('suggestion', suggestions => {
+  const suggestionsList = document.getElementById('suggestions');
+  // const input = document.getElementById('input');
+  suggestionsList.innerHTML = '';
+
+  if (suggestions.length === 0) return;
+
+  for (let suggestion of suggestions) {
+    const li = document.createElement('li');
+
+    if (suggestion) li.innerText = suggestion;
+    else li.innerText = suggestion;
+
+    suggestionsList.appendChild(li);
+  }
+});
+
 socket.on(
   'checkChatWindow',
   (

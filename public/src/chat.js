@@ -214,24 +214,26 @@ async function detectInput(e) {
   const matchclausesContent = currentInput.indexOf('|');
 
   if (wordSuggestion > -1 && clauseSuggestion === -1) {
-    const res = await fetch(
-      `/api/1.0/message/suggest?input=${currentInput.slice(wordSuggestion + 1)}`
-    );
-    const sugesstions = await res.json();
+    socket.emit('suggestion', currentInput.slice(wordSuggestion + 1));
 
-    suggestionsList.innerHTML = '';
+    // const res = await fetch(
+    //   `/api/1.0/message/suggest?input=${currentInput.slice(wordSuggestion + 1)}`
+    // );
+    // const sugesstions = await res.json();
+
+    // suggestionsList.innerHTML = '';
 
     // no suggestion, then no need to do anything at this point
-    if (sugesstions.length === 0) return;
+    // if (sugesstions.length === 0) return;
 
-    for (let suggestion of sugesstions) {
-      const li = document.createElement('li');
+    // for (let suggestion of sugesstions) {
+    //   const li = document.createElement('li');
 
-      if (suggestion) li.innerText = suggestion;
-      else li.innerText = suggestion;
+    //   if (suggestion) li.innerText = suggestion;
+    //   else li.innerText = suggestion;
 
-      suggestionsList.appendChild(li);
-    }
+    //   suggestionsList.appendChild(li);
+    // }
 
     //tab listener
     input.addEventListener(
@@ -240,8 +242,11 @@ async function detectInput(e) {
         if (e.key === 'Tab') {
           //to stay in the input field
           e.preventDefault();
-          if (sugesstions[0] !== 'undefined') {
-            e.target.value = currentInput.slice(0, wordSuggestion) + sugesstions[0];
+
+          const sugesstion = suggestionsList.querySelector('li');
+
+          if (sugesstion.innerText !== 'undefined') {
+            e.target.value = currentInput.slice(0, wordSuggestion) + sugesstion.innerText;
             suggestionsList.innerHTML = '';
           }
         }

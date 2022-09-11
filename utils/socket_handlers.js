@@ -1,5 +1,6 @@
 const es = require('./es');
 const { jwtVerify } = require('../utils/helper');
+const { suggestions, matchedClauses } = require('../models/message');
 
 function msgHandler(io, socket) {
   socket.on('msg', async (msg, targetSocketId, targetUserId, targetUserName, filesInfo) => {
@@ -189,9 +190,18 @@ async function deleteStarContact(io, socket) {
   });
 }
 
+async function suggestionsHandler(io, socket) {
+  socket.on('suggestion', async (input, index) => {
+    const result = await suggestions(input);
+
+    socket.emit('suggestion', result);
+  });
+}
+
 module.exports = {
   idHandler,
   msgHandler,
+  suggestionsHandler,
   checkChatWindowHandler,
   createStarContact,
   deleteStarContact,

@@ -15,7 +15,7 @@ router.get('/message', tryCatch(checkJwt), tryCatch(getHistoryMessages));
 
 router.get('/message/more', tryCatch(checkJwt), tryCatch(getMoreMessages));
 
-router.get('/message/suggest', tryCatch(getSuggestions));
+// router.get('/message/suggest', tryCatch(getSuggestions));
 
 router.get('/message/match', tryCatch(getMatchedClauses));
 
