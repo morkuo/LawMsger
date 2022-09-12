@@ -38,13 +38,15 @@ const getAllContacts = async (req, res) => {
 
   const unreadMessagesCount = responses.map(response => response.hits.total.value);
 
+  // console.log('Hashtable on controller:', global.hashTable);
+
   let i = 0;
   const contacts = users.map(user => ({
     id: user._id,
     name: user._source.name,
     email: user._source.email,
     picture: user._source.picture,
-    socket_id: user._source.socket_id,
+    socket_id: global.hashTable[user._id],
     unread: unreadMessagesCount[i++],
   }));
 
@@ -113,7 +115,7 @@ const getStarContacts = async (req, res) => {
     name: star._source.name,
     email: star._source.email,
     picture: star._source.picture,
-    socket_id: star._source.socket_id,
+    socket_id: global.hashTable[star._id],
     unread: unreadMessagesCount[i++],
   }));
 

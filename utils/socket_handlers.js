@@ -91,34 +91,28 @@ async function checkChatWindowHandler(io, socket) {
 }
 
 async function idHandler(io, socket) {
-  const { jwtToken } = socket.handshake.query;
-  const user = await jwtVerify(jwtToken, process.env.JWT_SECRET);
+  socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'on');
 
-  socket.broadcast.emit('onlineStatus', user.id, socket.id, 'on');
+  global.hashTable[socket.userdata.id] = socket.id;
 
   //partial update user socket_id
   const result = await es.update({
     index: 'user',
-    id: user.id,
+    id: socket.userdata.id,
     doc: {
       socket_id: socket.id,
     },
   });
 
-  console.log('socket connected (user socket id updated): ' + socket.id);
+  // console.log('new socket connected: ' + socket.id);
+  console.log('new connection. all connected sockets: ', io.allSockets());
 }
 
 async function disconnectionHandlers(io, socket) {
   socket.on('disconnect', async () => {
     socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
 
-    const result = await es.update({
-      index: 'user',
-      id: socket.userdata.id,
-      doc: {
-        socket_id: null,
-      },
-    });
+    delete global.hashTable[socket.userdata.id];
 
     console.log('user disconnected: ' + socket.id);
   });

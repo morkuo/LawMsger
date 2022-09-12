@@ -20,17 +20,7 @@ async function connect(server) {
 
   console.log('Socket Server is running');
 
-  //reset socket id of all users
-  await es.updateByQuery({
-    index: 'user',
-    script: {
-      lang: 'painless',
-      source: 'ctx._source["socket_id"] = null',
-    },
-    query: {
-      match_all: {},
-    },
-  });
+  global.hashTable = {};
 
   io.use(async (socket, next) => {
     try {
