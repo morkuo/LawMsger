@@ -16,11 +16,13 @@ async function drawSidebar() {
 
   const starContacts = await getStarContacts();
   drawContactDivs(starContacts, 'star');
-
   addChatListenerToContactDivs(starContactsDiv);
 
   drawAddStarButton(contacts, starContacts);
   drawDeleteStarButton(starContacts);
+
+  const groups = await getGroups();
+  drawGroups(groups);
 
   listenToChatWindow();
 
@@ -87,6 +89,11 @@ async function getStarContacts() {
   return response;
 }
 
+async function getGroups() {
+  const response = await fetchGet('/group');
+  return response;
+}
+
 function drawContactDivs(contacts, category) {
   const contactsDiv = document.querySelector(`#${category} .contacts`);
 
@@ -128,6 +135,25 @@ function drawContactDivs(contacts, category) {
   }
 }
 
+function drawGroups(groups) {
+  const groupsDiv = document.querySelector(`.groups`);
+
+  for (let group of groups) {
+    const groupDiv = document.createElement('div');
+
+    const nameDiv = document.createElement('div');
+
+    addClass('contact', groupDiv);
+
+    nameDiv.innerText = group.name;
+
+    groupDiv.setAttribute('data-id', group.id);
+
+    groupsDiv.appendChild(groupDiv);
+    groupDiv.appendChild(nameDiv);
+  }
+}
+
 //Check whether current user is at chat window. If yes, highlight chatting contact div.
 function listenToChatWindow() {
   const pane = document.getElementById('pane');
@@ -136,7 +162,7 @@ function listenToChatWindow() {
     const sideBar = document.getElementById('sidebar');
     const allContactDivs = document.querySelectorAll('.contact');
 
-    allContactDivs.forEach(contactDiv => {
+    allContactDivs.forEach(groupDiv => {
       contactDiv.style.backgroundColor = '';
     });
 
