@@ -23,6 +23,7 @@ async function drawSidebar() {
 
   const groups = await getGroups();
   drawGroups(groups);
+  socket.emit('join', groups);
 
   listenToChatWindow();
 

@@ -1,6 +1,7 @@
 const { Server } = require('socket.io');
 const {
   idHandler,
+  joinGroupHandler,
   msgHandler,
   suggestionsHandler,
   matchedClausesHandler,
@@ -38,6 +39,7 @@ async function connect(server) {
   io.on('connection', async socket => {
     //handlers
     idHandler(io, socket);
+    joinGroupHandler(io, socket);
     msgHandler(io, socket);
     suggestionsHandler(io, socket);
     matchedClausesHandler(io, socket);

@@ -108,6 +108,33 @@ async function idHandler(io, socket) {
   console.log('new connection. all connected sockets: ', io.allSockets());
 }
 
+async function joinGroupHandler(io, socket) {
+  socket.on('join', async groups => {
+    const groupIds = groups.map(group => group.id);
+
+    socket.join(groupIds);
+
+    console.log(`${socket.id} is in following rooms: `, socket.rooms);
+
+    // delete global.hashTable[socket.userdata.id];
+
+    // console.log('user disconnected: ' + socket.id);
+  });
+
+  // socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'on');
+
+  // global.hashTable[socket.userdata.id] = socket.id;
+
+  //partial update user socket_id
+  // const result = await es.update({
+  //   index: 'user',
+  //   id: socket.userdata.id,
+  //   doc: {
+  //     socket_id: socket.id,
+  //   },
+  // });
+}
+
 async function disconnectionHandlers(io, socket) {
   socket.on('disconnect', async () => {
     socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
@@ -221,6 +248,7 @@ async function updateMatchedClausesHandler(io, socket) {
 
 module.exports = {
   idHandler,
+  joinGroupHandler,
   msgHandler,
   suggestionsHandler,
   matchedClausesHandler,
