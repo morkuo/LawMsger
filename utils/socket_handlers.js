@@ -1,5 +1,5 @@
 const es = require('./es');
-const { jwtVerify } = require('../utils/helper');
+const { jwtVerify, tryCatch } = require('../utils/helper');
 const { suggestions, matchedClauses } = require('../models/message');
 
 function msgHandler(io, socket) {
@@ -44,6 +44,57 @@ function msgHandler(io, socket) {
           filesInfo
         );
     }
+
+    // console.log('Msg has been sent to: ' + targetSocketId);
+  });
+}
+
+function groupMsgHandler(io, socket) {
+  socket.on('groupmsg', async (msg, groupId, filesInfo) => {
+    // console.log('Server receives: ' + msg);
+    // console.log('received' + fileUrls);
+
+    console.log(msg, groupId, filesInfo);
+
+    socket.to(groupId).emit('groupmsg', msg, socket.id, groupId, filesInfo);
+
+    const fromSocketId = socket.id;
+    const fromUserId = socket.userdata.id;
+    const fromUserName = socket.userdata.name;
+
+    // if (!io.sockets.adapter.rooms.has(targetSocketId)) {
+    //   const parsedFilesInfo = await JSON.parse(filesInfo);
+    //   parsedFilesInfo.data.forEach(fileObj => {
+    //     //S3 presigned url which is going to expires
+    //     delete fileObj.location;
+    //   });
+    //   await es.index({
+    //     index: 'message',
+    //     document: {
+    //       sender_id: fromUserId,
+    //       sender_name: fromUserName,
+    //       receiver_id: targetUserId,
+    //       receiver_name: targetUserName,
+    //       message: msg,
+    //       files: JSON.stringify(parsedFilesInfo),
+    //       isRead: false,
+    //     },
+    //   });
+    // } else {
+    //   socket
+    //     .to(targetSocketId)
+    //     .emit(
+    //       'checkChatWindow',
+    //       msg,
+    //       fromSocketId,
+    //       fromUserId,
+    //       fromUserName,
+    //       targetSocketId,
+    //       targetUserId,
+    //       targetUserName,
+    //       filesInfo
+    //     );
+    // }
 
     // console.log('Msg has been sent to: ' + targetSocketId);
   });
@@ -231,18 +282,22 @@ async function matchedClausesHandler(io, socket) {
 
 async function updateMatchedClausesHandler(io, socket) {
   socket.on('updateMatchedClauses', async (origin, title, number) => {
-    await es.updateByQuery({
-      index: 'matchedclauses',
-      script: {
-        source: `ctx._source.last_searched = '${origin}'`,
-        lang: 'painless',
-      },
-      query: {
-        bool: {
-          filter: [{ term: { title: title } }, { term: { number: number } }],
+    try {
+      await es.updateByQuery({
+        index: 'matchedclauses',
+        script: {
+          source: `ctx._source.last_searched = '${origin}'`,
+          lang: 'painless',
         },
-      },
-    });
+        query: {
+          bool: {
+            filter: [{ term: { title: title } }, { term: { number: number } }],
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   });
 }
 
@@ -250,6 +305,7 @@ module.exports = {
   idHandler,
   joinGroupHandler,
   msgHandler,
+  groupMsgHandler,
   suggestionsHandler,
   matchedClausesHandler,
   updateMatchedClausesHandler,

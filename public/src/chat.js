@@ -10,7 +10,132 @@ function addChatListenerToContactDivs(contactsDiv) {
   contactsDiv.addEventListener('click', chatListener);
 }
 
+function addGroupChatListenerToGroupDivs(groupsDiv) {
+  /*
+    Click Specific Contact then draw Chat Window
+    */
+  groupsDiv.addEventListener('click', groupChatListener);
+}
+
 async function chatListener(e) {
+  // click on add star button, then return
+  if (e.target.classList.contains('contact-add-star-button') && e.target.innerText !== '') return;
+  if (e.target.classList.contains('contact-delete-star-button')) return;
+
+  //look for the clicked element's user id
+  let targetContact = e.target;
+  while (!targetContact.hasAttribute('data-socket-id')) {
+    targetContact = targetContact.parentElement;
+  }
+
+  //remove unread count
+  const unreadCountDivs = document.querySelectorAll(
+    `.contacts [data-id="${targetContact.dataset.id}"] .contact-unread-count`
+  );
+  unreadCountDivs.forEach(div => {
+    div.innerText = '';
+  });
+
+  drawChatWindow(targetContact.dataset.id, targetContact.dataset.socketId);
+
+  //append history message to chat window
+  const { data: history } = await getMessages(targetContact.dataset.id);
+
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].sender_id !== targetContact.dataset.id) {
+      setMessage(history[i].message, history[i].created_at, null, null, history[i].files, 'read');
+    } else {
+      setMessage(
+        history[i].message,
+        history[i].created_at,
+        targetContact.dataset.socketId,
+        null,
+        history[i].files,
+        history[i].isRead
+      );
+    }
+  }
+
+  //get more messages when scroll to top
+  const messages = document.getElementById('messages');
+
+  messages.addEventListener('scroll', async e => {
+    // console.log(e.target.scrollTop);
+
+    if (e.target.scrollTop === 0) {
+      // console.log('Pull New data');
+
+      let oldestMessageTimeDiv = messages.querySelector('li:first-child .chat-message-time');
+      let baselineTime = oldestMessageTimeDiv.dataset.rawTime;
+
+      const { data: moreMessages } = await getMessages(targetContact.dataset.id, baselineTime);
+
+      if (moreMessages.length === 0) return setMsg('No More Messages');
+
+      for (let msg of moreMessages) {
+        if (msg.sender_id !== targetContact.dataset.id) {
+          setMessage(msg.message, msg.created_at, null, 'more', msg.files, 'read');
+        } else {
+          setMessage(
+            msg.message,
+            msg.created_at,
+            targetContact.dataset.socketId,
+            'more',
+            msg.files,
+            msg.isRead
+          );
+        }
+      }
+    }
+  });
+
+  //suggestions
+  const input = document.getElementById('input');
+  const sugesstionsList = document.getElementById('suggestions');
+  const form = document.getElementById('form');
+
+  const debouncedDetectInput = debounce(detectInput, 600);
+
+  input.addEventListener('keydown', debouncedDetectInput);
+
+  // sugesstionsList.addEventListener('click', async e => {
+  //   if (e.target.tagName === 'LI') input.value = e.target.innerText;
+  // });
+
+  // Send message
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const messages = document.getElementById('messages');
+    const contactUserSocketId = messages.dataset.socketId;
+    const contactUserId = messages.dataset.id;
+    const contactDiv = document.querySelector(`[data-id="${contactUserId}"]`);
+
+    const contactNameDiv = contactDiv.querySelector('.contact-info div:first-child');
+    const contactName = contactNameDiv.innerText;
+
+    const uploadButton = document.querySelector('#chatUploadButton');
+
+    if (input.value || uploadButton.value) {
+      const authorization = getJwtToken();
+      const response = await uploadFile(authorization);
+
+      if (response.error) return alert(response.error);
+
+      // console.log('Got fileUrls from server:', rawfileUrls);
+
+      const filesInfo = JSON.stringify(response);
+
+      socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName, filesInfo);
+
+      setMessage(input.value, Date.now(), null, null, filesInfo, 'read');
+
+      input.value = '';
+    }
+  });
+}
+
+async function groupChatListener(e) {
   // click on add star button, then return
   if (e.target.classList.contains('contact-add-star-button') && e.target.innerText !== '') return;
   if (e.target.classList.contains('contact-delete-star-button')) return;
@@ -104,8 +229,8 @@ async function chatListener(e) {
     const contactUserId = messages.dataset.id;
     const contactDiv = document.querySelector(`[data-id="${contactUserId}"]`);
 
-    const contactNameDiv = contactDiv.querySelector('.contact-info div:first-child');
-    const contactName = contactNameDiv.innerText;
+    // const contactNameDiv = contactDiv.querySelector('.contact-info div:first-child');
+    // const contactName = contactNameDiv.innerText;
 
     const uploadButton = document.querySelector('#chatUploadButton');
 
@@ -119,7 +244,7 @@ async function chatListener(e) {
 
       const filesInfo = JSON.stringify(response);
 
-      socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName, filesInfo);
+      socket.emit('groupmsg', input.value, contactUserSocketId, filesInfo);
 
       setMessage(input.value, Date.now(), null, null, filesInfo, 'read');
 
@@ -265,6 +390,27 @@ async function detectInput(e) {
   if (matchclausesContent > -1) {
     socket.emit('matchedClauses', currentInput.slice(matchclausesContent + 1));
 
+    suggestionsList.addEventListener(
+      'click',
+      async e => {
+        if (e.target.tagName === 'LI') {
+          e.stopPropagation();
+          input.value = currentInput.slice(0, matchclausesContent) + e.target.dataset.body;
+
+          suggestionsList.innerHTML = '';
+
+          const title = e.target.dataset.title;
+          const number = e.target.dataset.number;
+
+          const now = new Date();
+          const origin = now.toISOString();
+
+          socket.emit('updateMatchedClauses', origin, title, number);
+        }
+      },
+      { once: true }
+    );
+
     //tab listener
     input.addEventListener(
       'keydown',
@@ -272,13 +418,13 @@ async function detectInput(e) {
         if (e.key === 'Tab') {
           e.preventDefault();
 
-          const sugesstion = suggestionsList.querySelector('li');
+          const suggestion = suggestionsList.querySelector('li');
 
-          e.target.value = currentInput.slice(0, matchclausesContent) + sugesstion.dataset.body;
+          e.target.value = currentInput.slice(0, matchclausesContent) + suggestion.dataset.body;
           suggestionsList.innerHTML = '';
 
-          const title = sugesstion.dataset.title;
-          const number = sugesstion.dataset.number;
+          const title = suggestion.dataset.title;
+          const number = suggestion.dataset.number;
 
           const now = new Date();
           const origin = now.toISOString();
@@ -396,4 +542,4 @@ function clearUploadFiles() {
   previewImageDiv.setAttribute('data-file', 'false');
 }
 
-export { addChatListenerToContactDivs };
+export { addChatListenerToContactDivs, addGroupChatListenerToGroupDivs };

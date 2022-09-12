@@ -19,14 +19,16 @@
   border-top: 1px solid black;
 }
 
-.contact {
+.contact,
+.group {
   display: flex;
   height: 4rem;
   border-bottom: 1px solid black;
   cursor: pointer;
 }
 
-.contact:hover {
+.contact:hover,
+.group:hover {
   background-color: pink;
 }
 

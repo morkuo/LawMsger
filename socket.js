@@ -3,6 +3,7 @@ const {
   idHandler,
   joinGroupHandler,
   msgHandler,
+  groupMsgHandler,
   suggestionsHandler,
   matchedClausesHandler,
   updateMatchedClausesHandler,
@@ -41,6 +42,7 @@ async function connect(server) {
     idHandler(io, socket);
     joinGroupHandler(io, socket);
     msgHandler(io, socket);
+    groupMsgHandler(io, socket);
     suggestionsHandler(io, socket);
     matchedClausesHandler(io, socket);
     updateMatchedClausesHandler(io, socket);

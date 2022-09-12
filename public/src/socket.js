@@ -27,6 +27,20 @@ socket.on('msg', (msg, senderSocketId, filesInfo) => {
   setMessage(msg, Date.now(), senderSocketId, null, filesInfo);
 });
 
+socket.on('groupmsg', (msg, senderSocketId, groupId, filesInfo) => {
+  console.log('From server:' + senderSocketId);
+
+  //check if current user is at chat window
+  const messages = document.getElementById('messages');
+  if (!messages) return;
+
+  //if message is not for current window contact, do nothing
+  if (groupId !== messages.dataset.socketId) return;
+
+  //append message from the sender to chat window
+  setMessage(msg, Date.now(), senderSocketId, null, filesInfo);
+});
+
 socket.on('suggestion', suggestions => {
   const suggestionsList = document.getElementById('suggestions');
   // const input = document.getElementById('input');
@@ -58,8 +72,8 @@ socket.on('clauses', suggestions => {
       const clauseTitle = suggestion.title;
       const clauseBody = suggestion.body;
 
-      if (clauseBody.length > 15) {
-        li.innerText = `${clauseTitle} ${clauseBody.slice(0, 15)}...`;
+      if (clauseBody.length > 50) {
+        li.innerText = `${clauseTitle} ${clauseBody.slice(0, 50)}...`;
         li.setAttribute('data-body', clauseBody);
       } else {
         li.innerText = `${clauseTitle} ${clauseBody}`;
@@ -86,8 +100,8 @@ socket.on('matchedClauses', suggestions => {
       const clauseBody = suggestion.body;
       const clauseNumber = suggestion.number;
 
-      if (clauseBody.length > 15) {
-        li.innerText = `${clauseBody.slice(0, 15)}...`;
+      if (clauseBody.length > 50) {
+        li.innerText = `${clauseBody.slice(0, 50)}...`;
         li.setAttribute('data-body', clauseBody);
         li.setAttribute('data-title', clauseTitle);
         li.setAttribute('data-number', clauseNumber);

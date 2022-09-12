@@ -1,12 +1,13 @@
 import { setMsg, addClass, getJwtToken, setMessage, fetchGet } from './helper.js';
 import { socket } from './socket.js';
-import { addChatListenerToContactDivs } from './chat.js';
+import { addChatListenerToContactDivs, addGroupChatListenerToGroupDivs } from './chat.js';
 
 async function drawSidebar() {
   const contacts = await getContacts();
 
   const allContactsDiv = document.querySelector(`#all .contacts`);
   const starContactsDiv = document.querySelector(`#star .contacts`);
+  const groupsDiv = document.querySelector(`.groups`);
 
   allContactsDiv.innerHTML = '';
   starContactsDiv.innerHTML = '';
@@ -23,6 +24,8 @@ async function drawSidebar() {
 
   const groups = await getGroups();
   drawGroups(groups);
+  addGroupChatListenerToGroupDivs(groupsDiv);
+
   socket.emit('join', groups);
 
   listenToChatWindow();
@@ -144,11 +147,11 @@ function drawGroups(groups) {
 
     const nameDiv = document.createElement('div');
 
-    addClass('contact', groupDiv);
+    addClass('group', groupDiv);
 
     nameDiv.innerText = group.name;
 
-    groupDiv.setAttribute('data-id', group.id);
+    groupDiv.setAttribute('data-socket-id', group.id);
 
     groupsDiv.appendChild(groupDiv);
     groupDiv.appendChild(nameDiv);
@@ -163,7 +166,7 @@ function listenToChatWindow() {
     const sideBar = document.getElementById('sidebar');
     const allContactDivs = document.querySelectorAll('.contact');
 
-    allContactDivs.forEach(groupDiv => {
+    allContactDivs.forEach(contactDiv => {
       contactDiv.style.backgroundColor = '';
     });
 
