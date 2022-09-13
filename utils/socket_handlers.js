@@ -54,13 +54,29 @@ function groupMsgHandler(io, socket) {
     // console.log('Server receives: ' + msg);
     // console.log('received' + fileUrls);
 
-    console.log(msg, groupId, filesInfo);
-
-    socket.to(groupId).emit('groupmsg', msg, socket.id, groupId, filesInfo);
-
     const fromSocketId = socket.id;
     const fromUserId = socket.userdata.id;
     const fromUserName = socket.userdata.name;
+
+    socket.to(groupId).emit('groupmsg', msg, fromSocketId, groupId, filesInfo);
+
+    const parsedFilesInfo = await JSON.parse(filesInfo);
+    parsedFilesInfo.data.forEach(fileObj => {
+      //S3 presigned url which is going to expires
+      delete fileObj.location;
+    });
+
+    await es.index({
+      index: 'groupmessage',
+      document: {
+        group_id: groupId,
+        sender_id: fromUserId,
+        sender_name: fromUserName,
+        message: msg,
+        files: JSON.stringify(parsedFilesInfo),
+        isRead: [socket.userdata.id],
+      },
+    });
 
     // if (!io.sockets.adapter.rooms.has(targetSocketId)) {
     //   const parsedFilesInfo = await JSON.parse(filesInfo);
