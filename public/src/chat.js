@@ -140,7 +140,7 @@ async function groupChatListener(e) {
   if (e.target.classList.contains('contact-add-star-button') && e.target.innerText !== '') return;
   if (e.target.classList.contains('contact-delete-star-button')) return;
 
-  //look for the clicked element's user id
+  //look for the clicked element's socket id
   let targetContact = e.target;
   while (!targetContact.hasAttribute('data-socket-id')) {
     targetContact = targetContact.parentElement;
@@ -192,7 +192,12 @@ async function groupChatListener(e) {
       let oldestMessageTimeDiv = messages.querySelector('li:first-child .chat-message-time');
       let baselineTime = oldestMessageTimeDiv.dataset.rawTime;
 
-      const { data: moreMessages } = await getMessages(targetContact.dataset.id, baselineTime);
+      console.log(baselineTime);
+
+      const { data: moreMessages } = await getGroupMessages(
+        targetContact.dataset.socketId,
+        baselineTime
+      );
 
       if (moreMessages.length === 0) return setMsg('No More Messages');
 

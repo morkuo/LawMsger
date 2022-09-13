@@ -7,6 +7,7 @@ const {
   getMoreMessages,
   uploadFiles,
   getGroupHistoryMessages,
+  getGroupMoreMessages,
 } = require('../controllers/message');
 
 router.get('/message', tryCatch(checkJwt), tryCatch(getHistoryMessages));
@@ -16,5 +17,7 @@ router.get('/message/more', tryCatch(checkJwt), tryCatch(getMoreMessages));
 router.post('/message/upload', tryCatch(checkJwt), upload.any('images'), tryCatch(uploadFiles));
 
 router.get('/groupmessage', tryCatch(checkJwt), tryCatch(getGroupHistoryMessages));
+
+router.get('/groupmessage/more', tryCatch(checkJwt), tryCatch(getGroupMoreMessages));
 
 module.exports = router;

@@ -158,10 +158,46 @@ const getMoreMessages = async (req, res) => {
   res.json(response);
 };
 
+const getGroupMoreMessages = async (req, res) => {
+  const { groupId, baselineTime } = req.query;
+
+  const {
+    hits: { hits: result },
+  } = await es.search({
+    index: 'groupmessage',
+    size: 20,
+    sort: {
+      'created_at': 'desc',
+    },
+    query: {
+      bool: {
+        filter: [
+          { term: { group_id: groupId } },
+          {
+            range: {
+              created_at: {
+                lt: baselineTime,
+              },
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  const messages = await generateS3PresignedUrl(result);
+
+  const response = {
+    data: messages,
+  };
+
+  res.json(response);
+};
+
 const getGroupHistoryMessages = async (req, res) => {
   const { groupId } = req.query;
 
-  //check whether the user is member of the group
+  // check whether the user is member of the group
   const {
     hits: {
       hits: [resultUser],
@@ -243,7 +279,8 @@ const uploadFiles = async (req, res) => {
 
 module.exports = {
   getHistoryMessages,
-  getGroupHistoryMessages,
   getMoreMessages,
+  getGroupHistoryMessages,
+  getGroupMoreMessages,
   uploadFiles,
 };
