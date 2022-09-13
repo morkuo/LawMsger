@@ -157,16 +157,26 @@ async function groupChatListener(e) {
   drawChatWindow(targetContact.dataset.id, targetContact.dataset.socketId);
 
   //append history message to chat window
-  const { data: history } = await getMessages(targetContact.dataset.id);
+  const { data: history } = await getGroupMessages(targetContact.dataset.socketId);
 
   for (let i = history.length - 1; i >= 0; i--) {
-    if (history[i].sender_id !== targetContact.dataset.id) {
-      setMessage(history[i].message, history[i].created_at, null, null, history[i].files, 'read');
+    const contactDiv = document.querySelector(`.contacts [data-id="${history[i].sender_id}"]`);
+
+    //other users
+    if (contactDiv) {
+      setMessage(
+        history[i].message,
+        history[i].created_at,
+        contactDiv.dataset.socketId,
+        null,
+        history[i].files,
+        'read'
+      );
     } else {
       setMessage(
         history[i].message,
         history[i].created_at,
-        targetContact.dataset.socketId,
+        null,
         null,
         history[i].files,
         history[i].isRead
@@ -313,6 +323,16 @@ async function getMessages(targetContactUserId, baselineTime) {
   else messageApiPath += `/more?contactUserId=${targetContactUserId}&baselineTime=${baselineTime}`;
 
   const response = await fetchGet(messageApiPath);
+  return response;
+}
+
+async function getGroupMessages(targetGroupId, baselineTime) {
+  let apiPath = `/groupmessage`;
+
+  if (!baselineTime) apiPath += `?groupId=${targetGroupId}`;
+  else apiPath += `/more?groupId=${targetGroupId}&baselineTime=${baselineTime}`;
+
+  const response = await fetchGet(apiPath);
   return response;
 }
 
