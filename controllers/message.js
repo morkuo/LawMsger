@@ -176,8 +176,6 @@ const getGroupHistoryMessages = async (req, res) => {
     },
   });
 
-  console.log(resultUser);
-
   if (!resultUser._source.participants.includes(req.userdata.id)) {
     return res.status(403).json({ error: 'forbidden' });
   }
@@ -195,8 +193,6 @@ const getGroupHistoryMessages = async (req, res) => {
     },
   });
 
-  // console.log(resultUpdate);
-
   const messages = await generateS3PresignedUrl(result);
 
   const response = {
@@ -205,23 +201,26 @@ const getGroupHistoryMessages = async (req, res) => {
 
   res.json(response);
 
-  //after responsing messages, update isRead, add current user into isRead
-  // const resultUpdate = await es.updateByQuery({
-  //   index: 'message',
-  //   script: {
-  //     source: `ctx._source.isRead = true`,
-  //     lang: 'painless',
-  //   },
-  //   query: {
-  //     bool: {
-  //       filter: [
-  //         { term: { sender_id: contactUserId } },
-  //         { term: { receiver_id: req.userdata.id } },
-  //         { term: { isRead: false } },
-  //       ],
-  //     },
-  //   },
-  // });
+  const messagesUnreadByCurrentUser = result
+    .filter(msg => !msg._source.isRead.includes(req.userdata.id))
+    .map(msg => ({ term: { _id: msg._id } }));
+
+  // after responsing messages, update isRead, add current user into isRead
+  const resultUpdate = await es.updateByQuery({
+    index: 'groupmessage',
+    script: {
+      source: `if(!ctx._source.isRead.contains(params.user_id)){ctx._source.isRead.add(params.user_id)}`,
+      lang: 'painless',
+      params: {
+        user_id: req.userdata.id,
+      },
+    },
+    query: {
+      bool: {
+        should: messagesUnreadByCurrentUser,
+      },
+    },
+  });
 };
 
 const uploadFiles = async (req, res) => {

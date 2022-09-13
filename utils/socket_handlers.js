@@ -171,8 +171,8 @@ async function idHandler(io, socket) {
     },
   });
 
-  // console.log('new socket connected: ' + socket.id);
-  console.log('new connection. all connected sockets: ', io.allSockets());
+  console.log('new socket connected: ' + socket.id);
+  // console.log('new connection. all connected sockets: ', io.allSockets());
 }
 
 async function joinGroupHandler(io, socket) {
@@ -181,7 +181,7 @@ async function joinGroupHandler(io, socket) {
 
     socket.join(groupIds);
 
-    console.log(`${socket.id} is in following rooms: `, socket.rooms);
+    // console.log(`${socket.id} is in following rooms: `, socket.rooms);
 
     // delete global.hashTable[socket.userdata.id];
 
