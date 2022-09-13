@@ -1,6 +1,7 @@
 const es = require('./es');
 const { jwtVerify, tryCatch } = require('../utils/helper');
 const { suggestions, matchedClauses } = require('../models/message');
+require('dotenv').config();
 
 function msgHandler(io, socket) {
   socket.on('msg', async (msg, targetSocketId, targetUserId, targetUserName, filesInfo) => {
@@ -136,6 +137,7 @@ async function checkGroupChatWindowHandler(io, socket) {
           user_id: receiverUserId,
         },
       },
+      retry_on_conflict: process.env.GROUP_MEMBER_LIMIT,
     });
   });
 }
