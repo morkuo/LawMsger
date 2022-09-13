@@ -123,7 +123,7 @@ function drawContactDivs(contacts, category) {
     unreadCountDiv.innerText = contact.unread;
 
     contactDiv.setAttribute('data-id', contact.id);
-    if (contact.socket_id === null) contact.socket_id = '';
+    if (contact.socket_id === undefined || null) contact.socket_id = '';
     contactDiv.setAttribute('data-socket-id', contact.socket_id);
 
     if (contact.socket_id) statusDiv.classList.add('on');
