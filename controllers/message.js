@@ -158,6 +158,72 @@ const getMoreMessages = async (req, res) => {
   res.json(response);
 };
 
+const getGroupHistoryMessages = async (req, res) => {
+  const { groupId } = req.query;
+
+  //check whether the user is member of the group
+  const {
+    hits: {
+      hits: [resultUser],
+    },
+  } = await es.search({
+    index: 'group',
+    sort: {
+      'created_at': 'desc',
+    },
+    query: {
+      term: { _id: groupId },
+    },
+  });
+
+  console.log(resultUser);
+
+  if (!resultUser._source.participants.includes(req.userdata.id)) {
+    return res.status(403).json({ error: 'forbidden' });
+  }
+
+  const {
+    hits: { hits: result },
+  } = await es.search({
+    index: 'groupmessage',
+    size: messageSize,
+    sort: {
+      'created_at': 'desc',
+    },
+    query: {
+      term: { group_id: groupId },
+    },
+  });
+
+  // console.log(resultUpdate);
+
+  const messages = await generateS3PresignedUrl(result);
+
+  const response = {
+    data: messages,
+  };
+
+  res.json(response);
+
+  //after responsing messages, update isRead, add current user into isRead
+  // const resultUpdate = await es.updateByQuery({
+  //   index: 'message',
+  //   script: {
+  //     source: `ctx._source.isRead = true`,
+  //     lang: 'painless',
+  //   },
+  //   query: {
+  //     bool: {
+  //       filter: [
+  //         { term: { sender_id: contactUserId } },
+  //         { term: { receiver_id: req.userdata.id } },
+  //         { term: { isRead: false } },
+  //       ],
+  //     },
+  //   },
+  // });
+};
+
 const uploadFiles = async (req, res) => {
   const filesInfo = [];
   for (let file of req.files) {
@@ -176,30 +242,9 @@ const uploadFiles = async (req, res) => {
   res.json({ data: filesInfo });
 };
 
-// async function updateMatchedClausesLastSearched(req, res) {
-//   const { origin, title, number } = req.body;
-
-//   const result = await es.updateByQuery({
-//     index: 'matchedclauses',
-//     script: {
-//       source: `ctx._source.last_searched = '${origin}'`,
-//       lang: 'painless',
-//     },
-//     query: {
-//       bool: {
-//         filter: [{ term: { title: title } }, { term: { number: number } }],
-//       },
-//     },
-//   });
-
-//   if (!result.updated) return res.status(500).json({ error: 'Server Error' });
-
-//   res.json(result.updated);
-// }
-
 module.exports = {
   getHistoryMessages,
+  getGroupHistoryMessages,
   getMoreMessages,
   uploadFiles,
-  // updateMatchedClausesLastSearched,
 };
