@@ -11,6 +11,7 @@ async function drawSidebar() {
 
   allContactsDiv.innerHTML = '';
   starContactsDiv.innerHTML = '';
+  groupsDiv.innerHTML = '';
 
   drawContactDivs(contacts, 'all');
   addChatListenerToContactDivs(allContactsDiv);
