@@ -179,6 +179,39 @@ socket.on(
   }
 );
 
+socket.on(
+  'checkGroupChatWindow',
+  (msg, fromSocketId, fromUserId, fromUserName, groupId, messageId, filesInfo) => {
+    console.log('Check Window!');
+
+    //check if current user is at group chat window
+    const messages = document.getElementById('messages');
+
+    if (!messages || messages.dataset.socketId !== groupId) {
+      console.log('Here');
+
+      //Unread
+      // const contactDivs = document.querySelectorAll(`[data-id="${fromUserId}"]`);
+
+      // contactDivs.forEach(div => {
+      //   console.log('Incrementing!');
+      //   const unreadCountDiv = div.querySelector('.contact-unread-count');
+      //   unreadCountDiv.innerText++;
+      // });
+
+      return;
+    }
+
+    const userId = localStorage.getItem('id');
+
+    //user is at window
+    socket.emit('checkGroupChatWindow', userId, messageId);
+
+    //append message from the sender to chat window
+    setMessage(msg, Date.now(), fromSocketId, null, filesInfo, 'read');
+  }
+);
+
 socket.on('createStarContact', response => {
   if (response.error) return;
 

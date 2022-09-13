@@ -51,68 +51,34 @@ function msgHandler(io, socket) {
 
 function groupMsgHandler(io, socket) {
   socket.on('groupmsg', async (msg, groupId, filesInfo) => {
-    // console.log('Server receives: ' + msg);
-    // console.log('received' + fileUrls);
-
     const fromSocketId = socket.id;
     const fromUserId = socket.userdata.id;
     const fromUserName = socket.userdata.name;
 
-    socket.to(groupId).emit('groupmsg', msg, fromSocketId, groupId, filesInfo);
-
-    const parsedFilesInfo = await JSON.parse(filesInfo);
-    parsedFilesInfo.data.forEach(fileObj => {
-      //S3 presigned url which is going to expires
-      delete fileObj.location;
-    });
-
-    await es.index({
+    const result = await es.index({
       index: 'groupmessage',
       document: {
         group_id: groupId,
         sender_id: fromUserId,
         sender_name: fromUserName,
         message: msg,
-        files: JSON.stringify(parsedFilesInfo),
+        files: filesInfo,
         isRead: [socket.userdata.id],
       },
     });
 
-    // if (!io.sockets.adapter.rooms.has(targetSocketId)) {
-    //   const parsedFilesInfo = await JSON.parse(filesInfo);
-    //   parsedFilesInfo.data.forEach(fileObj => {
-    //     //S3 presigned url which is going to expires
-    //     delete fileObj.location;
-    //   });
-    //   await es.index({
-    //     index: 'message',
-    //     document: {
-    //       sender_id: fromUserId,
-    //       sender_name: fromUserName,
-    //       receiver_id: targetUserId,
-    //       receiver_name: targetUserName,
-    //       message: msg,
-    //       files: JSON.stringify(parsedFilesInfo),
-    //       isRead: false,
-    //     },
-    //   });
-    // } else {
-    //   socket
-    //     .to(targetSocketId)
-    //     .emit(
-    //       'checkChatWindow',
-    //       msg,
-    //       fromSocketId,
-    //       fromUserId,
-    //       fromUserName,
-    //       targetSocketId,
-    //       targetUserId,
-    //       targetUserName,
-    //       filesInfo
-    //     );
-    // }
-
-    // console.log('Msg has been sent to: ' + targetSocketId);
+    socket
+      .to(groupId)
+      .emit(
+        'checkGroupChatWindow',
+        msg,
+        fromSocketId,
+        fromUserId,
+        fromUserName,
+        groupId,
+        result._id,
+        filesInfo
+      );
   });
 }
 
@@ -155,6 +121,23 @@ async function checkChatWindowHandler(io, socket) {
       });
     }
   );
+}
+
+async function checkGroupChatWindowHandler(io, socket) {
+  socket.on('checkGroupChatWindow', async (receiverUserId, messageId) => {
+    //add user into isRead array
+    const result = await es.update({
+      index: 'groupmessage',
+      id: messageId,
+      script: {
+        source: `if(!ctx._source.isRead.contains(params.user_id)){ctx._source.isRead.add(params.user_id)}`,
+        lang: 'painless',
+        params: {
+          user_id: receiverUserId,
+        },
+      },
+    });
+  });
 }
 
 async function idHandler(io, socket) {
@@ -326,6 +309,7 @@ module.exports = {
   matchedClausesHandler,
   updateMatchedClausesHandler,
   checkChatWindowHandler,
+  checkGroupChatWindowHandler,
   createStarContact,
   deleteStarContact,
   disconnectionHandlers,
