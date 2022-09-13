@@ -1,4 +1,4 @@
-import { setMsg, addClass, storeToken } from './helper.js';
+import { setMsg, addClass, storeToken, storeUserId } from './helper.js';
 
 setSignInField();
 
@@ -55,6 +55,8 @@ function setSignInField() {
     if (response.error) return setMsg(response.error, 'error');
 
     storeToken(response.data.access_token);
+    storeUserId(response.data.user.id);
+
     window.location.href = `${window.location.origin}/main.html`;
   });
 

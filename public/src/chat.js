@@ -164,23 +164,19 @@ async function groupChatListener(e) {
 
     //other users
     if (contactDiv) {
+      const userId = localStorage.getItem('id');
+      const isRead = history[i].isRead.includes(userId);
+
       setMessage(
         history[i].message,
         history[i].created_at,
         contactDiv.dataset.socketId,
         null,
         history[i].files,
-        'read'
+        isRead
       );
     } else {
-      setMessage(
-        history[i].message,
-        history[i].created_at,
-        null,
-        null,
-        history[i].files,
-        history[i].isRead
-      );
+      setMessage(history[i].message, history[i].created_at, null, null, history[i].files, 'read');
     }
   }
 

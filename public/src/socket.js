@@ -38,7 +38,7 @@ socket.on('groupmsg', (msg, senderSocketId, groupId, filesInfo) => {
   if (groupId !== messages.dataset.socketId) return;
 
   //append message from the sender to chat window
-  setMessage(msg, Date.now(), senderSocketId, null, filesInfo);
+  setMessage(msg, Date.now(), senderSocketId, null, filesInfo, 'read');
 });
 
 socket.on('suggestion', suggestions => {
