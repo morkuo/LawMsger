@@ -304,6 +304,46 @@ function drawAddAndDeleteParticipantsForm() {
     const payload = {
       groupName: groupNameInput.value,
       userIds,
+      updateType: 1,
+    };
+
+    let authorization = getJwtToken();
+
+    const res = await fetch(api, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authorization,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const response = await res.json();
+
+    if (response.error) return setMsg(response.error, 'error');
+
+    window.selectedUser = {};
+    groupNameInput.value = '';
+    participantsInput.value = '';
+    searchResultDiv.innerHTML = '';
+    selectedUserDiv.innerHTML = '';
+
+    return setMsg(response.data);
+  });
+
+  deleteButton.addEventListener('click', async e => {
+    e.preventDefault();
+
+    if (!groupNameInput.value) return setMsg('Please enter group name');
+
+    const userIds = Object.keys(window.selectedUser);
+
+    if (userIds.length === 0) return setMsg('Please select at least one participant');
+
+    const payload = {
+      groupName: groupNameInput.value,
+      userIds,
+      updateType: 0,
     };
 
     let authorization = getJwtToken();

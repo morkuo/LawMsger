@@ -97,9 +97,8 @@ const updateParticipants = async (req, res) => {
     return res.status(400).json({ error: errors.array() });
   }
 
-  const { groupName, userIds } = req.body;
+  const { groupName, userIds, updateType } = req.body;
 
-  //check whether the request is send from host of the group
   const {
     hits: {
       hits: [result],
@@ -113,7 +112,18 @@ const updateParticipants = async (req, res) => {
     },
   });
 
-  if (result._source.host !== req.userdata.id) return res.status(403).json({ error: 'forbidden' });
+  //check whether the group exist
+  if (!result) return res.status(400).json({ error: 'group not found' });
+
+  //check whether the request is send from host of the group
+  if (result._source.host !== req.userdata.id) {
+    return res.status(403).json({ error: 'forbidden' });
+  }
+
+  //check whether userIds include host Id
+  if (userIds.includes(result._source.host)) {
+    return res.status(400).json({ error: 'users should not include host user' });
+  }
 
   //check whether userIds exist
   const {
@@ -131,6 +141,30 @@ const updateParticipants = async (req, res) => {
 
   for (const userId of userIds) {
     if (!usersExisting.includes(userId)) return res.status(400).json({ error: 'wrong user ids' });
+  }
+
+  if (!updateType) {
+    const resultUpdate = await es.updateByQuery({
+      index: 'group',
+      script: {
+        source: `for(int i=0; i<ctx._source.participants.length; i++){
+          if(params.userIds.contains(ctx._source.participants[i])){
+            ctx._source.participants.remove(i)
+          }
+        }`,
+        lang: 'painless',
+        params: {
+          userIds,
+        },
+      },
+      query: {
+        term: { 'name.keyword': groupName },
+      },
+    });
+
+    if (!resultUpdate.updated) return res.status(500).json({ error: 'server error' });
+
+    return res.json({ data: 'deleted' });
   }
 
   //append user id to the group participants
