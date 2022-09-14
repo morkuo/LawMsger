@@ -249,6 +249,9 @@ socket.on('createStarContact', response => {
     socket.emit('deleteStarContact', targetContactUserId);
     contactDiv.remove();
   });
+
+  //set to the same color as div in all contacs block
+  contactDiv.style.backgroundColor = createdDiv.style.backgroundColor;
 });
 
 socket.on('deleteStarContact', response => {
