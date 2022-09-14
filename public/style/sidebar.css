@@ -48,10 +48,12 @@
   justify-content: center;
 }
 
+.group-name,
 .contact-info {
   flex-grow: 1;
 }
 
+.group-delete-button,
 .contact-add-star-button,
 .contact-delete-star-button {
   display: flex;

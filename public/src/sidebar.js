@@ -26,6 +26,7 @@ async function drawSidebar() {
   const groups = await getGroups();
   drawGroups(groups);
   addGroupChatListenerToGroupDivs(groupsDiv);
+  drawDeleteGroupButton(groups);
 
   socket.emit('join', groups);
 
@@ -80,6 +81,26 @@ async function drawDeleteStarButton(starContacts) {
     deleteStarButton.addEventListener('click', e => {
       socket.emit('deleteStarContact', starId);
       contactDiv.remove();
+    });
+  });
+}
+
+async function drawDeleteGroupButton(groups) {
+  console.log(groups);
+
+  const groupIds = groups.map(group => group.id);
+
+  groupIds.forEach(groupId => {
+    const groupDiv = document.querySelector(`.group[data-socket-id="${groupId}"]`);
+    const deleteStarButton = document.createElement('div');
+
+    deleteStarButton.setAttribute('class', 'group-delete-button');
+    groupDiv.appendChild(deleteStarButton);
+
+    deleteStarButton.innerText = '-';
+
+    deleteStarButton.addEventListener('click', e => {
+      groupDiv.remove();
     });
   });
 }
@@ -149,6 +170,7 @@ function drawGroups(groups) {
     const nameDiv = document.createElement('div');
 
     addClass('group', groupDiv);
+    addClass('group-name', nameDiv);
 
     nameDiv.innerText = group.name;
 
