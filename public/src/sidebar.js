@@ -91,6 +91,7 @@ async function drawDeleteGroupButton(groups) {
 
   groupIds.forEach(groupId => {
     const groupDiv = document.querySelector(`.group[data-socket-id="${groupId}"]`);
+    const groupNameDiv = groupDiv.querySelector('.group-name');
     const deleteStarButton = document.createElement('div');
 
     deleteStarButton.setAttribute('class', 'group-delete-button');
@@ -98,8 +99,31 @@ async function drawDeleteGroupButton(groups) {
 
     deleteStarButton.innerText = '-';
 
-    deleteStarButton.addEventListener('click', e => {
+    deleteStarButton.addEventListener('click', async e => {
+      let authorization = getJwtToken();
+
+      const api = `${window.location.origin}/api/1.0/group/leave`;
+
+      const payload = {
+        groupName: groupNameDiv.innerText,
+      };
+
+      const res = await fetch(api, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authorization,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const response = await res.json();
+
+      if (response.error) return setMsg(response.error, 'error');
+
       groupDiv.remove();
+
+      return setMsg(response.data);
     });
   });
 }

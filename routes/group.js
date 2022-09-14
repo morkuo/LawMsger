@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { checkJwt, checkJson } = require('../middlewares/validation');
 const { body: check } = require('express-validator');
 const { tryCatch } = require('../utils/helper');
-const { createGroup, getGroup, updateParticipants } = require('../controllers/group');
+const { createGroup, getGroup, updateParticipants, leaveGroup } = require('../controllers/group');
 
 router.get('/group', tryCatch(checkJwt), tryCatch(getGroup));
 router.post(
@@ -44,8 +44,29 @@ router.put(
     )
     .bail()
     .escape(),
-  check('userIds').isArray().withMessage('array not found').bail(),
+  check('userIds').isArray().withMessage('array not found'),
   tryCatch(updateParticipants)
+);
+
+router.put(
+  '/group/leave',
+  tryCatch(checkJwt),
+  tryCatch(checkJson),
+  check('groupName')
+    .isString()
+    .withMessage('string not found')
+    .bail()
+    .trim()
+    .isLength({
+      min: process.env.GROUP_NAME_MIN_LENGTH,
+      max: process.env.GROUP_NAME_MAX_LENGTH,
+    })
+    .withMessage(
+      `min length: ${process.env.GROUP_NAME_MIN_LENGTH}, max length: ${process.env.GROUP_NAME_MAX_LENGTH}`
+    )
+    .bail()
+    .escape(),
+  tryCatch(leaveGroup)
 );
 
 module.exports = router;

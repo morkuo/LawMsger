@@ -191,4 +191,70 @@ const updateParticipants = async (req, res) => {
   res.json({ data: 'updated' });
 };
 
-module.exports = { createGroup, getGroup, updateParticipants };
+const leaveGroup = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(400).json({ error: errors.array() });
+  }
+
+  const { groupName } = req.body;
+
+  const userId = req.userdata.id;
+
+  const {
+    hits: {
+      hits: [result],
+    },
+  } = await es.search({
+    index: 'group',
+    body: {
+      query: {
+        term: { 'name.keyword': groupName },
+      },
+    },
+  });
+
+  //check whether the group exist
+  if (!result) return res.status(400).json({ error: 'group not found' });
+
+  //if current user is the host, delete the group
+  if (result._source.host === userId) {
+    const resultUpdate = await es.deleteByQuery({
+      index: 'group',
+      body: {
+        query: {
+          term: { _id: result._id },
+        },
+      },
+    });
+
+    if (!resultUpdate.deleted) return res.status(500).json({ error: 'server error' });
+
+    return res.json({ data: 'deleted' });
+  }
+
+  const resultUpdate = await es.updateByQuery({
+    index: 'group',
+    script: {
+      source: `for(int i=0; i<ctx._source.participants.length; i++){
+          if(params.userId == ctx._source.participants[i]){
+            ctx._source.participants.remove(i)
+          }
+        }`,
+      lang: 'painless',
+      params: {
+        userId,
+      },
+    },
+    query: {
+      term: { 'name.keyword': groupName },
+    },
+  });
+
+  if (!resultUpdate.updated) return res.status(500).json({ error: 'server error' });
+
+  res.json({ data: 'updated' });
+};
+
+module.exports = { createGroup, getGroup, updateParticipants, leaveGroup };
