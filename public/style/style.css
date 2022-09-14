@@ -145,13 +145,13 @@ chat-unread-message #messages > li div {
   cursor: pointer;
 }
 
-#options {
+.options {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-#options a {
+.options a {
   display: flex;
   padding: 0 1rem;
   cursor: pointer;

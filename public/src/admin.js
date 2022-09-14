@@ -100,7 +100,7 @@ async function checkAdmin() {
 
 function drawDeleteUserForm() {
   const pane = document.querySelector('#pane');
-  const manageDive = pane.querySelector('div');
+  const manageDiv = pane.querySelector('div');
   const header = document.createElement('h3');
   const form = document.createElement('form');
   const emailPTag = document.createElement('p');
@@ -142,7 +142,7 @@ function drawDeleteUserForm() {
     return setMsg(response.data);
   });
 
-  manageDive.appendChild(form);
+  manageDiv.appendChild(form);
 
   form.appendChild(header);
   form.appendChild(emailPTag);

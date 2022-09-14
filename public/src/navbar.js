@@ -37,7 +37,7 @@ async function setNavbar() {
 
   userinfo.addEventListener('click', drawProfile);
 
-  const navbarOptions = document.querySelector('#options');
+  const navbarOptions = document.querySelector('#navbar .options');
 
   if (response.data.role === -1) {
     const adminButton = document.createElement('a');

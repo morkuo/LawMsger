@@ -1,5 +1,27 @@
+const { validationResult } = require('express-validator');
 const es = require('../utils/es');
 require('dotenv').config;
+
+const createGroup = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(400).json({ error: errors.array() });
+  }
+
+  const { name } = req.body;
+
+  const result = await es.index({
+    index: 'group',
+    document: {
+      host: req.userdata.id,
+      name,
+      participants: [req.userdata.id],
+    },
+  });
+
+  res.status(201).json({ data: 'created' });
+};
 
 const getGroup = async (req, res) => {
   const {
@@ -52,4 +74,4 @@ const getGroup = async (req, res) => {
   res.json(groups);
 };
 
-module.exports = { getGroup };
+module.exports = { createGroup, getGroup };
