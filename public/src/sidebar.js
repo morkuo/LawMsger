@@ -502,8 +502,21 @@ function listenToChatWindow() {
       contactDiv.style.backgroundColor = '';
     });
 
+    const allGroupDivs = document.querySelectorAll('.group');
+    allGroupDivs.forEach(groupDiv => {
+      groupDiv.style.backgroundColor = '';
+    });
+
     const messages = document.getElementById('messages');
     if (!messages) return;
+
+    //group
+    if (messages.dataset.id === 'undefined') {
+      const groupDiv = sideBar.querySelector(`[data-socket-id="${messages.dataset.socketId}"]`);
+      groupDiv.style.backgroundColor = 'skyblue';
+
+      return;
+    }
 
     const contactUserId = messages.dataset.id;
 
