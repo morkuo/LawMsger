@@ -205,7 +205,7 @@ socket.on(
     const userId = localStorage.getItem('id');
 
     //user is at window
-    socket.emit('checkGroupChatWindow', userId, messageId, socketsInRoom);
+    socket.emit('checkGroupChatWindow', userId, messageId);
 
     //append message from the sender to chat window
     setMessage(msg, Date.now(), fromSocketId, null, filesInfo, 'read');
