@@ -90,6 +90,52 @@ const getGroup = async (req, res) => {
   res.json(groups);
 };
 
+const getGroupParticipants = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(400).json({ error: errors.array() });
+  }
+
+  const { groupName } = req.query;
+
+  const {
+    hits: {
+      hits: [result],
+    },
+  } = await es.search({
+    index: 'group',
+    body: {
+      query: {
+        term: { 'name.keyword': groupName },
+      },
+    },
+  });
+
+  const usersQuery = result._source.participants.map(userId => ({ term: { _id: userId } }));
+
+  const {
+    hits: { hits: resultUsers },
+  } = await es.search({
+    index: 'user',
+    body: {
+      query: {
+        bool: {
+          should: usersQuery,
+        },
+      },
+    },
+  });
+
+  const users = resultUsers.map(user => ({
+    name: user._source.name,
+    email: user._source.email,
+    picture: user._source.picture,
+  }));
+
+  res.json(users);
+};
+
 const updateParticipants = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -257,4 +303,4 @@ const leaveGroup = async (req, res) => {
   res.json({ data: 'updated' });
 };
 
-module.exports = { createGroup, getGroup, updateParticipants, leaveGroup };
+module.exports = { createGroup, getGroup, getGroupParticipants, updateParticipants, leaveGroup };

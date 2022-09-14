@@ -201,6 +201,58 @@ function drawGroups(groups) {
 
     groupsDiv.appendChild(groupDiv);
     groupDiv.appendChild(nameDiv);
+
+    groupDiv.addEventListener('contextmenu', async e => {
+      e.preventDefault();
+
+      // click on leave button, then return
+      if (e.target.classList.contains('group-delete-button')) return;
+
+      let authorization = getJwtToken();
+
+      const api = `${window.location.origin}/api/1.0/group/participants?groupName=${group.name}`;
+
+      const res = await fetch(api, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authorization,
+        },
+      });
+
+      const response = await res.json();
+
+      if (response.error) return setMsg(response.error, 'error');
+
+      let groupPaticipantsList = document.getElementById('groupParticipantsList');
+
+      if (!groupPaticipantsList) groupPaticipantsList = document.createElement('div');
+      else groupPaticipantsList.innerHTML = '';
+
+      const closeButton = document.createElement('div');
+
+      groupPaticipantsList.setAttribute('id', 'groupParticipantsList');
+
+      closeButton.innerText = 'X';
+
+      closeButton.addEventListener('click', e => {
+        groupPaticipantsList.remove();
+      });
+
+      groupPaticipantsList.appendChild(closeButton);
+
+      for (let user of response) {
+        const userDiv = document.createElement('div');
+        userDiv.innerText = `${user.name} - ${user.email}`;
+        groupPaticipantsList.appendChild(userDiv);
+      }
+
+      const body = document.querySelector('body');
+
+      body.appendChild(groupPaticipantsList);
+
+      return setMsg(response.data);
+    });
   }
 }
 

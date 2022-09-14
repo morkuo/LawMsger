@@ -90,3 +90,15 @@
 .group-participants-selected {
   display: flex;
 }
+
+#groupParticipantsList {
+  position: absolute;
+  top: 30%;
+  left: 45%;
+  padding: 8rem;
+  border: 1px solid black;
+}
+
+#groupParticipantsList div:first-child {
+  cursor: pointer;
+}

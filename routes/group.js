@@ -2,9 +2,18 @@ const router = require('express').Router();
 const { checkJwt, checkJson } = require('../middlewares/validation');
 const { body: check } = require('express-validator');
 const { tryCatch } = require('../utils/helper');
-const { createGroup, getGroup, updateParticipants, leaveGroup } = require('../controllers/group');
+const {
+  createGroup,
+  getGroup,
+  getGroupParticipants,
+  updateParticipants,
+  leaveGroup,
+} = require('../controllers/group');
 
 router.get('/group', tryCatch(checkJwt), tryCatch(getGroup));
+
+router.get('/group/participants', tryCatch(checkJwt), tryCatch(getGroupParticipants));
+
 router.post(
   '/group',
   tryCatch(checkJwt),
