@@ -136,9 +136,8 @@ async function chatListener(e) {
 }
 
 async function groupChatListener(e) {
-  // click on add star button, then return
-  if (e.target.classList.contains('contact-add-star-button') && e.target.innerText !== '') return;
-  if (e.target.classList.contains('contact-delete-star-button')) return;
+  // click on leave button, then return
+  if (e.target.classList.contains('group-delete-button')) return;
 
   //look for the clicked element's socket id
   let targetContact = e.target;
