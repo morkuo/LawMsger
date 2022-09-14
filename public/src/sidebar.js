@@ -191,7 +191,7 @@ function drawGroupHeaderButton() {
 
   manageButton.addEventListener('click', () => {
     drawCreateGroupForm();
-    drawDeleteGroupForm();
+    drawAddAndDeleteParticipantsForm();
   });
 }
 
@@ -251,7 +251,7 @@ function drawCreateGroupForm() {
   form.appendChild(button);
 }
 
-function drawDeleteGroupForm() {
+function drawAddAndDeleteParticipantsForm() {
   const pane = document.querySelector('#pane');
   const manageDiv = pane.querySelector('div');
   const header = document.createElement('h3');
@@ -263,10 +263,10 @@ function drawDeleteGroupForm() {
   const addButton = document.createElement('button');
   const deleteButton = document.createElement('button');
 
-  header.innerText = 'Add Participants';
+  header.innerText = 'Manage Participants';
 
-  groupIdPtag.innerText = 'Group ID';
-  participantsPtag.innerText = 'Search Participants Name';
+  groupIdPtag.innerText = 'Group Name';
+  participantsPtag.innerText = 'Search Participants Email';
 
   addButton.innerText = 'Add';
   deleteButton.innerText = 'Delete';
@@ -315,10 +315,10 @@ function drawDeleteGroupForm() {
   form.appendChild(header);
   form.appendChild(groupIdPtag);
   form.appendChild(groupIdInput);
-  form.appendChild(addButton);
-  form.appendChild(deleteButton);
   form.appendChild(participantsPtag);
   form.appendChild(participantsInput);
+  form.appendChild(addButton);
+  form.appendChild(deleteButton);
 }
 
 //Check whether current user is at chat window. If yes, highlight chatting contact div.

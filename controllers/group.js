@@ -11,6 +11,22 @@ const createGroup = async (req, res) => {
 
   const { name } = req.body;
 
+  //check whether the name has been used
+  const {
+    hits: {
+      total: { value: resultCount },
+    },
+  } = await es.search({
+    index: 'group',
+    body: {
+      query: {
+        term: { 'name.keyword': name },
+      },
+    },
+  });
+
+  if (resultCount) return res.status(409).json({ error: 'group exists' });
+
   const result = await es.index({
     index: 'group',
     document: {
