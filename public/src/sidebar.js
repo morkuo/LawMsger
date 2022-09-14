@@ -189,18 +189,21 @@ function drawGroups(groups) {
 
   for (let group of groups) {
     const groupDiv = document.createElement('div');
-
     const nameDiv = document.createElement('div');
+    const unreadCountDiv = document.createElement('div');
 
     addClass('group', groupDiv);
     addClass('group-name', nameDiv);
+    addClass('group-unread-count', unreadCountDiv);
 
     nameDiv.innerText = group.name;
+    unreadCountDiv.innerText = group.unread;
 
     groupDiv.setAttribute('data-socket-id', group.id);
 
     groupsDiv.appendChild(groupDiv);
     groupDiv.appendChild(nameDiv);
+    groupDiv.appendChild(unreadCountDiv);
 
     groupDiv.addEventListener('contextmenu', async e => {
       e.preventDefault();

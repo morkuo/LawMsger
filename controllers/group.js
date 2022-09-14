@@ -1,3 +1,4 @@
+const e = require('cors');
 const { validationResult, check } = require('express-validator');
 const es = require('../utils/es');
 require('dotenv').config;
@@ -40,6 +41,8 @@ const createGroup = async (req, res) => {
 };
 
 const getGroup = async (req, res) => {
+  const userId = req.userdata.id;
+
   const {
     hits: { hits: result },
   } = await es.search({
@@ -47,44 +50,38 @@ const getGroup = async (req, res) => {
     body: {
       query: {
         term: {
-          participants: req.userdata.id,
+          participants: userId,
         },
       },
     },
   });
 
-  //   console.log(result);
+  const groupIds = result.map(group => ({ term: { group_id: group._id } }));
 
-  //   const unreadMessagesQueryBody = users.reduce((querybody, user) => {
-  //     querybody.push({ index: 'message' }),
-  //       querybody.push({
-  //         query: {
-  //           bool: {
-  //             filter: [
-  //               { term: { sender_id: user._id } },
-  //               { term: { receiver_id: req.userdata.id } },
-  //               { term: { isRead: false } },
-  //             ],
-  //           },
-  //         },
-  //       });
+  const {
+    hits: { hits: unreadMessages },
+  } = await es.search({
+    query: {
+      bool: {
+        should: groupIds,
+        must_not: { term: { isRead: userId } },
+      },
+    },
+  });
 
-  //     return querybody;
-  //   }, []);
+  let unreadMessagesCount = {};
+  unreadMessages.forEach(msg => {
+    if (!(msg._source.group_id in unreadMessagesCount))
+      unreadMessagesCount[msg._source.group_id] = 1;
+    else unreadMessagesCount[msg._source.group_id]++;
+  });
 
-  //   const { responses } = await es.msearch({
-  //     body: unreadMessagesQueryBody,
-  //   });
-
-  //   const unreadMessagesCount = responses.map(response => response.hits.total.value);
-
-  let i = 0;
   const groups = result.map(group => ({
     id: group._id,
     host: group._source.host,
     name: group._source.name,
     participants: group._source.participants,
-    // unread: unreadMessagesCount[i++],
+    unread: unreadMessagesCount[group._id] || 0,
   }));
 
   res.json(groups);
