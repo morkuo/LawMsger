@@ -256,17 +256,22 @@ function drawAddAndDeleteParticipantsForm() {
   const manageDiv = pane.querySelector('div');
   const header = document.createElement('h3');
   const form = document.createElement('form');
-  const groupIdPtag = document.createElement('p');
-  const groupIdInput = document.createElement('input');
+  const groupNamePtag = document.createElement('p');
+  const groupNameInput = document.createElement('input');
   const participantsPtag = document.createElement('p');
   const participantsInput = document.createElement('input');
+  const searchResultDiv = document.createElement('div');
+  const selectedUserDiv = document.createElement('div');
   const addButton = document.createElement('button');
   const deleteButton = document.createElement('button');
 
   header.innerText = 'Manage Participants';
 
-  groupIdPtag.innerText = 'Group Name';
+  groupNamePtag.innerText = 'Group Name';
   participantsPtag.innerText = 'Search Participants Email';
+
+  searchResultDiv.setAttribute('id', 'groupParticipantsSearchResultDiv');
+  selectedUserDiv.setAttribute('id', 'groupSelectedUserDivtDiv');
 
   addButton.innerText = 'Add';
   deleteButton.innerText = 'Delete';
@@ -275,26 +280,26 @@ function drawAddAndDeleteParticipantsForm() {
     'auth',
     header,
     form,
-    groupIdPtag,
-    groupIdInput,
+    groupNamePtag,
+    groupNameInput,
     participantsPtag,
     participantsInput,
     addButton,
     deleteButton
   );
 
-  const signUpApi = `${window.location.origin}/api/1.0/group`;
+  const api = `${window.location.origin}/api/1.0/group`;
 
   addButton.addEventListener('click', async e => {
     e.preventDefault();
 
     const payload = {
-      email: groupIdInput.value,
+      groupName: groupNameInput.value,
     };
 
     let authorization = getJwtToken();
 
-    const res = await fetch(signUpApi, {
+    const res = await fetch(api, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -313,10 +318,12 @@ function drawAddAndDeleteParticipantsForm() {
   manageDiv.appendChild(form);
 
   form.appendChild(header);
-  form.appendChild(groupIdPtag);
-  form.appendChild(groupIdInput);
+  form.appendChild(groupNamePtag);
+  form.appendChild(groupNameInput);
   form.appendChild(participantsPtag);
   form.appendChild(participantsInput);
+  form.appendChild(searchResultDiv);
+  form.appendChild(selectedUserDiv);
   form.appendChild(addButton);
   form.appendChild(deleteButton);
 }

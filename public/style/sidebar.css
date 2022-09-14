@@ -77,3 +77,11 @@
 .contact-status.on {
   background-color: rgb(145, 189, 157);
 }
+
+#groupParticipantsSearchResultDiv,
+#groupSelectedUserDivtDiv {
+  margin-top: 1.5rem;
+  height: 50%;
+  width: 70%;
+  border: 1px solid black;
+}
