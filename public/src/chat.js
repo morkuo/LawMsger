@@ -145,13 +145,12 @@ async function groupChatListener(e) {
     targetContact = targetContact.parentElement;
   }
 
+  console.log(targetContact);
+
   //remove unread count
-  const unreadCountDivs = document.querySelectorAll(
-    `.contacts [data-id="${targetContact.dataset.id}"] .contact-unread-count`
-  );
-  unreadCountDivs.forEach(div => {
-    div.innerText = '';
-  });
+  const unreadCountDiv = targetContact.querySelector('.group-unread-count');
+
+  unreadCountDiv.innerText = '';
 
   drawChatWindow(targetContact.dataset.id, targetContact.dataset.socketId);
 

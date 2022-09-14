@@ -190,14 +190,12 @@ socket.on(
     if (!messages || messages.dataset.socketId !== groupId) {
       console.log('Here');
 
-      //Unread
-      // const contactDivs = document.querySelectorAll(`[data-id="${fromUserId}"]`);
+      // Unread
+      const groupDiv = document.querySelector(`[data-socket-id="${groupId}"]`);
 
-      // contactDivs.forEach(div => {
-      //   console.log('Incrementing!');
-      //   const unreadCountDiv = div.querySelector('.contact-unread-count');
-      //   unreadCountDiv.innerText++;
-      // });
+      console.log('Incrementing!');
+      const unreadCountDiv = groupDiv.querySelector('.group-unread-count');
+      unreadCountDiv.innerText++;
 
       return;
     }
