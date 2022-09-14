@@ -192,6 +192,7 @@ function drawGroupHeaderButton() {
   manageButton.addEventListener('click', () => {
     drawCreateGroupForm();
     drawAddAndDeleteParticipantsForm();
+    addEmailInputLitener();
   });
 }
 
@@ -270,8 +271,9 @@ function drawAddAndDeleteParticipantsForm() {
   groupNamePtag.innerText = 'Group Name';
   participantsPtag.innerText = 'Search Participants Email';
 
+  participantsInput.setAttribute('id', 'groupParticipantsSearchEmailInput');
   searchResultDiv.setAttribute('id', 'groupParticipantsSearchResultDiv');
-  selectedUserDiv.setAttribute('id', 'groupSelectedUserDivtDiv');
+  selectedUserDiv.setAttribute('id', 'groupSelectedUserDiv');
 
   addButton.innerText = 'Add';
   deleteButton.innerText = 'Delete';
@@ -293,8 +295,15 @@ function drawAddAndDeleteParticipantsForm() {
   addButton.addEventListener('click', async e => {
     e.preventDefault();
 
+    if (!groupNameInput.value) return setMsg('Please enter group name');
+
+    const userIds = Object.keys(window.selectedUser);
+
+    if (userIds.length === 0) return setMsg('Please select at least one participant');
+
     const payload = {
       groupName: groupNameInput.value,
+      userIds,
     };
 
     let authorization = getJwtToken();
@@ -312,6 +321,12 @@ function drawAddAndDeleteParticipantsForm() {
 
     if (response.error) return setMsg(response.error, 'error');
 
+    window.selectedUser = {};
+    groupNameInput.value = '';
+    participantsInput.value = '';
+    searchResultDiv.innerHTML = '';
+    selectedUserDiv.innerHTML = '';
+
     return setMsg(response.data);
   });
 
@@ -326,6 +341,34 @@ function drawAddAndDeleteParticipantsForm() {
   form.appendChild(selectedUserDiv);
   form.appendChild(addButton);
   form.appendChild(deleteButton);
+}
+
+function addEmailInputLitener() {
+  const input = document.getElementById('groupParticipantsSearchEmailInput');
+
+  const debouncedDetectInput = debounce(detectInput, 600);
+
+  input.addEventListener('keydown', debouncedDetectInput);
+}
+
+function debounce(func, delay) {
+  let timer = null;
+  return function (...args) {
+    if (timer) clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      func.apply(null, args);
+    }, delay);
+  };
+}
+
+async function detectInput(e) {
+  const currentInput = e.target.value;
+  const suggestionsList = document.getElementById('groupParticipantsSearchResultDiv');
+
+  if (!currentInput) return (suggestionsList.innerHTML = '');
+
+  socket.emit('searchEamil', currentInput);
 }
 
 //Check whether current user is at chat window. If yes, highlight chatting contact div.

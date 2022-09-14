@@ -302,6 +302,31 @@ async function updateMatchedClausesHandler(io, socket) {
   });
 }
 
+async function searchEamilHandler(io, socket) {
+  socket.on('searchEamil', async input => {
+    const {
+      hits: { hits: result },
+    } = await es.search({
+      index: 'user',
+      body: {
+        size: 5,
+        query: {
+          match: { email: input },
+        },
+      },
+    });
+
+    const users = result.map(user => ({
+      id: user._id,
+      name: user._source.name,
+      email: user._source.email,
+      picture: user._source.picture,
+    }));
+
+    socket.emit('searchEamil', users);
+  });
+}
+
 module.exports = {
   idHandler,
   joinGroupHandler,
@@ -314,5 +339,6 @@ module.exports = {
   checkGroupChatWindowHandler,
   createStarContact,
   deleteStarContact,
+  searchEamilHandler,
   disconnectionHandlers,
 };

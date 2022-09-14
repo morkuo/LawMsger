@@ -11,6 +11,7 @@ const {
   checkGroupChatWindowHandler,
   createStarContact,
   deleteStarContact,
+  searchEamilHandler,
   disconnectionHandlers,
 } = require('./utils/socket_handlers');
 const es = require('./utils/es');
@@ -51,6 +52,7 @@ async function connect(server) {
     checkGroupChatWindowHandler(io, socket);
     createStarContact(io, socket);
     deleteStarContact(io, socket);
+    searchEamilHandler(io, socket);
     disconnectionHandlers(io, socket);
   });
 

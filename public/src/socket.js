@@ -296,6 +296,56 @@ socket.on('onlineStatus', (userId, socketId, status) => {
   }
 });
 
+//provide search users result in add group participants page
+window.selectedUser = {};
+socket.on('searchEamil', users => {
+  const suggestionsList = document.getElementById('groupParticipantsSearchResultDiv');
+  const selectedUserDiv = document.getElementById('groupSelectedUserDiv');
+
+  suggestionsList.innerHTML = '';
+
+  users.forEach(user => {
+    const suggestionDiv = document.createElement('div');
+    const info = document.createElement('div');
+    const addButton = document.createElement('div');
+
+    addClass('group-participants-option', suggestionDiv);
+
+    info.innerText = user.name;
+    addButton.innerText = '+';
+
+    addButton.addEventListener('click', e => {
+      window.selectedUser[user.id] = user.name;
+
+      selectedUserDiv.innerHTML = '';
+
+      for (let userId in window.selectedUser) {
+        const userDiv = document.createElement('div');
+        const info = document.createElement('div');
+        const deleteButton = document.createElement('div');
+
+        info.innerText = window.selectedUser[userId];
+        deleteButton.innerText = '-';
+
+        addClass('group-participants-selected', userDiv);
+
+        selectedUserDiv.appendChild(userDiv);
+        userDiv.appendChild(info);
+        userDiv.appendChild(deleteButton);
+
+        deleteButton.addEventListener('click', () => {
+          delete window.selectedUser[userId];
+          userDiv.remove();
+        });
+      }
+    });
+
+    suggestionsList.appendChild(suggestionDiv);
+    suggestionDiv.appendChild(info);
+    suggestionDiv.appendChild(addButton);
+  });
+});
+
 //Change online status to 'off' when disonnected
 socket.on('disconnect', () => {
   console.log('Server down');

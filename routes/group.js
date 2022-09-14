@@ -44,6 +44,7 @@ router.put(
     )
     .bail()
     .escape(),
+  check('userIds').isArray().withMessage('array not found').bail(),
   tryCatch(updateParticipants)
 );
 

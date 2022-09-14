@@ -79,9 +79,14 @@
 }
 
 #groupParticipantsSearchResultDiv,
-#groupSelectedUserDivtDiv {
+#groupSelectedUserDiv {
   margin-top: 1.5rem;
   height: 50%;
   width: 70%;
   border: 1px solid black;
+}
+
+.group-participants-option,
+.group-participants-selected {
+  display: flex;
 }
