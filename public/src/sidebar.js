@@ -183,6 +183,8 @@ function drawGroups(groups) {
 function drawGroupHeaderButton() {
   const groupHeaderOption = document.querySelector('#group .header .options');
 
+  groupHeaderOption.innerHTML = '';
+
   const manageButton = document.createElement('a');
   manageButton.innerText = '+';
   groupHeaderOption.appendChild(manageButton);
@@ -212,7 +214,7 @@ function drawCreateGroupForm() {
 
   addClass('auth', createGroupDiv, header, form, namePTag, nameInput, button);
 
-  const signUpApi = `${window.location.origin}/api/1.0/user`;
+  const api = `${window.location.origin}/api/1.0/group`;
 
   button.addEventListener('click', async e => {
     e.preventDefault();
@@ -223,7 +225,7 @@ function drawCreateGroupForm() {
 
     let authorization = getJwtToken();
 
-    const res = await fetch(signUpApi, {
+    const res = await fetch(api, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
