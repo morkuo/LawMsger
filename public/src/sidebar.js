@@ -191,6 +191,7 @@ function drawGroupHeaderButton() {
 
   manageButton.addEventListener('click', () => {
     drawCreateGroupForm();
+    drawDeleteGroupForm();
   });
 }
 
@@ -248,6 +249,76 @@ function drawCreateGroupForm() {
   form.appendChild(nameInput);
 
   form.appendChild(button);
+}
+
+function drawDeleteGroupForm() {
+  const pane = document.querySelector('#pane');
+  const manageDiv = pane.querySelector('div');
+  const header = document.createElement('h3');
+  const form = document.createElement('form');
+  const groupIdPtag = document.createElement('p');
+  const groupIdInput = document.createElement('input');
+  const participantsPtag = document.createElement('p');
+  const participantsInput = document.createElement('input');
+  const addButton = document.createElement('button');
+  const deleteButton = document.createElement('button');
+
+  header.innerText = 'Add Participants';
+
+  groupIdPtag.innerText = 'Group ID';
+  participantsPtag.innerText = 'Search Participants Name';
+
+  addButton.innerText = 'Add';
+  deleteButton.innerText = 'Delete';
+
+  addClass(
+    'auth',
+    header,
+    form,
+    groupIdPtag,
+    groupIdInput,
+    participantsPtag,
+    participantsInput,
+    addButton,
+    deleteButton
+  );
+
+  const signUpApi = `${window.location.origin}/api/1.0/group`;
+
+  addButton.addEventListener('click', async e => {
+    e.preventDefault();
+
+    const payload = {
+      email: groupIdInput.value,
+    };
+
+    let authorization = getJwtToken();
+
+    const res = await fetch(signUpApi, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authorization,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const response = await res.json();
+
+    if (response.error) return setMsg(response.error, 'error');
+
+    return setMsg(response.data);
+  });
+
+  manageDiv.appendChild(form);
+
+  form.appendChild(header);
+  form.appendChild(groupIdPtag);
+  form.appendChild(groupIdInput);
+  form.appendChild(addButton);
+  form.appendChild(deleteButton);
+  form.appendChild(participantsPtag);
+  form.appendChild(participantsInput);
 }
 
 //Check whether current user is at chat window. If yes, highlight chatting contact div.
