@@ -8,6 +8,12 @@
   src: url('../fonts/ChicagoNormal.ttf') format('truetype');
 }
 
+:root {
+  --background-color: rgb(21, 21, 22);
+  --options-background-color: rgb(34, 34, 38);
+  --border-radius: 10px;
+}
+
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;
@@ -124,25 +130,33 @@ a {
   margin: auto auto;
   font-size: 3rem;
   font-family: ChiKareGo2;
+  cursor: default;
 }
 
 #form {
   display: flex;
   justify-content: center;
   align-items: center;
+
+  height: 9.5vh;
+  width: 100%;
+  padding: 0.7rem 0.25rem;
+
+  border-top: 1px solid black;
   background: rgba(0, 0, 0, 0.15);
-  padding: 0.25rem;
-  display: flex;
-  min-height: 3rem;
   backdrop-filter: blur(10px);
+  background-color: white;
 }
+
 #input {
   border: none;
   padding: 0 1rem;
-  min-height: 1.5rem;
-  flex-grow: 1;
-  border-radius: 2rem;
+  width: 90%;
+  min-height: 2.35rem;
+  border-radius: var(--border-radius);
   margin: 0.25rem;
+  color: white;
+  background-color: var(--options-background-color);
 }
 #input:focus {
   outline: none;
@@ -162,8 +176,8 @@ a {
   list-style-type: none;
   margin: 0;
   padding: 0;
+  height: 90vh;
   overflow-y: auto;
-  border-bottom: 1px solid black;
 }
 
 #messages > li {

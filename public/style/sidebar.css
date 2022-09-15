@@ -1,5 +1,6 @@
 :root {
   --sidebar-background-color: rgb(21, 21, 22);
+  --sidebar-footer-options-background-color: rgb(34, 34, 38);
   --sidebar-border-radius: 10px;
   --sidebar-options-background-color: white;
 }
@@ -99,7 +100,7 @@
 .group-delete-button:hover,
 .contact-add-star-button:hover,
 .contact-delete-star-button:hover {
-  background-color: rgb(145, 189, 157);
+  background-color: orange;
 }
 
 .contact-status {
