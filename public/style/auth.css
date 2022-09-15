@@ -1,7 +1,28 @@
-body {
-  margin: 0;
+@font-face {
+  font-family: ChiKareGo2;
+  src: url('../fonts/ChiKareGo2.ttf') format('truetype');
+}
+
+* {
   box-sizing: border-box;
+  font-size: 1.1rem;
+}
+
+body {
   height: 100vh;
+  font-family: ChiKareGo2;
+}
+
+h3 {
+  font-size: 2rem;
+}
+
+input {
+  font-family: ChiKareGo2;
+}
+
+button {
+  font-family: ChiKareGo2;
 }
 
 .container {
@@ -12,7 +33,7 @@ body {
 
 #pane {
   flex: 1;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 div.auth {
@@ -37,6 +58,7 @@ form.auth {
 
 #signIn {
   margin: 0;
+  padding: 0;
   max-height: 100%;
   border: none;
 }
@@ -57,6 +79,8 @@ button.auth {
 
 button.auth {
   margin-top: 4rem;
+  padding: 0.22rem 0.7rem;
+  border-radius: 0.5rem;
   cursor: pointer;
 }
 
@@ -78,5 +102,5 @@ button.signout {
   background-repeat: no-repeat;
   background-position: center;
   border: none;
-  border-radius: 7px;
+  border-radius: 10px;
 }
