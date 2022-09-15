@@ -269,7 +269,7 @@ function drawGroupHeaderButton() {
   groupHeaderOption.innerHTML = '';
 
   const manageButton = document.createElement('a');
-  manageButton.innerText = '+';
+  manageButton.innerText = 'G';
   groupHeaderOption.appendChild(manageButton);
 
   manageButton.addEventListener('click', () => {

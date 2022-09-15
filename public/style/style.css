@@ -65,10 +65,26 @@ a {
 
 #main {
   display: flex;
+  position: relative;
   flex-direction: column;
   justify-content: flex-start;
   flex-grow: 1;
   border-bottom: 1px solid black;
+}
+
+#main::after {
+  content: '';
+  background: url(/images/main.jpeg);
+  background-size: 42rem;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.07;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;
 }
 
 #pane {
@@ -77,6 +93,12 @@ a {
   justify-content: space-between;
   height: 90vh;
   flex-grow: 1;
+}
+
+#pane h1 {
+  margin: auto auto;
+  font-size: 3rem;
+  font-family: ChiKareGo2;
 }
 
 #form {
