@@ -18,6 +18,8 @@ function setSignInField() {
   passwordPtag.innerText = 'Password';
   button.innerText = 'Submit';
 
+  form.setAttribute('id', 'signIn');
+
   passwordInput.setAttribute('type', 'password');
 
   addClass(
