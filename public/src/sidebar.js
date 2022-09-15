@@ -25,14 +25,17 @@ async function drawSidebar() {
 
   const groups = await getGroups();
   drawGroups(groups);
-  drawGroupHeaderButton();
   addGroupChatListenerToGroupDivs(groupsDiv);
   drawDeleteGroupButton(groups);
+
   collapseSidebar();
 
   socket.emit('join', groups);
 
   listenToChatWindow();
+
+  groupAddParticipantsButton();
+  signOutButton();
 
   //if user is at chat window, renew the socket id of chat window
   const chatWindow = document.querySelector('#messages');
@@ -263,16 +266,10 @@ function drawGroups(groups) {
   }
 }
 
-function drawGroupHeaderButton() {
-  const groupHeaderOption = document.querySelector('.group-options');
+function groupAddParticipantsButton() {
+  const groupAddParticipants = document.getElementById('groupAddParticipants');
 
-  groupHeaderOption.innerHTML = '';
-
-  const manageButton = document.createElement('a');
-  manageButton.innerText = 'G';
-  groupHeaderOption.appendChild(manageButton);
-
-  manageButton.addEventListener('click', () => {
+  groupAddParticipants.addEventListener('click', () => {
     drawCreateGroupForm();
     drawAddAndDeleteParticipantsForm();
     addEmailInputLitener();
@@ -590,6 +587,15 @@ function collapseSidebar() {
       header.click();
     }
   }
+}
+
+function signOutButton() {
+  const signOutButton = document.getElementById('signOut');
+
+  signOutButton.addEventListener('click', () => {
+    localStorage.removeItem('token');
+    window.location.href = `${window.location.origin}/index.html`;
+  });
 }
 
 export { drawContactDivs, drawSidebar };

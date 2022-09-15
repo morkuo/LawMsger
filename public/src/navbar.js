@@ -5,6 +5,7 @@ main();
 
 async function main() {
   setNavbar();
+  profileButton();
 }
 
 async function setNavbar() {
@@ -35,16 +36,16 @@ async function setNavbar() {
   userinfo.created_at = response.data.created_at;
   userinfo.picture = response.data.picture;
 
-  userinfo.addEventListener('click', drawProfile);
-
-  const navbarOptions = document.querySelector('#navbar .options');
+  const footerOptions = document.querySelector('.footer-options');
 
   if (response.data.role === -1) {
-    const adminButton = document.createElement('a');
-    adminButton.innerText = 'Manage';
+    const adminButton = document.createElement('span');
+    adminButton.innerText = 'admin_panel_settings';
+
+    adminButton.setAttribute('class', 'material-symbols-outlined');
+    adminButton.setAttribute('id', 'adminButton');
 
     adminButton.addEventListener('click', async () => {
-      // window.location.href = `${window.location.origin}/admin.html`;
       const isAdmin = await checkAdmin();
       if (!isAdmin) return setMsg(response.error, 'error');
 
@@ -52,17 +53,23 @@ async function setNavbar() {
       drawDeleteUserForm();
     });
 
-    navbarOptions.appendChild(adminButton);
+    footerOptions.insertAdjacentElement('afterbegin', adminButton);
   }
 
-  const signOutButton = document.createElement('a');
-  signOutButton.innerText = 'Sign Out';
-  navbarOptions.appendChild(signOutButton);
+  const profile = document.getElementById('profile');
 
-  signOutButton.addEventListener('click', () => {
-    localStorage.removeItem('token');
-    window.location.href = `${window.location.origin}/index.html`;
-  });
+  profile.name = response.data.name;
+  profile.email = response.data.email;
+  profile.created_at = response.data.created_at;
+  profile.picture = response.data.picture;
+
+  profile.addEventListener('click', drawProfile);
+}
+
+function profileButton() {
+  const profile = document.getElementById('profile');
+
+  profile.addEventListener('click', drawProfile);
 }
 
 async function drawProfile(e) {
@@ -82,7 +89,7 @@ async function drawProfile(e) {
   pane.innerHTML = '';
 
   header.innerText = 'Profile';
-  namePTag.innerText = e.target.innerText;
+  namePTag.innerText = e.target.name;
   emailPTag.innerText = e.target.email;
   picture.src = e.target.picture;
   onboardDatePTag.innerText = e.target.created_at;
