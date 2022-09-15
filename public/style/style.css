@@ -3,12 +3,37 @@
   src: url('../fonts/ChiKareGo2.ttf') format('truetype');
 }
 
+@font-face {
+  font-family: Chicago;
+  src: url('../fonts/ChicagoNormal.ttf') format('truetype');
+}
+
 * {
+  margin: 0;
   box-sizing: border-box;
+  font-size: 1.1rem;
 }
 
 body {
-  margin: 0;
+  font-family: Chicago;
+}
+
+h2 {
+  font-family: ChiKareGo2;
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-family: ChiKareGo2;
+  font-size: 1.3rem;
+}
+
+input {
+  margin: 1rem 0;
+  font-family: ChiKareGo2;
+}
+
+button {
   font-family: ChiKareGo2;
 }
 
