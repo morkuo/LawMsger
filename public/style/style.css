@@ -11,6 +11,7 @@
 :root {
   --background-color: rgb(21, 21, 22);
   --options-background-color: rgb(34, 34, 38);
+  --options-hover-color: rgb(126, 126, 138);
   --border-radius: 10px;
 }
 
@@ -148,19 +149,46 @@ a {
   background-color: white;
 }
 
+#inputWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 95%;
+  min-height: 2.35rem;
+  border: 1px solid black;
+  color: white;
+  border-radius: var(--border-radius);
+  background-color: var(--options-background-color);
+}
+
+#inputWrapper span {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+#inputWrapper button {
+  display: flex;
+  align-items: center;
+  border: none;
+  color: white;
+  border-radius: var(--border-radius);
+  background-color: var(--options-background-color);
+}
+
 #input {
   border: none;
   padding: 0 1rem;
-  width: 90%;
-  min-height: 2.35rem;
-  border-radius: var(--border-radius);
+  width: 93%;
+  height: 100%;
   margin: 0.25rem;
   color: white;
+  border-radius: var(--border-radius);
   background-color: var(--options-background-color);
 }
 #input:focus {
   outline: none;
 }
+
 #form > button {
   background: #333;
   border: none;

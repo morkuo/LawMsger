@@ -1,14 +1,39 @@
+:root {
+  --background-color: rgb(21, 21, 22);
+  --options-background-color: rgb(34, 34, 38);
+  --options-hover-color: rgb(126, 126, 138);
+  --border-radius: 10px;
+}
+
 #chatUploadButtonWrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
-  height: 1.5rem;
-  width: 1.5rem;
+  margin: 0 0.5rem;
+  height: 2rem;
+  width: 2rem;
   cursor: pointer;
-  background-color: #333;
+}
+
+#chatUploadButtonWrapper span {
+  padding: 0.1rem;
   color: white;
-  border-radius: 50%;
+  border-radius: var(--border-radius);
+}
+
+#chatUploadButtonWrapper span:hover {
+  background-color: var(--options-hover-color);
+}
+
+#chatSendButtonWrapper {
+  margin: 0 0.7rem;
+  padding: 0.1rem;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+}
+
+#chatSendButtonWrapper:hover {
+  background-color: var(--options-hover-color);
 }
 
 #previewImageDiv {

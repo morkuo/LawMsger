@@ -1,6 +1,7 @@
 :root {
   --sidebar-background-color: rgb(21, 21, 22);
   --sidebar-footer-options-background-color: rgb(34, 34, 38);
+  --sidebar-footer-options-hover-color: rgb(126, 126, 138);
   --sidebar-border-radius: 10px;
   --sidebar-options-background-color: white;
 }

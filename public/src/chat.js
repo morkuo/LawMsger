@@ -266,10 +266,13 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   const pane = document.getElementById('pane');
   const messages = document.createElement('ul');
   const suggestions = document.createElement('ul');
-  const input = document.createElement('input');
   const form = document.createElement('form');
+  const inputWrapper = document.createElement('div');
+  const input = document.createElement('input');
+  const sendButtonWrapper = document.createElement('span');
   const sendButton = document.createElement('button');
   const uploadButtonWrapper = document.createElement('label');
+  const uploadButtonIcon = document.createElement('span');
   const uploadButton = document.createElement('input');
   const previewImageDiv = document.createElement('div');
   const unloadButton = document.createElement('div');
@@ -281,17 +284,22 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   messages.setAttribute('data-socket-id', targetContactSocketId);
   suggestions.setAttribute('id', 'suggestions');
   form.setAttribute('id', 'form');
+  inputWrapper.setAttribute('id', 'inputWrapper');
   input.setAttribute('id', 'input');
   input.setAttribute('autocomplete', 'off');
 
-  sendButton.innerText = 'Send';
+  sendButtonWrapper.innerText = 'send';
+  sendButtonWrapper.setAttribute('class', 'material-symbols-outlined');
+  sendButtonWrapper.setAttribute('id', 'chatSendButtonWrapper');
 
   uploadButtonWrapper.setAttribute('id', 'chatUploadButtonWrapper');
+  uploadButtonIcon.setAttribute('class', 'material-symbols-outlined');
   uploadButton.setAttribute('id', 'chatUploadButton');
   uploadButton.setAttribute('type', 'file');
   uploadButton.setAttribute('name', 'images');
   uploadButton.setAttribute('multiple', '');
   uploadButton.style.visibility = 'hidden';
+  uploadButtonIcon.innerText = 'attach_file';
 
   unloadButton.setAttribute('id', 'chatUnloadFileButton');
   unloadButton.innerText = 'X';
@@ -299,15 +307,18 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   previewImageDiv.setAttribute('id', 'previewImageDiv');
   previewImageDiv.setAttribute('data-file', 'false');
 
-  form.appendChild(input);
-  form.appendChild(sendButton);
-
   pane.appendChild(messages);
   pane.appendChild(suggestions);
   pane.appendChild(form);
+  form.appendChild(inputWrapper);
 
-  form.appendChild(uploadButtonWrapper);
   uploadButtonWrapper.appendChild(uploadButton);
+  uploadButtonWrapper.appendChild(uploadButtonIcon);
+  inputWrapper.appendChild(uploadButtonWrapper);
+  inputWrapper.appendChild(input);
+  inputWrapper.appendChild(sendButton);
+  sendButton.appendChild(sendButtonWrapper);
+
   pane.appendChild(previewImageDiv);
   previewImageDiv.appendChild(unloadButton);
 
