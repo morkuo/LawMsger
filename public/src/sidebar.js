@@ -264,7 +264,7 @@ function drawGroups(groups) {
 }
 
 function drawGroupHeaderButton() {
-  const groupHeaderOption = document.querySelector('#group .header .options');
+  const groupHeaderOption = document.querySelector('.group-options');
 
   groupHeaderOption.innerHTML = '';
 
@@ -550,9 +550,11 @@ function collapseSidebar() {
     header.addEventListener('click', e => {
       const actives = document.querySelectorAll('.active');
 
-      for (let active of actives) {
-        active.classList.remove('active');
-        active.parentNode.querySelector('.content').setAttribute('style', 'height: 0');
+      if (actives.length !== 0) {
+        for (let active of actives) {
+          active.classList.remove('active');
+          active.parentElement.nextElementSibling.setAttribute('style', 'height: 0');
+        }
       }
 
       //get current block root
@@ -580,7 +582,8 @@ function collapseSidebar() {
 
       content.setAttribute('style', 'height: ' + totalHeight + 'px');
 
-      content.classList.toggle('active');
+      const symbol = headerParent.querySelector('.collapse-symbol');
+      symbol.classList.toggle('active');
     });
 
     if (header.dataset.expanded === 'true') {

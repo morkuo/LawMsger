@@ -23,7 +23,7 @@
   cursor: pointer;
 }
 
-#sidebar .header div {
+#sidebar .header div:first-child {
   width: 7rem;
 }
 
@@ -151,7 +151,7 @@
   cursor: pointer;
 }
 
-#group div.options {
+.collapse-symbol {
   display: flex;
   justify-content: center;
   width: 1rem;
@@ -167,4 +167,47 @@
 .content {
   overflow: hidden;
   transition: height 0.3s ease;
+}
+
+.group-options {
+  display: flex;
+  margin-top: auto;
+  justify-content: flex-end;
+}
+
+.group-options a {
+  color: white;
+  cursor: pointer;
+}
+
+/* toggle symbol animation */
+
+.collapse-symbol {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  right: 5px;
+}
+
+.collapse-symbol span {
+  display: block;
+  position: absolute;
+  width: 12px;
+  height: 2px;
+  background-color: #000;
+  transition: transform 0.2s ease;
+}
+
+.collapse-symbol span:last-child {
+  top: 9.5px;
+  transform: rotate(90deg) translateX(-2px);
+}
+
+.collapse-symbol.active span:first-child {
+  transform: rotate(180deg);
+}
+
+.collapse-symbol.active span:last-child {
+  transform: rotate(0) translateY(-2px);
 }
