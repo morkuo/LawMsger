@@ -28,6 +28,7 @@ async function drawSidebar() {
   drawGroupHeaderButton();
   addGroupChatListenerToGroupDivs(groupsDiv);
   drawDeleteGroupButton(groups);
+  collapseSidebar();
 
   socket.emit('join', groups);
 
@@ -534,6 +535,58 @@ function listenToChatWindow() {
     childList: true,
     subtree: true,
   });
+}
+
+function collapseSidebar() {
+  const contents = document.querySelectorAll('.content');
+
+  for (let content of contents) {
+    content.setAttribute('style', 'height:0');
+  }
+
+  const headers = document.querySelectorAll('.header');
+
+  for (let header of headers) {
+    header.addEventListener('click', e => {
+      const actives = document.querySelectorAll('.active');
+
+      for (let active of actives) {
+        active.classList.remove('active');
+        active.parentNode.querySelector('.content').setAttribute('style', 'height: 0');
+      }
+
+      //get current block root
+      let headerParent = e.target;
+      while (!headerParent.classList.contains('collapse')) {
+        headerParent = headerParent.parentElement;
+      }
+
+      //get content div
+      const content = headerParent.querySelector('.content');
+
+      //get current total height of current content element
+      const contentChildren = content.children;
+      let totalHeight = 0;
+
+      for (let child of contentChildren) {
+        const style = window.getComputedStyle(child);
+        const marginTop = +style.marginTop.slice(0, style.marginTop.indexOf('px'));
+        const marginBottom = +style.marginBottom.slice(0, style.marginBottom.indexOf('px'));
+
+        totalHeight += child.offsetHeight;
+        totalHeight += marginTop;
+        totalHeight += marginBottom;
+      }
+
+      content.setAttribute('style', 'height: ' + totalHeight + 'px');
+
+      content.classList.toggle('active');
+    });
+
+    if (header.dataset.expanded === 'true') {
+      header.click();
+    }
+  }
 }
 
 export { drawContactDivs, drawSidebar };

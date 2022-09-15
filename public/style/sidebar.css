@@ -20,6 +20,7 @@
   background: linear-gradient(rgb(255, 255, 255) 50%, transparent 0);
   background-clip: content-box;
   background-size: 6.6666666667% 9.3333333333%;
+  cursor: pointer;
 }
 
 #sidebar .header div {
@@ -36,7 +37,6 @@
   display: flex;
   margin: 1.5rem 0;
   justify-content: space-between;
-  border-bottom: 1px solid black;
   color: white;
 }
 
@@ -44,17 +44,9 @@
   color: white;
 }
 
-.header div {
-  cursor: pointer;
-}
-
 #all {
-  flex-grow: 1;
   max-height: 50%;
   background-color: rgb(21, 21, 22);
-}
-
-#star {
 }
 
 .contact,
@@ -170,4 +162,9 @@
   background-repeat: no-repeat;
   background-size: 60% 5px, 5px 60%;
   cursor: pointer;
+}
+
+.content {
+  overflow: hidden;
+  transition: height 0.3s ease;
 }
