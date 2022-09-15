@@ -4,13 +4,13 @@
 }
 
 * {
+  margin: 0;
   box-sizing: border-box;
   font-size: 1.1rem;
 }
 
 body {
   height: 100vh;
-
   font-family: ChiKareGo2;
 }
 
@@ -19,6 +19,7 @@ h3 {
 }
 
 input {
+  margin: 1rem 0;
   font-family: ChiKareGo2;
 }
 
@@ -83,7 +84,7 @@ button.auth {
 }
 
 button.auth {
-  margin-top: 4rem;
+  margin-top: 2rem;
   padding: 0.22rem 0.7rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -114,4 +115,8 @@ button.signout {
   position: absolute;
   top: 9%;
   color: rgb(229, 136, 152);
+}
+
+#systemMsg p {
+  margin: 0.5rem;
 }
