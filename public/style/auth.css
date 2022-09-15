@@ -10,6 +10,7 @@
 
 body {
   height: 100vh;
+
   font-family: ChiKareGo2;
 }
 
@@ -34,6 +35,8 @@ button {
 #pane {
   flex: 1;
   border-radius: 12px;
+  min-width: 1350px;
+  min-height: 700px;
 }
 
 div.auth {
@@ -57,8 +60,10 @@ form.auth {
 }
 
 #signIn {
+  position: relative;
   margin: 0;
   padding: 0;
+  min-width: 31%;
   max-height: 100%;
   border: none;
 }
@@ -103,4 +108,10 @@ button.signout {
   background-position: center;
   border: none;
   border-radius: 10px;
+}
+
+#systemMsg {
+  position: absolute;
+  top: 9%;
+  color: rgb(229, 136, 152);
 }

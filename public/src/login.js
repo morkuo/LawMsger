@@ -1,4 +1,4 @@
-import { setMsg, addClass, storeToken, storeUserId } from './helper.js';
+import { addClass, storeToken, storeUserId } from './helper.js';
 
 setSignInField();
 
@@ -54,7 +54,7 @@ function setSignInField() {
 
     const response = await res.json();
 
-    if (response.error) return setMsg(response.error, 'error');
+    if (response.error) return setSystemMessage(response.error, 'error');
 
     storeToken(response.data.access_token);
     storeUserId(response.data.user.id);
@@ -70,4 +70,35 @@ function setSignInField() {
   form.appendChild(passwordPtag);
   form.appendChild(passwordInput);
   form.appendChild(button);
+}
+
+function setSystemMessage(messages, type, autoRemove = true) {
+  const container = document.querySelector('#signIn');
+
+  const msgDiv = document.createElement('div');
+  msgDiv.setAttribute('id', 'systemMsg');
+
+  if (Array.isArray(messages)) {
+    messages.forEach(message => {
+      const msg = document.createElement('p');
+      msg.innerText = `${message.param}: ${message.msg}`;
+      msgDiv.appendChild(msg);
+    });
+  } else {
+    const msg = document.createElement('p');
+    msg.innerText = messages;
+    msgDiv.appendChild(msg);
+  }
+
+  if (type === 'error') {
+    addClass('error', msgDiv);
+  }
+
+  container.insertAdjacentElement('afterbegin', msgDiv);
+
+  if (autoRemove) {
+    setTimeout(() => {
+      msgDiv.remove();
+    }, 4000);
+  }
 }
