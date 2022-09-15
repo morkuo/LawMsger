@@ -11,7 +11,7 @@
 * {
   margin: 0;
   box-sizing: border-box;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
 body {
@@ -155,19 +155,6 @@ chat-unread-message #messages > li div {
   align-items: flex-start;
   padding-left: 1rem;
   flex-grow: 1;
-}
-
-#sidebar {
-  display: flex;
-  flex-direction: column;
-  min-width: 20%;
-  border: 1px solid black;
-}
-
-#navbar {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid black;
 }
 
 #userInfo {

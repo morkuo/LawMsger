@@ -164,8 +164,8 @@ function drawContactDivs(contacts, category) {
     //if picture not url, then show initial
     if (contact.picture.length <= 1) pictureDiv.innerText = contact.name[0].toUpperCase();
     nameDiv.innerText = contact.name;
-    emailDiv.innerText = contact.email;
-    unreadCountDiv.innerText = contact.unread;
+    // emailDiv.innerText = contact.email;
+    if (contact.unread) unreadCountDiv.innerText = contact.unread;
 
     contactDiv.setAttribute('data-id', contact.id);
     if (contact.socket_id === undefined || null) contact.socket_id = '';
@@ -189,19 +189,22 @@ function drawGroups(groups) {
 
   for (let group of groups) {
     const groupDiv = document.createElement('div');
+    const statusDiv = document.createElement('div');
     const nameDiv = document.createElement('div');
     const unreadCountDiv = document.createElement('div');
 
     addClass('group', groupDiv);
+    addClass('group-status', statusDiv);
     addClass('group-name', nameDiv);
     addClass('group-unread-count', unreadCountDiv);
 
     nameDiv.innerText = group.name;
-    unreadCountDiv.innerText = group.unread;
+    if (group.unread) unreadCountDiv.innerText = group.unread;
 
     groupDiv.setAttribute('data-socket-id', group.id);
 
     groupsDiv.appendChild(groupDiv);
+    groupDiv.appendChild(statusDiv);
     groupDiv.appendChild(nameDiv);
     groupDiv.appendChild(unreadCountDiv);
 

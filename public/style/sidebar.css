@@ -1,35 +1,75 @@
+:root {
+  --sidebar-background-color: rgb(21, 21, 22);
+  --sidebar-border-radius: 10px;
+  --sidebar-options-background-color: white;
+}
+
+#sidebar {
+  background-color: var(--sidebar-background-color);
+  display: flex;
+  flex-direction: column;
+  min-width: 20%;
+}
+
 #sidebar .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1rem;
-  border-bottom: 1px solid black;
+  margin: 1rem 0;
+  color: white;
+  background: linear-gradient(rgb(255, 255, 255) 50%, transparent 0);
+  background-clip: content-box;
+  background-size: 6.6666666667% 9.3333333333%;
 }
 
-.header div:last-child {
+#sidebar .header div {
+  width: 7rem;
+}
+
+#sidebar h3 {
+  padding: 0 1rem;
+  margin: 0 0 0 1rem;
+  background-color: var(--sidebar-background-color);
+}
+
+#navbar {
+  display: flex;
+  margin: 1.5rem 0;
+  justify-content: space-between;
+  border-bottom: 1px solid black;
+  color: white;
+}
+
+#navbar .options a {
+  color: white;
+}
+
+.header div {
   cursor: pointer;
 }
 
 #all {
   flex-grow: 1;
   max-height: 50%;
+  background-color: rgb(21, 21, 22);
 }
 
 #star {
-  border-top: 1px solid black;
 }
 
 .contact,
 .group {
   display: flex;
-  height: 4rem;
-  border-bottom: 1px solid black;
+  margin: 0.7rem 1rem;
+  height: 1.5rem;
+  border-radius: var(--sidebar-border-radius);
   cursor: pointer;
+  background-color: var(--sidebar-options-background-color);
 }
 
 .contact:hover,
 .group:hover {
-  background-color: pink;
+  background-color: rgb(231, 225, 225);
 }
 
 .contact-picture {
@@ -38,7 +78,6 @@
   justify-content: center;
   align-items: center;
   width: 15%;
-  border-right: 1px solid black;
 }
 
 .contact-info,
@@ -51,6 +90,7 @@
 .group-name,
 .contact-info {
   flex-grow: 1;
+  font-size: 1.1rem;
 }
 
 .group-delete-button,
@@ -60,9 +100,11 @@
   justify-content: center;
   align-items: center;
   min-width: 10%;
-  border-left: 1px solid black;
+  border-top-right-radius: var(--sidebar-border-radius);
+  border-bottom-right-radius: var(--sidebar-border-radius);
 }
 
+.group-delete-button:hover,
 .contact-add-star-button:hover,
 .contact-delete-star-button:hover {
   background-color: rgb(145, 189, 157);
@@ -71,11 +113,25 @@
 .contact-status {
   width: 0.75rem;
   background-color: grey;
-  border-right: 1px solid black;
+  border-top-left-radius: var(--sidebar-border-radius);
+  border-bottom-left-radius: var(--sidebar-border-radius);
 }
 
 .contact-status.on {
   background-color: rgb(145, 189, 157);
+}
+
+.group-status {
+  width: 0.75rem;
+  margin-right: 1rem;
+  background-color: rgb(247, 199, 139);
+  border-top-left-radius: var(--sidebar-border-radius);
+  border-bottom-left-radius: var(--sidebar-border-radius);
+}
+
+.group-name {
+  display: flex;
+  align-items: center;
 }
 
 #groupParticipantsSearchResultDiv,
@@ -100,5 +156,18 @@
 }
 
 #groupParticipantsList div:first-child {
+  cursor: pointer;
+}
+
+#group div.options {
+  display: flex;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  margin: 0 0.6rem;
+  border: 0.3px solid #000;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  background-size: 60% 5px, 5px 60%;
   cursor: pointer;
 }
