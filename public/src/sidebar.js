@@ -391,11 +391,11 @@ function drawAddAndDeleteParticipantsForm() {
   addButton.addEventListener('click', async e => {
     e.preventDefault();
 
-    if (!groupNameInput.value) return setMsg('Please enter group name');
+    if (!groupNameInput.value) return setMsg('Please enter group name', 'error');
 
     const userIds = Object.keys(window.selectedUser);
 
-    if (userIds.length === 0) return setMsg('Please select at least one participant');
+    if (userIds.length === 0) return setMsg('Please select at least one participant', 'error');
 
     const payload = {
       groupName: groupNameInput.value,
@@ -430,11 +430,11 @@ function drawAddAndDeleteParticipantsForm() {
   deleteButton.addEventListener('click', async e => {
     e.preventDefault();
 
-    if (!groupNameInput.value) return setMsg('Please enter group name');
+    if (!groupNameInput.value) return setMsg('Please enter group name', 'error');
 
     const userIds = Object.keys(window.selectedUser);
 
-    if (userIds.length === 0) return setMsg('Please select at least one participant');
+    if (userIds.length === 0) return setMsg('Please select at least one participant', 'error');
 
     const payload = {
       groupName: groupNameInput.value,

@@ -12,6 +12,7 @@
   --background-color: rgb(21, 21, 22);
   --options-background-color: rgb(80, 80, 93);
   --options-hover-color: rgb(126, 126, 138);
+  --success-background-color: rgb(145, 189, 157);
   --error-background-color: pink;
   --border-radius: 10px;
 }
@@ -89,8 +90,12 @@ a {
   position: absolute;
   justify-content: center;
   width: 100%;
-  background-color: var(--error-background-color);
+  background-color: var(--success-background-color);
   color: white;
+}
+
+#systemMsg.error {
+  background-color: var(--error-background-color);
 }
 
 #systemMsg p {

@@ -1,4 +1,4 @@
-function setMsg(messages, type, autoRemove = true, appendTo = '#main') {
+function setMsg(messages, error = false, autoRemove = true, appendTo = '#main') {
   const container = document.querySelector(appendTo);
 
   const msgDiv = document.createElement('div');
@@ -16,7 +16,7 @@ function setMsg(messages, type, autoRemove = true, appendTo = '#main') {
     msgDiv.appendChild(msg);
   }
 
-  if (type === 'error') {
+  if (error) {
     addClass('error', msgDiv);
   }
 
