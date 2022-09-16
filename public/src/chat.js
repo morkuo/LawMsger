@@ -111,10 +111,6 @@ async function chatListener(e) {
 
   input.addEventListener('keydown', debouncedDetectInput);
 
-  // sugesstionsList.addEventListener('click', async e => {
-  //   if (e.target.tagName === 'LI') input.value = e.target.innerText;
-  // });
-
   // Send message
   form.addEventListener('submit', async e => {
     e.preventDefault();
@@ -134,8 +130,6 @@ async function chatListener(e) {
       const response = await uploadFile(authorization);
 
       if (response.error) return alert(response.error);
-
-      // console.log('Got fileUrls from server:', rawfileUrls);
 
       const filesInfo = JSON.stringify(response);
 
@@ -329,12 +323,12 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   previewImageDiv.setAttribute('data-file', 'false');
 
   pane.appendChild(messages);
-  pane.appendChild(suggestions);
   pane.appendChild(form);
   form.appendChild(inputWrapper);
 
   uploadButtonWrapper.appendChild(uploadButton);
   uploadButtonWrapper.appendChild(uploadButtonIcon);
+  inputWrapper.appendChild(suggestions);
   inputWrapper.appendChild(uploadButtonWrapper);
   inputWrapper.appendChild(input);
   inputWrapper.appendChild(sendButton);
@@ -383,6 +377,8 @@ async function detectInput(e) {
   const suggestionsList = document.getElementById('suggestions');
   const input = document.getElementById('input');
 
+  suggestionsList.classList.remove('on');
+
   if (!currentInput) return (suggestionsList.innerHTML = '');
 
   const wordSuggestion = currentInput.indexOf('`');
@@ -405,10 +401,23 @@ async function detectInput(e) {
           if (sugesstion.innerText !== 'undefined') {
             e.target.value = currentInput.slice(0, wordSuggestion) + sugesstion.innerText;
             suggestionsList.innerHTML = '';
+            suggestionsList.classList.remove('on');
           }
         }
       },
       //once the eventlistener has been fired once, remove itself
+      { once: true }
+    );
+
+    suggestionsList.addEventListener(
+      'click',
+      async e => {
+        input.value = currentInput.slice(0, wordSuggestion) + e.target.innerText;
+
+        suggestionsList.innerHTML = '';
+
+        suggestionsList.classList.remove('on');
+      },
       { once: true }
     );
 
@@ -425,18 +434,62 @@ async function detectInput(e) {
         if (e.key === 'Tab') {
           e.preventDefault();
 
-          const sugesstion = suggestionsList.querySelector('li');
+          const sugesstion = suggestionsList.querySelector('tr');
 
           if (sugesstion.innerText !== 'undefined') {
             e.target.value = currentInput.slice(0, clauseSuggestion) + sugesstion.dataset.body;
             suggestionsList.innerHTML = '';
           }
+          suggestionsList.classList.remove('on');
         }
       },
       { once: true }
     );
+
+    suggestionsList.addEventListener(
+      'click',
+      async e => {
+        let targetContact = e.target;
+        while (!targetContact.hasAttribute('data-body')) {
+          targetContact = targetContact.parentElement;
+        }
+
+        input.value = currentInput.slice(0, clauseSuggestion) + targetContact.dataset.body;
+
+        suggestionsList.innerHTML = '';
+
+        suggestionsList.classList.remove('on');
+      },
+      { once: true }
+    );
+
     return;
   }
+
+  //tab listener
+  input.addEventListener(
+    'keydown',
+    async e => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+
+        const suggestion = suggestionsList.querySelector('li');
+
+        e.target.value = currentInput.slice(0, matchclausesContent) + suggestion.dataset.body;
+        suggestionsList.innerHTML = '';
+
+        const title = suggestion.dataset.title;
+        const number = suggestion.dataset.number;
+
+        const now = new Date();
+        const origin = now.toISOString();
+
+        socket.emit('updateMatchedClauses', origin, title, number);
+        suggestionsList.classList.remove('on');
+      }
+    },
+    { once: true }
+  );
 
   if (matchclausesContent > -1) {
     socket.emit('matchedClauses', currentInput.slice(matchclausesContent + 1));
@@ -457,30 +510,7 @@ async function detectInput(e) {
           const origin = now.toISOString();
 
           socket.emit('updateMatchedClauses', origin, title, number);
-        }
-      },
-      { once: true }
-    );
-
-    //tab listener
-    input.addEventListener(
-      'keydown',
-      async e => {
-        if (e.key === 'Tab') {
-          e.preventDefault();
-
-          const suggestion = suggestionsList.querySelector('li');
-
-          e.target.value = currentInput.slice(0, matchclausesContent) + suggestion.dataset.body;
-          suggestionsList.innerHTML = '';
-
-          const title = suggestion.dataset.title;
-          const number = suggestion.dataset.number;
-
-          const now = new Date();
-          const origin = now.toISOString();
-
-          socket.emit('updateMatchedClauses', origin, title, number);
+          suggestionsList.classList.remove('on');
         }
       },
       { once: true }

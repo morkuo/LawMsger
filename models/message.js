@@ -17,17 +17,12 @@ async function suggestions(input, index) {
 
   //words suggestion
   if (!index) {
-    // console.log(input);
     return result.suggest.suggestions[0].options.map(option => option.text);
   }
 
-  // console.log(input);
-
-  // console.log(result.suggest.suggestions[0].options[0]._source.suggest.input);
-
   //clauses suggestion
   const suggestions = result.suggest.suggestions[0].options.map(option => ({
-    title: option._source.suggest.input,
+    title: option._source.suggest.input.replace(option._source.number, ''),
     number: option._source.number,
     body: option._source.body,
   }));

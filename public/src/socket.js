@@ -43,8 +43,9 @@ socket.on('groupmsg', (msg, senderSocketId, groupId, filesInfo) => {
 
 socket.on('suggestion', suggestions => {
   const suggestionsList = document.getElementById('suggestions');
-  // const input = document.getElementById('input');
+
   suggestionsList.innerHTML = '';
+  suggestionsList.classList.remove('on');
 
   if (suggestions.length === 0) return;
 
@@ -56,38 +57,58 @@ socket.on('suggestion', suggestions => {
 
     suggestionsList.appendChild(li);
   }
+
+  suggestionsList.classList.add('on');
 });
 
 socket.on('clauses', suggestions => {
   const suggestionsList = document.getElementById('suggestions');
-  // const input = document.getElementById('input');
+
   suggestionsList.innerHTML = '';
+  suggestionsList.classList.remove('on');
 
   if (suggestions.length === 0) return;
 
+  const table = document.createElement('table');
+
   for (let suggestion of suggestions) {
-    const li = document.createElement('li');
+    const clauseTitle = suggestion.title;
+    const clauseNumber = suggestion.number;
+    const clauseBody = suggestion.body;
 
-    if (suggestion) {
-      const clauseTitle = suggestion.title;
-      const clauseBody = suggestion.body;
+    const row = document.createElement('tr');
+    const title = document.createElement('td');
+    const number = document.createElement('td');
+    const body = document.createElement('td');
 
-      if (clauseBody.length > 50) {
-        li.innerText = `${clauseTitle} ${clauseBody.slice(0, 50)}...`;
-        li.setAttribute('data-body', clauseBody);
-      } else {
-        li.innerText = `${clauseTitle} ${clauseBody}`;
-        li.setAttribute('data-body', clauseBody);
-      }
-    } else li.innerText = suggestion;
+    row.appendChild(title);
+    row.appendChild(number);
+    row.appendChild(body);
 
-    suggestionsList.appendChild(li);
+    if (clauseBody.length > 50) {
+      title.innerText = clauseTitle;
+      number.innerText = clauseNumber;
+      body.innerText = `${clauseBody.slice(0, 50)}...`;
+
+      row.setAttribute('data-body', clauseBody);
+    } else {
+      title.innerText = clauseTitle;
+      number.innerText = clauseNumber;
+      body.innerText = clauseBody;
+
+      row.setAttribute('data-body', clauseBody);
+    }
+
+    suggestionsList.appendChild(table);
+    table.appendChild(row);
   }
+
+  suggestionsList.classList.add('on');
 });
 
 socket.on('matchedClauses', suggestions => {
   const suggestionsList = document.getElementById('suggestions');
-  // const input = document.getElementById('input');
+
   suggestionsList.innerHTML = '';
 
   if (suggestions.length === 0) return;
@@ -115,6 +136,8 @@ socket.on('matchedClauses', suggestions => {
 
     suggestionsList.appendChild(li);
   }
+
+  suggestionsList.classList.add('on');
 });
 
 socket.on(
