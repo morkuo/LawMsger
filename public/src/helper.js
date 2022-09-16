@@ -1,23 +1,31 @@
-function setMsg(message, type, autoRemove = true) {
-  const pane = document.querySelector('#pane');
+function setMsg(messages, type, autoRemove = true, appendTo = '#main') {
+  const container = document.querySelector(appendTo);
 
   const msgDiv = document.createElement('div');
-  const msg = document.createElement('p');
-  msgDiv.setAttribute('id', 'msgBox');
+  msgDiv.setAttribute('id', 'systemMsg');
+
+  if (Array.isArray(messages)) {
+    messages.forEach(message => {
+      const msg = document.createElement('p');
+      msg.innerText = `${message.param}: ${message.msg}`;
+      msgDiv.appendChild(msg);
+    });
+  } else {
+    const msg = document.createElement('p');
+    msg.innerText = messages;
+    msgDiv.appendChild(msg);
+  }
 
   if (type === 'error') {
     addClass('error', msgDiv);
   }
 
-  msg.innerText = message;
-
-  pane.appendChild(msgDiv);
-  msgDiv.appendChild(msg);
+  container.insertAdjacentElement('afterbegin', msgDiv);
 
   if (autoRemove) {
     setTimeout(() => {
       msgDiv.remove();
-    }, 3000);
+    }, 4000);
   }
 }
 

@@ -130,13 +130,3 @@ button.group-function {
 #groupParticipantsList div:first-child {
   cursor: pointer;
 }
-
-#systemMsg {
-  position: absolute;
-  top: 9%;
-  color: rgb(229, 136, 152);
-}
-
-#systemMsg p {
-  margin: 0.5rem;
-}
