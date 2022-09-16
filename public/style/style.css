@@ -167,7 +167,7 @@ a {
   position: relative;
   color: white;
   border-radius: var(--border-radius);
-  background-color: var(--options-background-color);
+  background-color: var(--background-color);
 }
 
 #inputWrapper span {
@@ -181,7 +181,7 @@ a {
   border: none;
   color: white;
   border-radius: var(--border-radius);
-  background-color: var(--options-background-color);
+  background-color: var(--background-color);
 }
 
 #input {
@@ -192,7 +192,7 @@ a {
   margin: 0.25rem;
   color: white;
   border-radius: var(--border-radius);
-  background-color: var(--options-background-color);
+  background-color: var(--background-color);
 }
 #input:focus {
   outline: none;

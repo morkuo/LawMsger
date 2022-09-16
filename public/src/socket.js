@@ -328,16 +328,14 @@ socket.on('searchEamil', users => {
   suggestionsList.innerHTML = '';
 
   users.forEach(user => {
-    const suggestionDiv = document.createElement('div');
+    const suggestionLi = document.createElement('li');
     const info = document.createElement('div');
-    const addButton = document.createElement('div');
 
-    addClass('group-participants-option', suggestionDiv);
+    addClass('group-participants-option', suggestionLi);
 
     info.innerText = user.name;
-    addButton.innerText = '+';
 
-    addButton.addEventListener('click', e => {
+    suggestionLi.addEventListener('click', e => {
       window.selectedUser[user.id] = user.name;
 
       selectedUserDiv.innerHTML = '';
@@ -345,27 +343,23 @@ socket.on('searchEamil', users => {
       for (let userId in window.selectedUser) {
         const userDiv = document.createElement('div');
         const info = document.createElement('div');
-        const deleteButton = document.createElement('div');
 
         info.innerText = window.selectedUser[userId];
-        deleteButton.innerText = '-';
 
         addClass('group-participants-selected', userDiv);
 
         selectedUserDiv.appendChild(userDiv);
         userDiv.appendChild(info);
-        userDiv.appendChild(deleteButton);
 
-        deleteButton.addEventListener('click', () => {
+        userDiv.addEventListener('click', () => {
           delete window.selectedUser[userId];
           userDiv.remove();
         });
       }
     });
 
-    suggestionsList.appendChild(suggestionDiv);
-    suggestionDiv.appendChild(info);
-    suggestionDiv.appendChild(addButton);
+    suggestionsList.appendChild(suggestionLi);
+    suggestionLi.appendChild(info);
   });
 });
 

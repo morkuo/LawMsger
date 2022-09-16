@@ -1,13 +1,9 @@
 :root {
-  --sidebar-background-color: rgb(21, 21, 22);
-  --sidebar-footer-options-background-color: rgb(34, 34, 38);
-  --sidebar-footer-options-hover-color: rgb(126, 126, 138);
-  --sidebar-border-radius: 10px;
   --sidebar-options-background-color: white;
 }
 
 #sidebar {
-  background-color: var(--sidebar-background-color);
+  background-color: var(--background-color);
   display: flex;
   flex-direction: column;
   min-width: 20%;
@@ -32,7 +28,7 @@
 #sidebar h3 {
   padding: 0 1rem;
   margin: 0 0 0 1rem;
-  background-color: var(--sidebar-background-color);
+  background-color: var(--background-color);
 }
 
 #navbar {
@@ -56,7 +52,7 @@
   display: flex;
   margin: 0.7rem 1rem;
   height: 1.5rem;
-  border-radius: var(--sidebar-border-radius);
+  border-radius: var(--border-radius);
   cursor: pointer;
   background-color: var(--sidebar-options-background-color);
 }
@@ -94,8 +90,8 @@
   justify-content: center;
   align-items: center;
   min-width: 10%;
-  border-top-right-radius: var(--sidebar-border-radius);
-  border-bottom-right-radius: var(--sidebar-border-radius);
+  border-top-right-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
 }
 
 .group-delete-button:hover,
@@ -107,50 +103,12 @@
 .contact-status {
   width: 0.75rem;
   background-color: grey;
-  border-top-left-radius: var(--sidebar-border-radius);
-  border-bottom-left-radius: var(--sidebar-border-radius);
+  border-top-left-radius: var(--border-radius);
+  border-bottom-left-radius: var(--border-radius);
 }
 
 .contact-status.on {
   background-color: rgb(145, 189, 157);
-}
-
-.group-status {
-  width: 0.75rem;
-  margin-right: 1rem;
-  background-color: rgb(247, 199, 139);
-  border-top-left-radius: var(--sidebar-border-radius);
-  border-bottom-left-radius: var(--sidebar-border-radius);
-}
-
-.group-name {
-  display: flex;
-  align-items: center;
-}
-
-#groupParticipantsSearchResultDiv,
-#groupSelectedUserDiv {
-  margin-top: 1.5rem;
-  height: 50%;
-  width: 70%;
-  border: 1px solid black;
-}
-
-.group-participants-option,
-.group-participants-selected {
-  display: flex;
-}
-
-#groupParticipantsList {
-  position: absolute;
-  top: 30%;
-  left: 45%;
-  padding: 8rem;
-  border: 1px solid black;
-}
-
-#groupParticipantsList div:first-child {
-  cursor: pointer;
 }
 
 .collapse-symbol {
@@ -177,14 +135,14 @@
   align-items: center;
   margin: auto 1rem 1.3rem 1rem;
   padding: 0.2rem 1rem;
-  border-radius: var(--sidebar-border-radius);
-  background-color: rgb(34, 34, 38);
+  border-radius: var(--border-radius);
+  background-color: var(--options-background-color);
   color: white;
   cursor: pointer;
 }
 
 .footer-options span {
-  border-radius: var(--sidebar-border-radius);
+  border-radius: var(--border-radius);
   padding: 0.1rem 1rem;
   font-size: 1.8rem;
 }

@@ -278,9 +278,11 @@ function groupAddParticipantsButton() {
 
 function drawCreateGroupForm() {
   const pane = document.querySelector('#pane');
-  const createGroupDiv = document.createElement('div');
+  const manageDiv = document.createElement('div');
+  const formDiv = document.createElement('div');
+  const infoDiv = document.createElement('div');
   const header = document.createElement('h3');
-  const form = document.createElement('form');
+  const createForm = document.createElement('form');
   const namePTag = document.createElement('p');
 
   const nameInput = document.createElement('input');
@@ -294,7 +296,11 @@ function drawCreateGroupForm() {
 
   button.innerText = 'Create';
 
-  addClass('auth', createGroupDiv, header, form, namePTag, nameInput, button);
+  manageDiv.setAttribute('id', 'manageDiv');
+  formDiv.setAttribute('id', 'formDiv');
+  infoDiv.setAttribute('id', 'infoDiv');
+
+  addClass('group-function', infoDiv, header, createForm, namePTag, nameInput, button);
 
   const api = `${window.location.origin}/api/1.0/group`;
 
@@ -323,18 +329,21 @@ function drawCreateGroupForm() {
     return setMsg(response.data);
   });
 
-  pane.appendChild(createGroupDiv);
-  createGroupDiv.appendChild(form);
-  form.appendChild(header);
-  form.appendChild(namePTag);
-  form.appendChild(nameInput);
+  pane.appendChild(manageDiv);
+  manageDiv.appendChild(formDiv);
+  manageDiv.appendChild(infoDiv);
+  formDiv.appendChild(createForm);
+  createForm.appendChild(header);
+  createForm.appendChild(namePTag);
+  createForm.appendChild(nameInput);
 
-  form.appendChild(button);
+  createForm.appendChild(button);
 }
 
 function drawAddAndDeleteParticipantsForm() {
   const pane = document.querySelector('#pane');
-  const manageDiv = pane.querySelector('div');
+  const formDiv = pane.querySelector('#formDiv');
+  const infoDiv = pane.querySelector('#infoDiv');
   const header = document.createElement('h3');
   const form = document.createElement('form');
   const groupNamePtag = document.createElement('p');
@@ -343,14 +352,18 @@ function drawAddAndDeleteParticipantsForm() {
   const participantsInput = document.createElement('input');
   const searchResultDiv = document.createElement('div');
   const selectedUserDiv = document.createElement('div');
+  const searchResultPtag = document.createElement('h3');
+  const selectedUserPtag = document.createElement('h3');
+  const buttonsDiv = document.createElement('div');
   const addButton = document.createElement('button');
   const deleteButton = document.createElement('button');
 
-  header.innerText = 'Manage Participants';
+  header.innerText = 'Manage member';
 
   groupNamePtag.innerText = 'Group Name';
-  participantsPtag.innerText = 'Search Participants Email';
+  participantsPtag.innerText = 'Search User';
 
+  participantsInput.setAttribute('placeholder', 'attorney@email.com');
   participantsInput.setAttribute('id', 'groupParticipantsSearchEmailInput');
   searchResultDiv.setAttribute('id', 'groupParticipantsSearchResultDiv');
   selectedUserDiv.setAttribute('id', 'groupSelectedUserDiv');
@@ -358,8 +371,11 @@ function drawAddAndDeleteParticipantsForm() {
   addButton.innerText = 'Add';
   deleteButton.innerText = 'Delete';
 
+  searchResultPtag.innerText = 'Search Result';
+  selectedUserPtag.innerText = 'Selected';
+
   addClass(
-    'auth',
+    'group-function',
     header,
     form,
     groupNamePtag,
@@ -450,17 +466,21 @@ function drawAddAndDeleteParticipantsForm() {
     return setMsg(response.data);
   });
 
-  manageDiv.appendChild(form);
+  formDiv.appendChild(form);
 
   form.appendChild(header);
   form.appendChild(groupNamePtag);
   form.appendChild(groupNameInput);
   form.appendChild(participantsPtag);
   form.appendChild(participantsInput);
-  form.appendChild(searchResultDiv);
-  form.appendChild(selectedUserDiv);
-  form.appendChild(addButton);
-  form.appendChild(deleteButton);
+  form.appendChild(buttonsDiv);
+  buttonsDiv.appendChild(addButton);
+  buttonsDiv.appendChild(deleteButton);
+
+  infoDiv.appendChild(searchResultPtag);
+  infoDiv.appendChild(searchResultDiv);
+  infoDiv.appendChild(selectedUserPtag);
+  infoDiv.appendChild(selectedUserDiv);
 }
 
 function addEmailInputLitener() {
