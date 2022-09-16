@@ -48,6 +48,7 @@ const getGroup = async (req, res) => {
   } = await es.search({
     index: 'group',
     body: {
+      size: process.env.ES_SEARCH_LIMIT,
       query: {
         term: {
           participants: userId,
@@ -61,6 +62,7 @@ const getGroup = async (req, res) => {
   const {
     hits: { hits: unreadMessages },
   } = await es.search({
+    size: process.env.ES_SEARCH_LIMIT,
     query: {
       bool: {
         should: groupIds,
@@ -103,6 +105,7 @@ const getGroupParticipants = async (req, res) => {
   } = await es.search({
     index: 'group',
     body: {
+      size: process.env.ES_SEARCH_LIMIT,
       query: {
         term: { 'name.keyword': groupName },
       },
@@ -116,6 +119,7 @@ const getGroupParticipants = async (req, res) => {
   } = await es.search({
     index: 'user',
     body: {
+      size: process.env.ES_SEARCH_LIMIT,
       query: {
         bool: {
           should: usersQuery,
@@ -174,6 +178,7 @@ const updateParticipants = async (req, res) => {
   } = await es.search({
     index: 'user',
     body: {
+      size: process.env.ES_SEARCH_LIMIT,
       query: {
         match_all: {},
       },
