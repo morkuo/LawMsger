@@ -92,8 +92,33 @@ button.group-function {
   margin-bottom: 2rem;
   padding: 1rem;
   height: 35vh;
+  max-height: 40vh;
   width: 70%;
   border-radius: var(--border-radius);
+}
+
+#groupParticipantsSearchResultDiv,
+#groupSelectedUserDiv {
+  overflow-y: auto;
+  transition: height 0.3s ease;
+
+  scrollbar-color: var(--options-background-color) var(--options-hover-color);
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  direction: rtl;
+}
+#groupParticipantsSearchResultDiv::-webkit-scrollbar,
+#groupSelectedUserDiv::-webkit-scrollbar {
+  width: 0.8rem;
+}
+
+#groupParticipantsSearchResultDiv::-webkit-scrollbar-track,
+#groupSelectedUserDiv::-webkit-scrollbar-track {
+  background: var(--scrollbar-background-color);
+}
+#groupParticipantsSearchResultDiv::-webkit-scrollbar-thumb,
+#groupSelectedUserDiv::-webkit-scrollbar-thumb {
+  background-color: var(--background-color);
 }
 
 #groupParticipantsSearchResultDiv {

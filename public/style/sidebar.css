@@ -143,7 +143,6 @@
 }
 .content::-webkit-scrollbar-thumb {
   background-color: var(--background-color);
-  border-radius: 20px;
 }
 
 .footer-options {

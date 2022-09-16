@@ -258,7 +258,6 @@ p {
 
 #messages::-webkit-scrollbar-thumb {
   background-color: var(--background-color);
-  border-radius: 20px;
 }
 
 #messages > li {
