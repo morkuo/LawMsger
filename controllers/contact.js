@@ -78,6 +78,7 @@ const getStarContacts = async (req, res) => {
   } = await es.search({
     index: 'user',
     body: {
+      size: process.env.ES_SEARCH_LIMIT,
       query: {
         terms: {
           _id: stars,
