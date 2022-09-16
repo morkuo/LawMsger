@@ -1,0 +1,56 @@
+@font-face {
+  font-family: ChiKareGo2;
+  src: url('../fonts/ChiKareGo2.ttf') format('truetype');
+}
+
+div.admin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto 4rem;
+  height: 70vh;
+  border: 1px solid #6d665b;
+  border-radius: var(--border-radius);
+}
+
+form.admin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 4rem;
+  min-width: 27vw;
+  height: 50vh;
+}
+
+form.admin:first-child {
+  border-top-left-radius: var(--border-radius);
+  border-bottom-left-radius: var(--border-radius);
+}
+
+form.admin:last-child {
+  border-top-right-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+}
+
+h3.admin {
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  cursor: default;
+}
+
+input.admin,
+button.admin {
+  background-color: #2b2a33;
+  color: white;
+  border: 1px solid grey;
+  border-radius: 3px;
+  padding: 0.1rem 0.2rem;
+  max-width: 15vw;
+}
+
+button.admin {
+  margin-top: auto;
+  padding: 0.22rem 0.7rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}

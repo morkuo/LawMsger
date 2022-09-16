@@ -24,7 +24,7 @@ function drawCreateUserForm() {
   passwordInput.setAttribute('type', 'password');
 
   addClass(
-    'auth',
+    'admin',
     signUpDiv,
     header,
     form,
@@ -113,7 +113,7 @@ function drawDeleteUserForm() {
 
   button.innerText = 'Delete';
 
-  addClass('auth', header, form, emailPTag, emailInput, button);
+  addClass('admin', header, form, emailPTag, emailInput, button);
 
   const signUpApi = `${window.location.origin}/api/1.0/user`;
 
