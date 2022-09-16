@@ -12,6 +12,7 @@
   --background-color: rgb(21, 21, 22);
   --options-background-color: rgb(80, 80, 93);
   --options-hover-color: rgb(126, 126, 138);
+  --scrollbar-background-color: rgb(46, 46, 55);
   --success-background-color: rgb(145, 189, 157);
   --error-background-color: pink;
   --border-radius: 10px;
@@ -243,9 +244,21 @@ p {
   height: 90vh;
   overflow-y: auto;
 
-  scrollbar-color: var(--options-background-color) var(--options-hover-color);
   scrollbar-width: thin;
   scrollbar-gutter: stable;
+}
+
+#messages::-webkit-scrollbar {
+  width: 0.8rem;
+}
+
+#messages::-webkit-scrollbar-track {
+  background: var(--scrollbar-background-color);
+}
+
+#messages::-webkit-scrollbar-thumb {
+  background-color: var(--background-color);
+  border-radius: 20px;
 }
 
 #messages > li {

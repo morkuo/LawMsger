@@ -7,6 +7,7 @@ const getAllContacts = async (req, res) => {
   } = await es.search({
     index: 'user',
     body: {
+      size: process.env.ES_SEARCH_LIMIT,
       query: {
         match_all: {},
       },
@@ -59,6 +60,7 @@ const getStarContacts = async (req, res) => {
   } = await es.search({
     index: 'star',
     body: {
+      size: process.env.ES_SEARCH_LIMIT,
       query: {
         term: {
           user_id: req.userdata.id,

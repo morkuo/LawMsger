@@ -583,21 +583,7 @@ function collapseSidebar() {
       //get content div
       const content = headerParent.querySelector('.content');
 
-      //get current total height of current content element
-      const contentChildren = content.children;
-      let totalHeight = 0;
-
-      for (let child of contentChildren) {
-        const style = window.getComputedStyle(child);
-        const marginTop = +style.marginTop.slice(0, style.marginTop.indexOf('px'));
-        const marginBottom = +style.marginBottom.slice(0, style.marginBottom.indexOf('px'));
-
-        totalHeight += child.offsetHeight;
-        totalHeight += marginTop;
-        totalHeight += marginBottom;
-      }
-
-      content.setAttribute('style', 'height: ' + totalHeight + 'px');
+      content.setAttribute('style', 'height: ' + 65 + 'vh');
 
       const symbol = headerParent.querySelector('.collapse-symbol');
       symbol.classList.toggle('active');

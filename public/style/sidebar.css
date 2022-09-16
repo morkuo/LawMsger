@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   min-width: 20%;
+  max-height: 100%;
 }
 
 #sidebar .header {
@@ -43,7 +44,6 @@
 }
 
 #all {
-  max-height: 50%;
   background-color: rgb(21, 21, 22);
 }
 
@@ -55,6 +55,7 @@
   border-radius: var(--border-radius);
   cursor: pointer;
   background-color: var(--sidebar-options-background-color);
+  direction: ltr;
 }
 
 .contact:hover,
@@ -125,8 +126,24 @@
 }
 
 .content {
-  overflow: hidden;
+  overflow-y: auto;
   transition: height 0.3s ease;
+
+  scrollbar-color: var(--options-background-color) var(--options-hover-color);
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  direction: rtl;
+}
+.content::-webkit-scrollbar {
+  width: 0.8rem;
+}
+
+.content::-webkit-scrollbar-track {
+  background: var(--scrollbar-background-color);
+}
+.content::-webkit-scrollbar-thumb {
+  background-color: var(--background-color);
+  border-radius: 20px;
 }
 
 .footer-options {
