@@ -58,6 +58,17 @@
   cursor: pointer;
 }
 
+.chat-sender-picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 3rem;
+  height: 3rem;
+  min-width: 3rem;
+  min-height: 3rem;
+  border: 1px solid black;
+}
+
 .chat-message-image-preview,
 .chat-message-file-preview,
 .chat-upload-image-preview,
@@ -84,4 +95,8 @@
 .chat-message-image-preview,
 .chat-message-file-preview {
   cursor: pointer;
+}
+
+.chat-message-time {
+  min-width: 7.5rem;
 }

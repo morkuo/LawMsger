@@ -10,7 +10,7 @@
 
 :root {
   --background-color: rgb(21, 21, 22);
-  --options-background-color: rgb(34, 34, 38);
+  --options-background-color: rgb(80, 80, 93);
   --options-hover-color: rgb(126, 126, 138);
   --border-radius: 10px;
 }
@@ -142,8 +142,6 @@ a {
   height: 9.5vh;
   width: 100%;
   padding: 0.7rem 0.25rem;
-
-  border-top: 1px solid black;
   background: rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(10px);
   background-color: white;
@@ -206,6 +204,10 @@ a {
   padding: 0;
   height: 90vh;
   overflow-y: auto;
+
+  scrollbar-color: var(--options-background-color) var(--options-hover-color);
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
 }
 
 #messages > li {
@@ -218,19 +220,6 @@ chat-unread-message #messages > li div {
   min-width: 3rem;
   min-height: 3rem;
   justify-content: center;
-}
-
-.chat-sender-picture {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 3rem;
-  height: 3rem;
-  border: 1px solid black;
-}
-
-#messages > li:nth-child(odd) {
-  background: #efefef;
 }
 
 #messages > li.chat-unread-message {

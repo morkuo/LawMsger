@@ -173,9 +173,8 @@ socket.on(
       filesInfo,
       true
     );
-
     //append message from the sender to chat window
-    setMessage(msg, Date.now(), fromSocketId, null, filesInfo, 'read');
+    setMessage(msg, Date.now(), fromUserId, null, filesInfo, 'read', fromUserName);
   }
 );
 
@@ -206,7 +205,7 @@ socket.on(
     socket.emit('checkGroupChatWindow', userId, messageId);
 
     //append message from the sender to chat window
-    setMessage(msg, Date.now(), fromSocketId, null, filesInfo, 'read');
+    setMessage(msg, Date.now(), fromUserId, null, filesInfo, 'read', fromUserName);
   }
 );
 

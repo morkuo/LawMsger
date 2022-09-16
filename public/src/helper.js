@@ -45,7 +45,7 @@ function getJwtToken() {
   return authorization;
 }
 
-async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead) {
+async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead, senderName) {
   const messages = document.getElementById('messages');
 
   if (!messages) return;
@@ -54,6 +54,8 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead) {
 
   const senderDiv = document.createElement('div');
   const messageDiv = document.createElement('div');
+  const messageWrapper = document.createElement('div');
+  const messageName = document.createElement('div');
   const messageText = document.createElement('p');
   const filesDiv = document.createElement('div');
   const timeDiv = document.createElement('div');
@@ -62,6 +64,7 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead) {
   const relativeTime = changeTimeFormat(time);
   timeDiv.innerText = relativeTime;
 
+  messageName.innerText = senderName;
   senderDiv.setAttribute('class', 'chat-sender-picture');
   messageDiv.setAttribute('class', 'chat-message-text');
   timeDiv.setAttribute('class', 'chat-message-time');
@@ -71,9 +74,12 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead) {
   item.appendChild(messageDiv);
   item.appendChild(timeDiv);
 
+  messageDiv.appendChild(messageWrapper);
+  messageWrapper.appendChild(messageName);
+
   if (msg !== '') {
     messageText.innerText = msg;
-    messageDiv.appendChild(messageText);
+    messageWrapper.appendChild(messageText);
   }
 
   if (filesInfo) {
@@ -104,7 +110,7 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead) {
         }
       }
 
-      messageDiv.appendChild(filesDiv);
+      messageWrapper.appendChild(filesDiv);
     }
   }
 
@@ -119,10 +125,7 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead) {
     return;
   }
 
-  const contactDiv = document.querySelector(`.contacts [data-socket-id="${senderSocketId}"]`);
-  const contactPictureDiv = contactDiv.querySelector('.contact-picture');
-
-  senderDiv.innerText = contactPictureDiv.innerText;
+  senderDiv.innerText = senderName[0].toUpperCase();
   if (!more) messages.scrollTo(0, messages.scrollHeight);
   return;
 }

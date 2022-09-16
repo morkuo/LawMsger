@@ -28,6 +28,9 @@ async function chatListener(e) {
     targetContact = targetContact.parentElement;
   }
 
+  const userId = localStorage.getItem('id');
+  const userName = document.querySelector('#userInfo h2');
+
   //remove unread count
   const unreadCountDivs = document.querySelectorAll(
     `.contacts [data-id="${targetContact.dataset.id}"] .contact-unread-count`
@@ -43,15 +46,24 @@ async function chatListener(e) {
 
   for (let i = history.length - 1; i >= 0; i--) {
     if (history[i].sender_id !== targetContact.dataset.id) {
-      setMessage(history[i].message, history[i].created_at, null, null, history[i].files, 'read');
+      setMessage(
+        history[i].message,
+        history[i].created_at,
+        null,
+        null,
+        history[i].files,
+        'read',
+        history[i].sender_name
+      );
     } else {
       setMessage(
         history[i].message,
         history[i].created_at,
-        targetContact.dataset.socketId,
+        targetContact.dataset.id,
         null,
         history[i].files,
-        history[i].isRead
+        history[i].isRead,
+        history[i].sender_name
       );
     }
   }
@@ -74,15 +86,16 @@ async function chatListener(e) {
 
       for (let msg of moreMessages) {
         if (msg.sender_id !== targetContact.dataset.id) {
-          setMessage(msg.message, msg.created_at, null, 'more', msg.files, 'read');
+          setMessage(msg.message, msg.created_at, null, 'more', msg.files, 'read', msg.sender_name);
         } else {
           setMessage(
             msg.message,
             msg.created_at,
-            targetContact.dataset.socketId,
+            targetContact.dataset.id,
             'more',
             msg.files,
-            msg.isRead
+            msg.isRead,
+            msg.sender_name
           );
         }
       }
@@ -128,7 +141,9 @@ async function chatListener(e) {
 
       socket.emit('msg', input.value, contactUserSocketId, contactUserId, contactName, filesInfo);
 
-      setMessage(input.value, Date.now(), null, null, filesInfo, 'read');
+      console.log(userId);
+
+      setMessage(input.value, Date.now(), userId, null, filesInfo, 'read', userName.innerText);
 
       input.value = '';
     }
@@ -145,14 +160,15 @@ async function groupChatListener(e) {
     targetContact = targetContact.parentElement;
   }
 
-  console.log(targetContact);
-
   //remove unread count
   const unreadCountDiv = targetContact.querySelector('.group-unread-count');
 
   unreadCountDiv.innerText = '';
 
   drawChatWindow(targetContact.dataset.id, targetContact.dataset.socketId);
+
+  const userId = localStorage.getItem('id');
+  const userName = document.querySelector('#userInfo h2');
 
   //append history message to chat window
   const { data: history } = await getGroupMessages(targetContact.dataset.socketId);
@@ -168,13 +184,22 @@ async function groupChatListener(e) {
       setMessage(
         history[i].message,
         history[i].created_at,
-        contactDiv.dataset.socketId,
+        contactDiv.dataset.id,
         null,
         history[i].files,
-        isRead
+        isRead,
+        history[i].sender_name
       );
     } else {
-      setMessage(history[i].message, history[i].created_at, null, null, history[i].files, 'read');
+      setMessage(
+        history[i].message,
+        history[i].created_at,
+        null,
+        null,
+        history[i].files,
+        'read',
+        history[i].sender_name
+      );
     }
   }
 
@@ -190,8 +215,6 @@ async function groupChatListener(e) {
       let oldestMessageTimeDiv = messages.querySelector('li:first-child .chat-message-time');
       let baselineTime = oldestMessageTimeDiv.dataset.rawTime;
 
-      console.log(baselineTime);
-
       const { data: moreMessages } = await getGroupMessages(
         targetContact.dataset.socketId,
         baselineTime
@@ -200,16 +223,17 @@ async function groupChatListener(e) {
       if (moreMessages.length === 0) return setMsg('No More Messages');
 
       for (let msg of moreMessages) {
-        if (msg.sender_id !== targetContact.dataset.id) {
-          setMessage(msg.message, msg.created_at, null, 'more', msg.files, 'read');
+        if (msg.sender_id === userId) {
+          setMessage(msg.message, msg.created_at, null, 'more', msg.files, 'read', msg.sender_name);
         } else {
           setMessage(
             msg.message,
             msg.created_at,
-            targetContact.dataset.socketId,
+            msg.sender_id,
             'more',
             msg.files,
-            msg.isRead
+            msg.isRead,
+            msg.sender_name
           );
         }
       }
@@ -238,9 +262,6 @@ async function groupChatListener(e) {
     const contactUserId = messages.dataset.id;
     const contactDiv = document.querySelector(`[data-id="${contactUserId}"]`);
 
-    // const contactNameDiv = contactDiv.querySelector('.contact-info div:first-child');
-    // const contactName = contactNameDiv.innerText;
-
     const uploadButton = document.querySelector('#chatUploadButton');
 
     if (input.value || uploadButton.value) {
@@ -249,13 +270,13 @@ async function groupChatListener(e) {
 
       if (response.error) return alert(response.error);
 
-      // console.log('Got fileUrls from server:', rawfileUrls);
-
       const filesInfo = JSON.stringify(response);
 
       socket.emit('groupmsg', input.value, contactUserSocketId, filesInfo);
 
-      setMessage(input.value, Date.now(), null, null, filesInfo, 'read');
+      console.log(userId);
+
+      setMessage(input.value, Date.now(), userId, null, filesInfo, 'read', userName.innerText);
 
       input.value = '';
     }
