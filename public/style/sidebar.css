@@ -6,7 +6,7 @@
   background-color: var(--background-color);
   display: flex;
   flex-direction: column;
-  min-width: 20%;
+  min-width: 23%;
   max-height: 100%;
 }
 

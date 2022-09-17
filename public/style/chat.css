@@ -91,5 +91,7 @@
 }
 
 .chat-message-time {
-  min-width: 7.5rem;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 9.5rem;
 }
