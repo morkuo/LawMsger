@@ -241,6 +241,9 @@ async function setParticipantsInfoToGroup(groups) {
       titleAttribute += `${user.name} - ${user.email}\n`;
     }
 
+    const lastLineBreak = titleAttribute.lastIndexOf('\n');
+    titleAttribute = titleAttribute.slice(0, lastLineBreak);
+
     groupDiv.setAttribute('title', titleAttribute);
   }
 }
