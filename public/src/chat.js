@@ -334,7 +334,7 @@ function drawChatWindow(targetContactUserId, targetContactSocketId) {
   inputWrapper.appendChild(sendButton);
   sendButton.appendChild(sendButtonWrapper);
 
-  pane.appendChild(previewImageDiv);
+  inputWrapper.appendChild(previewImageDiv);
   previewImageDiv.appendChild(unloadButton);
 
   addUploadFileListener();
