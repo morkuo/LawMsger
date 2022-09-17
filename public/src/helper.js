@@ -101,6 +101,7 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead, se
         if (isImage(originalName)) {
           const aTag = document.createElement('a');
           aTag.setAttribute('href', `${url}`);
+          aTag.setAttribute('target', `_blank`);
 
           const image = document.createElement('img');
           image.setAttribute('class', 'chat-message-image-preview');
@@ -113,6 +114,7 @@ async function setMessage(msg, time, senderSocketId, more, filesInfo, isRead, se
           const file = document.createElement('a');
           file.setAttribute('class', 'chat-message-file-preview');
           file.setAttribute('href', `${url}`);
+          file.setAttribute('target', `_blank`);
           file.setAttribute('download', `testname`);
           file.innerText = originalName;
           filesDiv.appendChild(file);
