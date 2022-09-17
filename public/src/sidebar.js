@@ -174,6 +174,7 @@ function drawContactDivs(contacts, category) {
     contactDiv.setAttribute('data-id', contact.id);
     if (contact.socket_id === undefined || null) contact.socket_id = '';
     contactDiv.setAttribute('data-socket-id', contact.socket_id);
+    contactDiv.setAttribute('title', contact.email);
 
     if (contact.socket_id) statusDiv.classList.add('on');
 
