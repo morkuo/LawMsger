@@ -587,7 +587,7 @@ function collapseSidebar() {
       //get content div
       const content = headerParent.querySelector('.content');
 
-      content.setAttribute('style', 'height: ' + 65 + 'vh');
+      content.setAttribute('style', 'height: ' + 60 + 'vh');
 
       const symbol = headerParent.querySelector('.collapse-symbol');
       symbol.classList.toggle('active');
