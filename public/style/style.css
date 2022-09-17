@@ -118,7 +118,7 @@ p {
   max-width: 100%;
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
-  background-color: var(--options-background-color);
+  background-color: var(--background-color);
   color: white;
   cursor: pointer;
   visibility: hidden;
@@ -129,7 +129,8 @@ p {
   visibility: visible;
 }
 
-#suggestions td {
+#suggestions td,
+#suggestions li {
   padding: 0 0.4rem;
   font-size: 1rem;
 }

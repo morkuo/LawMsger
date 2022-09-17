@@ -69,7 +69,7 @@ async function matchedClauses(input) {
   const matchclauses = result.map(option => ({
     title: option._source.title,
     number: option._source.number,
-    body: option._source.body,
+    body: option._source.body.replace(`${option._source.title}${option._source.number}：`, ''),
   }));
 
   return matchclauses;

@@ -449,12 +449,12 @@ async function detectInput(e) {
     suggestionsList.addEventListener(
       'click',
       async e => {
-        let targetContact = e.target;
-        while (!targetContact.hasAttribute('data-body')) {
-          targetContact = targetContact.parentElement;
+        let targetClause = e.target;
+        while (!targetClause.hasAttribute('data-body')) {
+          targetClause = targetClause.parentElement;
         }
 
-        input.value = currentInput.slice(0, clauseSuggestion) + targetContact.dataset.body;
+        input.value = currentInput.slice(0, clauseSuggestion) + targetClause.dataset.body;
 
         suggestionsList.innerHTML = '';
 
@@ -466,45 +466,51 @@ async function detectInput(e) {
     return;
   }
 
-  //tab listener
-  input.addEventListener(
-    'keydown',
-    async e => {
-      if (e.key === 'Tab') {
-        e.preventDefault();
-
-        const suggestion = suggestionsList.querySelector('li');
-
-        e.target.value = currentInput.slice(0, matchclausesContent) + suggestion.dataset.body;
-        suggestionsList.innerHTML = '';
-
-        const title = suggestion.dataset.title;
-        const number = suggestion.dataset.number;
-
-        const now = new Date();
-        const origin = now.toISOString();
-
-        socket.emit('updateMatchedClauses', origin, title, number);
-        suggestionsList.classList.remove('on');
-      }
-    },
-    { once: true }
-  );
-
   if (matchclausesContent > -1) {
     socket.emit('matchedClauses', currentInput.slice(matchclausesContent + 1));
 
     suggestionsList.addEventListener(
       'click',
       async e => {
-        if (e.target.tagName === 'LI') {
-          e.stopPropagation();
-          input.value = currentInput.slice(0, matchclausesContent) + e.target.dataset.body;
+        let targetClause = e.target;
+        while (!targetClause.hasAttribute('data-body')) {
+          targetClause = targetClause.parentElement;
+        }
 
+        input.value = `${currentInput.slice(0, matchclausesContent)}${
+          targetClause.dataset.title
+        }第${targetClause.dataset.number}條：「${targetClause.dataset.body}」`;
+
+        suggestionsList.innerHTML = '';
+
+        const title = targetClause.dataset.title;
+        const number = targetClause.dataset.number;
+
+        const now = new Date();
+        const origin = now.toISOString();
+
+        socket.emit('updateMatchedClauses', origin, title, number);
+        suggestionsList.classList.remove('on');
+      },
+      { once: true }
+    );
+
+    //tab listener
+    input.addEventListener(
+      'keydown',
+      async e => {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+
+          const suggestion = suggestionsList.querySelector('tr');
+
+          e.target.value = `${currentInput.slice(0, matchclausesContent)}${
+            suggestion.dataset.title
+          }第${suggestion.dataset.number}條：「${suggestion.dataset.body}」`;
           suggestionsList.innerHTML = '';
 
-          const title = e.target.dataset.title;
-          const number = e.target.dataset.number;
+          const title = suggestion.dataset.title;
+          const number = suggestion.dataset.number;
 
           const now = new Date();
           const origin = now.toISOString();

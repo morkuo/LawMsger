@@ -70,6 +70,7 @@ socket.on('clauses', suggestions => {
   if (suggestions.length === 0) return;
 
   const table = document.createElement('table');
+  suggestionsList.appendChild(table);
 
   for (let suggestion of suggestions) {
     const clauseTitle = suggestion.title;
@@ -99,7 +100,6 @@ socket.on('clauses', suggestions => {
       row.setAttribute('data-body', clauseBody);
     }
 
-    suggestionsList.appendChild(table);
     table.appendChild(row);
   }
 
@@ -113,28 +113,42 @@ socket.on('matchedClauses', suggestions => {
 
   if (suggestions.length === 0) return;
 
+  const table = document.createElement('table');
+  suggestionsList.appendChild(table);
+
   for (let suggestion of suggestions) {
-    const li = document.createElement('li');
+    const clauseTitle = suggestion.title;
+    const clauseBody = suggestion.body;
+    const clauseNumber = suggestion.number;
 
-    if (suggestion) {
-      const clauseTitle = suggestion.title;
-      const clauseBody = suggestion.body;
-      const clauseNumber = suggestion.number;
+    const row = document.createElement('tr');
+    const title = document.createElement('td');
+    const number = document.createElement('td');
+    const body = document.createElement('td');
 
-      if (clauseBody.length > 50) {
-        li.innerText = `${clauseBody.slice(0, 50)}...`;
-        li.setAttribute('data-body', clauseBody);
-        li.setAttribute('data-title', clauseTitle);
-        li.setAttribute('data-number', clauseNumber);
-      } else {
-        li.innerText = `${clauseBody}`;
-        li.setAttribute('data-body', clauseBody);
-        li.setAttribute('data-title', clauseTitle);
-        li.setAttribute('data-number', clauseNumber);
-      }
-    } else li.innerText = suggestion;
+    row.appendChild(title);
+    row.appendChild(number);
+    row.appendChild(body);
 
-    suggestionsList.appendChild(li);
+    if (clauseBody.length > 50) {
+      title.innerText = clauseTitle;
+      number.innerText = clauseNumber;
+      body.innerText = `${clauseBody.slice(0, 50)}...`;
+
+      row.setAttribute('data-body', clauseBody);
+      row.setAttribute('data-title', clauseTitle);
+      row.setAttribute('data-number', clauseNumber);
+    } else {
+      title.innerText = clauseTitle;
+      number.innerText = clauseNumber;
+      body.innerText = `${clauseBody}`;
+
+      row.setAttribute('data-body', clauseBody);
+      row.setAttribute('data-title', clauseTitle);
+      row.setAttribute('data-number', clauseNumber);
+    }
+
+    table.appendChild(row);
   }
 
   suggestionsList.classList.add('on');
