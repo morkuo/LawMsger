@@ -104,8 +104,6 @@
 .contact-status {
   width: 0.75rem;
   background-color: grey;
-  border-top-left-radius: var(--border-radius);
-  border-bottom-left-radius: var(--border-radius);
 }
 
 .contact-status.on {
