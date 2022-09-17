@@ -319,8 +319,6 @@ socket.on('onlineStatus', (userId, socketId, status) => {
   }
 });
 
-//provide search users result in add group participants page
-window.selectedUser = {};
 socket.on('searchEamil', users => {
   const suggestionsList = document.getElementById('groupParticipantsSearchResultDiv');
   const selectedUserDiv = document.getElementById('groupSelectedUserDiv');

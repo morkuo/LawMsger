@@ -341,6 +341,10 @@ function drawCreateGroupForm() {
 }
 
 function drawAddAndDeleteParticipantsForm() {
+  //provide search users result in add group participants page
+  //every time user enter into this page, reset selectedUser
+  window.selectedUser = {};
+
   const pane = document.querySelector('#pane');
   const formDiv = pane.querySelector('#formDiv');
   const infoDiv = pane.querySelector('#infoDiv');

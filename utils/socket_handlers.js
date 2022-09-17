@@ -311,7 +311,7 @@ async function searchEamilHandler(io, socket) {
       body: {
         size: 5,
         query: {
-          match: { email: input },
+          prefix: { 'email.search_as_you_type': input },
         },
       },
     });
