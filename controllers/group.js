@@ -37,7 +37,12 @@ const createGroup = async (req, res) => {
     },
   });
 
-  res.status(201).json({ data: 'created' });
+  res.status(201).json({
+    data: 'created',
+    group: {
+      id: result._id,
+    },
+  });
 };
 
 const getGroup = async (req, res) => {

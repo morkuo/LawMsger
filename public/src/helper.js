@@ -43,6 +43,14 @@ function storeUserId(userId) {
   localStorage.setItem('id', userId);
 }
 
+function storeUsername(username) {
+  localStorage.setItem('name', username);
+}
+
+function storeUserEmail(userEmail) {
+  localStorage.setItem('email', userEmail);
+}
+
 function getJwtToken() {
   let authorization = 'Bearer ';
   let tokenJson = localStorage.getItem('token');
@@ -200,4 +208,15 @@ function isImage(url) {
   return /\.(jpg|jpeg|png|gif|svg)$/.test(url);
 }
 
-export { setMsg, addClass, storeToken, storeUserId, getJwtToken, setMessage, fetchGet, isImage };
+export {
+  setMsg,
+  addClass,
+  storeToken,
+  storeUserId,
+  storeUsername,
+  storeUserEmail,
+  getJwtToken,
+  setMessage,
+  fetchGet,
+  isImage,
+};

@@ -308,6 +308,27 @@ function drawCreateGroupForm() {
 
     if (response.error) return setMsg(response.error, 'error');
 
+    const newGroup = [
+      {
+        id: response.group.id,
+        name: nameInput.value,
+        unread: 0,
+      },
+    ];
+
+    drawGroups(newGroup);
+
+    const username = localStorage.getItem('name');
+    const userEmail = localStorage.getItem('email');
+
+    const newGroupDiv = document.querySelector(`[data-socket-id="${response.group.id}"]`);
+    const titleAttribute = `${username} - ${userEmail}`;
+    newGroupDiv.setAttribute('title', titleAttribute);
+
+    socket.emit('join', newGroup);
+
+    drawDeleteGroupButton(newGroup);
+
     return setMsg(response.data);
   });
 
