@@ -60,7 +60,7 @@ async function setNavbar() {
 
   profile.name = response.data.name;
   profile.email = response.data.email;
-  profile.created_at = response.data.created_at;
+  profile.created_at = response.data.created_at.replace('T', ' ').slice(0, 16);
   profile.picture = response.data.picture;
 
   profile.addEventListener('click', drawProfile);
