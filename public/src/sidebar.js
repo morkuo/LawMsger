@@ -128,6 +128,17 @@ async function drawDeleteGroupButton(groups) {
 
       groupDiv.remove();
 
+      const messages = document.getElementById('messages');
+      if (!messages || messages.dataset.socketId !== groupId) return;
+
+      const pane = document.getElementById('pane');
+      const welcome = document.createElement('h1');
+
+      welcome.innerText = 'Welcome Aboard';
+
+      pane.innerHTML = '';
+      pane.appendChild(welcome);
+
       return setMsg(response.data);
     });
   });
