@@ -1,5 +1,5 @@
 import { addClass, setMessage } from './helper.js';
-import { drawContactDivs, drawSidebar } from './sidebar.js';
+import { drawContactDivs, drawSidebar, drawGroups, drawDeleteGroupButton } from './sidebar.js';
 
 let jwtToken = localStorage.getItem('token');
 
@@ -245,6 +245,30 @@ socket.on(
     setMessage(msg, Date.now(), fromUserId, null, filesInfo, 'read', fromUserName);
   }
 );
+
+socket.on('drawGroupDiv', (groupId, groupName, participants) => {
+  const newGroup = [
+    {
+      id: groupId,
+      name: groupName,
+      unread: 0,
+    },
+  ];
+
+  drawGroups(newGroup);
+
+  const newGroupDiv = document.querySelector(`[data-socket-id="${groupId}"]`);
+  let titleAttribute = '';
+  for (let participant of participants) {
+    titleAttribute += `${participant.name} - ${participant.email}\n`;
+  }
+
+  newGroupDiv.setAttribute('title', titleAttribute);
+
+  socket.emit('join', newGroup);
+
+  drawDeleteGroupButton(newGroup);
+});
 
 socket.on('createStarContact', response => {
   if (response.error) return;

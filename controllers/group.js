@@ -241,7 +241,12 @@ const updateParticipants = async (req, res) => {
 
   if (!resultUpdate.updated) return res.status(500).json({ error: 'server error' });
 
-  res.json({ data: 'updated' });
+  res.json({
+    data: 'updated',
+    group: {
+      id: result._id,
+    },
+  });
 };
 
 const leaveGroup = async (req, res) => {

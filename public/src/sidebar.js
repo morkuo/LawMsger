@@ -425,6 +425,10 @@ function drawAddAndDeleteParticipantsForm() {
 
     if (response.error) return setMsg(response.error, 'error');
 
+    const currentUserId = localStorage.getItem('id');
+
+    socket.emit('drawGroupDiv', userIds, currentUserId, response.group.id, groupNameInput.value);
+
     window.selectedUser = {};
     groupNameInput.value = '';
     participantsInput.value = '';
@@ -611,4 +615,4 @@ function signOutButton() {
   });
 }
 
-export { drawContactDivs, drawSidebar };
+export { drawContactDivs, drawSidebar, drawGroups, drawDeleteGroupButton };

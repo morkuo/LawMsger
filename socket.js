@@ -2,6 +2,7 @@ const { Server } = require('socket.io');
 const {
   idHandler,
   joinGroupHandler,
+  drawGroupDivHandler,
   msgHandler,
   groupMsgHandler,
   suggestionsHandler,
@@ -43,6 +44,7 @@ async function connect(server) {
     //handlers
     idHandler(io, socket);
     joinGroupHandler(io, socket);
+    drawGroupDivHandler(io, socket);
     msgHandler(io, socket);
     groupMsgHandler(io, socket);
     suggestionsHandler(io, socket);

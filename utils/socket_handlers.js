@@ -187,6 +187,42 @@ async function joinGroupHandler(io, socket) {
   // });
 }
 
+async function drawGroupDivHandler(io, socket) {
+  socket.on('drawGroupDiv', async (newParticipantsUserId, hostId, groupId, groupName) => {
+    const socketIdsOnline = newParticipantsUserId
+      .map(userId => global.hashTable[userId])
+      .filter(userId => userId !== undefined);
+
+    const participantsUserId = [hostId, ...newParticipantsUserId];
+
+    const usersQuery = participantsUserId.map(userId => ({ term: { _id: userId } }));
+
+    const {
+      hits: { hits: resultUsers },
+    } = await es.search({
+      index: 'user',
+      body: {
+        size: process.env.ES_SEARCH_LIMIT,
+        query: {
+          bool: {
+            should: usersQuery,
+          },
+        },
+      },
+    });
+
+    const participants = resultUsers.map(user => ({
+      name: user._source.name,
+      email: user._source.email,
+      picture: user._source.picture,
+    }));
+
+    if (socketIdsOnline.length !== 0) {
+      socket.to(socketIdsOnline).emit('drawGroupDiv', groupId, groupName, participants);
+    }
+  });
+}
+
 async function disconnectionHandlers(io, socket) {
   socket.on('disconnect', async () => {
     socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
@@ -330,6 +366,7 @@ async function searchEamilHandler(io, socket) {
 module.exports = {
   idHandler,
   joinGroupHandler,
+  drawGroupDivHandler,
   msgHandler,
   groupMsgHandler,
   suggestionsHandler,
