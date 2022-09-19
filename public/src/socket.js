@@ -273,6 +273,17 @@ socket.on('drawGroupDiv', (groupId, groupName, participants) => {
 socket.on('deleteGroupDiv', groupId => {
   const groupDiv = document.querySelector(`[data-socket-id="${groupId}"]`);
   groupDiv.remove();
+
+  const messages = document.getElementById('messages');
+  if (!messages || messages.dataset.socketId !== groupId) return;
+
+  const pane = document.getElementById('pane');
+  const welcome = document.createElement('h1');
+
+  welcome.innerText = 'Welcome Aboard';
+
+  pane.innerHTML = '';
+  pane.appendChild(welcome);
 });
 
 socket.on('createStarContact', response => {
