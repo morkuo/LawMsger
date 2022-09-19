@@ -223,6 +223,18 @@ async function drawGroupDivHandler(io, socket) {
   });
 }
 
+async function deleteGroupDivHandler(io, socket) {
+  socket.on('deleteGroupDiv', async (userIds, groupId) => {
+    const socketIdsOnline = userIds
+      .map(userId => global.hashTable[userId])
+      .filter(userId => userId !== undefined);
+
+    if (socketIdsOnline.length !== 0) {
+      socket.to(socketIdsOnline).emit('deleteGroupDiv', groupId);
+    }
+  });
+}
+
 async function disconnectionHandlers(io, socket) {
   socket.on('disconnect', async () => {
     socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
@@ -367,6 +379,7 @@ module.exports = {
   idHandler,
   joinGroupHandler,
   drawGroupDivHandler,
+  deleteGroupDivHandler,
   msgHandler,
   groupMsgHandler,
   suggestionsHandler,

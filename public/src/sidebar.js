@@ -468,6 +468,8 @@ function drawAddAndDeleteParticipantsForm() {
 
     if (response.error) return setMsg(response.error, 'error');
 
+    socket.emit('deleteGroupDiv', userIds, response.group.id);
+
     window.selectedUser = {};
     groupNameInput.value = '';
     participantsInput.value = '';

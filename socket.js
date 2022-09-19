@@ -3,6 +3,7 @@ const {
   idHandler,
   joinGroupHandler,
   drawGroupDivHandler,
+  deleteGroupDivHandler,
   msgHandler,
   groupMsgHandler,
   suggestionsHandler,
@@ -45,6 +46,7 @@ async function connect(server) {
     idHandler(io, socket);
     joinGroupHandler(io, socket);
     drawGroupDivHandler(io, socket);
+    deleteGroupDivHandler(io, socket);
     msgHandler(io, socket);
     groupMsgHandler(io, socket);
     suggestionsHandler(io, socket);

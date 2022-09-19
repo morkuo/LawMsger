@@ -270,6 +270,11 @@ socket.on('drawGroupDiv', (groupId, groupName, participants) => {
   drawDeleteGroupButton(newGroup);
 });
 
+socket.on('deleteGroupDiv', groupId => {
+  const groupDiv = document.querySelector(`[data-socket-id="${groupId}"]`);
+  groupDiv.remove();
+});
+
 socket.on('createStarContact', response => {
   if (response.error) return;
 

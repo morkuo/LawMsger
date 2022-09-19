@@ -217,7 +217,12 @@ const updateParticipants = async (req, res) => {
 
     if (!resultUpdate.updated) return res.status(500).json({ error: 'server error' });
 
-    return res.json({ data: 'deleted' });
+    return res.json({
+      data: 'deleted',
+      group: {
+        id: result._id,
+      },
+    });
   }
 
   //append user id to the group participants
