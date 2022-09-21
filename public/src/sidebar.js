@@ -128,6 +128,17 @@ async function drawDeleteGroupButton(groups) {
 
       groupDiv.remove();
 
+      const messages = document.getElementById('messages');
+      if (!messages || messages.dataset.socketId !== groupId) return;
+
+      const pane = document.getElementById('pane');
+      const welcome = document.createElement('h1');
+
+      welcome.innerText = 'Welcome Aboard';
+
+      pane.innerHTML = '';
+      pane.appendChild(welcome);
+
       return setMsg(response.data);
     });
   });
@@ -425,6 +436,10 @@ function drawAddAndDeleteParticipantsForm() {
 
     if (response.error) return setMsg(response.error, 'error');
 
+    const currentUserId = localStorage.getItem('id');
+
+    socket.emit('drawGroupDiv', userIds, currentUserId, response.group.id, groupNameInput.value);
+
     window.selectedUser = {};
     groupNameInput.value = '';
     participantsInput.value = '';
@@ -463,6 +478,8 @@ function drawAddAndDeleteParticipantsForm() {
     const response = await res.json();
 
     if (response.error) return setMsg(response.error, 'error');
+
+    socket.emit('deleteGroupDiv', userIds, response.group.id);
 
     window.selectedUser = {};
     groupNameInput.value = '';
@@ -611,4 +628,4 @@ function signOutButton() {
   });
 }
 
-export { drawContactDivs, drawSidebar };
+export { drawContactDivs, drawSidebar, drawGroups, drawDeleteGroupButton };
