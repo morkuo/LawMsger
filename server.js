@@ -13,7 +13,7 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use('/api/1.0', [
+app.use('/1.0', [
   require('./routes/user'),
   require('./routes/contact'),
   require('./routes/message'),
