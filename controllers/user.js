@@ -16,14 +16,18 @@ const createUser = async (req, res) => {
   }
 
   const { name, email, password } = req.body;
+  const organizationId = process.env.NEW_USER_ORGANIZATION_ID || req.userdata.organizationId;
   const picture = '';
 
-  //check whether the email exists
+  // check whether the email exists
   const resultEmail = await getUserDataByEmail(email);
   if (resultEmail) return res.status(409).json({ error: 'email exists' });
 
   // hash password
   const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+  const sql = `INSERT INTO user (email, password, organization_id) VALUES (?, ?, ?);`;
+  const [resultSql] = await promisePool.execute(sql, [email, hashedPassword, organizationId]);
 
   const result = await es.index({
     index: 'user',
@@ -32,7 +36,7 @@ const createUser = async (req, res) => {
       email,
       password: hashedPassword,
       picture,
-      role: 1,
+      role: process.env.NEW_USER_ADMIN_ROLE || 1,
       socket_id: null,
     },
   });
