@@ -22,7 +22,9 @@ const { jwtVerify } = require('./utils/helper');
 require('dotenv').config();
 
 async function connect(server) {
-  const io = new Server(server);
+  const io = new Server(server, {
+    cors: '*',
+  });
 
   console.log('Socket Server is running');
 
