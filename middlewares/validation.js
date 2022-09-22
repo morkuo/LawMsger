@@ -1,5 +1,4 @@
 const { jwtVerify } = require('../utils/helper');
-const { getUserDataByEmail } = require('../models/user');
 require('dotenv').config();
 
 async function checkJwt(req, res, next) {

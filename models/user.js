@@ -1,6 +1,14 @@
 const es = require('../utils/es');
+const { promisePool } = require('../utils/mysql');
 
-async function getUserDataByEmail(email) {
+async function getOrganizationUserDataByEmail(email, organizationId) {
+  const sql = `SELECT email FROM user WHERE email = ? AND organization_id = ?;`;
+  const [emailList] = await promisePool.execute(sql, [email, organizationId]);
+
+  return emailList;
+}
+
+async function getESUserDataByEmail(email) {
   const {
     hits: {
       hits: [result],
@@ -31,6 +39,7 @@ async function deleteUserByEmail(index, email) {
 }
 
 module.exports = {
-  getUserDataByEmail,
+  getOrganizationUserDataByEmail,
+  getESUserDataByEmail,
   deleteUserByEmail,
 };
