@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const es = require('../utils/es');
+const { promisePool } = require('../utils/mysql');
 const { jwtSign } = require('../utils/helper');
 const { getUserDataByEmail, deleteUserByEmail } = require('../models/user');
 require('dotenv').config;
