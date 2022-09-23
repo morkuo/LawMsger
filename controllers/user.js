@@ -125,13 +125,21 @@ const updateUserPassword = async (req, res) => {
   if (newPassword !== confirm) return res.status(400).json({ error: 'new password should match' });
 
   //get old password
-  const result = await getESUserDataByEmail(req.userdata.email);
+  const result = await getESUserDataByEmail(req.userdata.organizationId, req.userdata.email);
 
   //check password is correct or not
   const isCorrectPassword = await bcrypt.compare(oldPassword, result._source.password);
   if (!isCorrectPassword) return res.status(401).json({ error: 'wrong current password' });
 
   const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+  //update mysql
+  const sql = `UPDATE user SET password = ? WHERE organization_id = ? AND email = ?`;
+  const resultSql = await promisePool.execute(sql, [
+    hashedPassword,
+    req.userdata.organizationId,
+    req.userdata.email,
+  ]);
 
   const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
     index: 'user',
