@@ -7,6 +7,8 @@ const getAllContacts = async (req, res) => {
 
   const users = result.filter(user => user._id !== req.userdata.id);
 
+  console.log(users);
+
   const unreadMessagesQueryBody = users.reduce((querybody, user) => {
     querybody.push({ index: 'message' }),
       querybody.push({
