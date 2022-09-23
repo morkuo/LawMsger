@@ -1,3 +1,5 @@
+const es = require('../utils/es');
+
 async function getAllUser(organizationId) {
   const {
     hits: { hits: result },
