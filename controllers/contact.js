@@ -1,18 +1,9 @@
 const es = require('../utils/es');
+const { getAllUser } = require('../models/contact');
 require('dotenv').config;
 
 const getAllContacts = async (req, res) => {
-  const {
-    hits: { hits: result },
-  } = await es.search({
-    index: 'user',
-    body: {
-      size: process.env.ES_SEARCH_LIMIT,
-      query: {
-        match_all: {},
-      },
-    },
-  });
+  const result = await getAllUser(req.userdata.organizationId);
 
   const users = result.filter(user => user._id !== req.userdata.id);
 
@@ -33,7 +24,7 @@ const getAllContacts = async (req, res) => {
     return querybody;
   }, []);
 
-  const { responses } = await es.msearch({
+  const { responses } = await es[req.userdata.organizationId].msearch({
     body: unreadMessagesQueryBody,
   });
 
