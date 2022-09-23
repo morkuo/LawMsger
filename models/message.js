@@ -1,7 +1,7 @@
 const es = require('../utils/es');
 
-async function suggestions(input, index) {
-  const result = await es.search({
+async function suggestions(organizationId, input, index) {
+  const result = await es[organizationId].search({
     index: index || 'words',
     body: {
       suggest: {
@@ -30,13 +30,13 @@ async function suggestions(input, index) {
   return suggestions;
 }
 
-async function matchedClauses(input) {
+async function matchedClauses(organizationId, input) {
   const now = new Date();
   const origin = now.toISOString();
 
   const {
     hits: { hits: result },
-  } = await es.search({
+  } = await es[organizationId].search({
     index: 'matchedclauses',
     body: {
       size: 5,

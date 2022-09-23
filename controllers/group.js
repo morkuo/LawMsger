@@ -17,7 +17,7 @@ const createGroup = async (req, res) => {
     hits: {
       total: { value: resultCount },
     },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'group',
     body: {
       query: {
@@ -28,7 +28,7 @@ const createGroup = async (req, res) => {
 
   if (resultCount) return res.status(409).json({ error: 'group exists' });
 
-  const result = await es.index({
+  const result = await es[req.userdata.organizationId].index({
     index: 'group',
     document: {
       host: req.userdata.id,
@@ -85,7 +85,7 @@ const getGroupParticipants = async (req, res) => {
     hits: {
       hits: [result],
     },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'group',
     body: {
       size: process.env.ES_SEARCH_LIMIT,
@@ -99,7 +99,7 @@ const getGroupParticipants = async (req, res) => {
 
   const {
     hits: { hits: resultUsers },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'user',
     body: {
       size: process.env.ES_SEARCH_LIMIT,
@@ -133,7 +133,7 @@ const updateParticipants = async (req, res) => {
     hits: {
       hits: [result],
     },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'group',
     body: {
       query: {
@@ -158,7 +158,7 @@ const updateParticipants = async (req, res) => {
   //check whether userIds exist
   const {
     hits: { hits: resultUser },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'user',
     body: {
       size: process.env.ES_SEARCH_LIMIT,
@@ -175,7 +175,7 @@ const updateParticipants = async (req, res) => {
   }
 
   if (!updateType) {
-    const resultUpdate = await es.updateByQuery({
+    const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
       index: 'group',
       script: {
         source: `for(int i=0; i<ctx._source.participants.length; i++){
@@ -204,7 +204,7 @@ const updateParticipants = async (req, res) => {
   }
 
   //append user id to the group participants
-  const resultUpdate = await es.updateByQuery({
+  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
     index: 'group',
     script: {
       source: `for(int i=0; i<params.userIds.length; i++){
@@ -247,7 +247,7 @@ const leaveGroup = async (req, res) => {
     hits: {
       hits: [result],
     },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'group',
     body: {
       query: {
@@ -261,7 +261,7 @@ const leaveGroup = async (req, res) => {
 
   //if current user is the host, delete the group
   if (result._source.host === userId) {
-    const resultUpdate = await es.deleteByQuery({
+    const resultUpdate = await es[req.userdata.organizationId].deleteByQuery({
       index: 'group',
       body: {
         query: {
@@ -275,7 +275,7 @@ const leaveGroup = async (req, res) => {
     return res.json({ data: 'deleted' });
   }
 
-  const resultUpdate = await es.updateByQuery({
+  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
     index: 'group',
     script: {
       source: `for(int i=0; i<ctx._source.participants.length; i++){

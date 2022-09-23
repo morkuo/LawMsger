@@ -132,7 +132,7 @@ const updateUserPassword = async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-  const resultUpdate = await es.updateByQuery({
+  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
     index: 'user',
     script: {
       lang: 'painless',
@@ -164,11 +164,11 @@ const deleteUser = async (req, res) => {
 
   if (!resultEmail) return res.status(400).json({ error: 'email not found' });
 
-  const resultUser = await deleteUserByEmail('user', email);
+  const resultUser = await deleteUserByEmail(req.userdata.organizationId, 'user', email);
 
   if (!resultUser.deleted) return res.status(500).json({ error: 'failed' });
 
-  const resultStarred = await es.deleteByQuery({
+  const resultStarred = await es[req.userdata.organizationId].deleteByQuery({
     index: 'star',
     body: {
       query: {

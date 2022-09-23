@@ -26,8 +26,8 @@ async function getESUserDataByEmail(email, organizationId) {
   return result;
 }
 
-async function deleteUserByEmail(index, email) {
-  const result = await es.deleteByQuery({
+async function deleteUserByEmail(organizationId, index, email) {
+  const result = await es[organizationId].deleteByQuery({
     index,
     body: {
       query: {

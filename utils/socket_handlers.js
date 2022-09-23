@@ -18,7 +18,7 @@ function msgHandler(io, socket) {
         //S3 presigned url which is going to expires
         delete fileObj.location;
       });
-      await es.index({
+      await es[socket.userdata.organizationId].index({
         index: 'message',
         document: {
           sender_id: fromUserId,
@@ -56,7 +56,7 @@ function groupMsgHandler(io, socket) {
     const fromUserId = socket.userdata.id;
     const fromUserName = socket.userdata.name;
 
-    const result = await es.index({
+    const result = await es[socket.userdata.organizationId].index({
       index: 'groupmessage',
       document: {
         group_id: groupId,
@@ -108,7 +108,7 @@ async function checkChatWindowHandler(io, socket) {
 
       socket.to(targetSocketId).emit('msg', msg, fromSocketId, filesInfo);
 
-      await es.index({
+      await es[socket.userdata.organizationId].index({
         index: 'message',
         document: {
           sender_id: fromUserId,
@@ -127,7 +127,7 @@ async function checkChatWindowHandler(io, socket) {
 async function checkGroupChatWindowHandler(io, socket) {
   socket.on('checkGroupChatWindow', async (receiverUserId, messageId) => {
     //add user into isRead array
-    const result = await es.update({
+    const result = await es[socket.userdata.organizationId].update({
       index: 'groupmessage',
       id: messageId,
       script: {
@@ -156,26 +156,7 @@ async function joinGroupHandler(io, socket) {
     const groupIds = groups.map(group => group.id);
 
     socket.join(groupIds);
-
-    // console.log(`${socket.id} is in following rooms: `, socket.rooms);
-
-    // delete global.hashTable[socket.userdata.id];
-
-    // console.log('user disconnected: ' + socket.id);
   });
-
-  // socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'on');
-
-  // global.hashTable[socket.userdata.id] = socket.id;
-
-  //partial update user socket_id
-  // const result = await es.update({
-  //   index: 'user',
-  //   id: socket.userdata.id,
-  //   doc: {
-  //     socket_id: socket.id,
-  //   },
-  // });
 }
 
 async function drawGroupDivHandler(io, socket) {
@@ -190,7 +171,7 @@ async function drawGroupDivHandler(io, socket) {
 
     const {
       hits: { hits: resultUsers },
-    } = await es.search({
+    } = await es[socket.userdata.organizationId].search({
       index: 'user',
       body: {
         size: process.env.ES_SEARCH_LIMIT,
@@ -240,7 +221,7 @@ async function createStarContact(io, socket) {
   socket.on('createStarContact', async targetContactUserId => {
     const {
       hits: { hits: resultCheckDuplicate },
-    } = await es.search({
+    } = await es[socket.userdata.organizationId].search({
       index: 'star',
       body: {
         query: {
@@ -258,7 +239,7 @@ async function createStarContact(io, socket) {
       return socket.emit('createStarContact', { error: 'star exists' });
     }
 
-    const result = await es.index({
+    const result = await es[socket.userdata.organizationId].index({
       index: 'star',
       document: {
         user_id: socket.userdata.id,
@@ -276,7 +257,7 @@ async function createStarContact(io, socket) {
 
 async function deleteStarContact(io, socket) {
   socket.on('deleteStarContact', async targetContactUserId => {
-    const result = await es.deleteByQuery({
+    const result = await es[socket.userdata.organizationId].deleteByQuery({
       index: 'star',
       body: {
         query: {
@@ -304,7 +285,7 @@ async function deleteStarContact(io, socket) {
 
 async function suggestionsHandler(io, socket) {
   socket.on('suggestion', async (input, index) => {
-    const result = await suggestions(input, index);
+    const result = await suggestions(socket.userdata.organizationId, input, index);
 
     if (!index) socket.emit('suggestion', result);
     else socket.emit('clauses', result);
@@ -314,7 +295,7 @@ async function suggestionsHandler(io, socket) {
 async function matchedClausesHandler(io, socket) {
   socket.on('matchedClauses', async input => {
     if (!input) return;
-    const result = await matchedClauses(input);
+    const result = await matchedClauses(socket.userdata.organizationId, input);
 
     socket.emit('matchedClauses', result);
   });
@@ -323,7 +304,7 @@ async function matchedClausesHandler(io, socket) {
 async function updateMatchedClausesHandler(io, socket) {
   socket.on('updateMatchedClauses', async (origin, title, number) => {
     try {
-      await es.updateByQuery({
+      await es[socket.userdata.organizationId].updateByQuery({
         index: 'matchedclauses',
         script: {
           source: `ctx._source.last_searched = '${origin}'`,
@@ -345,7 +326,7 @@ async function searchEamilHandler(io, socket) {
   socket.on('searchEamil', async input => {
     const {
       hits: { hits: result },
-    } = await es.search({
+    } = await es[socket.userdata.organizationId].search({
       index: 'user',
       body: {
         size: 5,

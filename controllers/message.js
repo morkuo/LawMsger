@@ -38,7 +38,7 @@ const getHistoryMessages = async (req, res) => {
 
   const {
     hits: { hits: result },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'message',
     size: messageSize,
     sort: {
@@ -79,7 +79,7 @@ const getHistoryMessages = async (req, res) => {
   res.json(response);
 
   //after responsing messages, update isRead to true
-  const resultUpdate = await es.updateByQuery({
+  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
     index: 'message',
     script: {
       source: `ctx._source.isRead = true`,
@@ -105,7 +105,7 @@ const getMoreMessages = async (req, res) => {
 
   const {
     hits: { hits: result },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'message',
     size: 20,
     sort: {
@@ -163,7 +163,7 @@ const getGroupMoreMessages = async (req, res) => {
 
   const {
     hits: { hits: result },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'groupmessage',
     size: 20,
     sort: {
@@ -202,7 +202,7 @@ const getGroupHistoryMessages = async (req, res) => {
     hits: {
       hits: [resultUser],
     },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'group',
     sort: {
       'created_at': 'desc',
@@ -218,7 +218,7 @@ const getGroupHistoryMessages = async (req, res) => {
 
   const {
     hits: { hits: result },
-  } = await es.search({
+  } = await es[req.userdata.organizationId].search({
     index: 'groupmessage',
     size: messageSize,
     sort: {
@@ -242,7 +242,7 @@ const getGroupHistoryMessages = async (req, res) => {
     .map(msg => ({ term: { _id: msg._id } }));
 
   // after responsing messages, update isRead, add current user into isRead
-  const resultUpdate = await es.updateByQuery({
+  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
     index: 'groupmessage',
     script: {
       source: `if(!ctx._source.isRead.contains(params.user_id)){ctx._source.isRead.add(params.user_id)}`,
