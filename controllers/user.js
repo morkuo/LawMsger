@@ -36,6 +36,8 @@ const createUser = async (req, res) => {
   const sql = `INSERT INTO user (email, password, organization_id) VALUES (?, ?, ?);`;
   const [resultSql] = await promisePool.execute(sql, [email, hashedPassword, organizationId]);
 
+  console.log(es);
+
   const result = await es[organizationId].index({
     index: 'user',
     document: {
