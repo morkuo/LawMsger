@@ -1,6 +1,6 @@
-const e = require('cors');
 const { validationResult, check } = require('express-validator');
 const es = require('../utils/es');
+const { getParticipatedGroups, getUnreadGroupMessage } = require('../models/group');
 require('dotenv').config;
 
 const createGroup = async (req, res) => {
@@ -48,33 +48,11 @@ const createGroup = async (req, res) => {
 const getGroup = async (req, res) => {
   const userId = req.userdata.id;
 
-  const {
-    hits: { hits: result },
-  } = await es.search({
-    index: 'group',
-    body: {
-      size: process.env.ES_SEARCH_LIMIT,
-      query: {
-        term: {
-          participants: userId,
-        },
-      },
-    },
-  });
+  const result = await getParticipatedGroups(req.userdata.organizationId, userId);
 
   const groupIds = result.map(group => ({ term: { group_id: group._id } }));
 
-  const {
-    hits: { hits: unreadMessages },
-  } = await es.search({
-    size: process.env.ES_SEARCH_LIMIT,
-    query: {
-      bool: {
-        should: groupIds,
-        must_not: { term: { isRead: userId } },
-      },
-    },
-  });
+  const unreadMessages = await getUnreadGroupMessage(req.userdata.organizationId, userId, groupIds);
 
   let unreadMessagesCount = {};
   unreadMessages.forEach(msg => {
