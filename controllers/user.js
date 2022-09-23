@@ -68,7 +68,7 @@ const signIn = async (req, res) => {
   //get current user's organization id
   if (!resultSql[0]) return res.status(401).json({ error: 'wrong email or password' });
   const { organization_id: organizationId } = resultSql[0];
-  const result = await getESUserDataByEmail(email, organizationId);
+  const result = await getESUserDataByEmail(organizationId, email);
 
   //email does not exist
   if (!resultSql.length) return res.status(401).json({ error: 'wrong email or password' });
