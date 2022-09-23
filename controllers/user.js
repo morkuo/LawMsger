@@ -58,16 +58,22 @@ const signIn = async (req, res) => {
     return res.status(400).json({ error: errors.array() });
   }
 
-  const { email, password } = req.body;
+  const { email, password, organizationName } = req.body;
 
   //check whether the email exists
+  const sql = `SELECT * FROM user JOIN organization ON user.organization_id = organization.id WHERE user.email = ? AND organization.name = ?;`;
+  const [resultSql] = await promisePool.execute(sql, [email, organizationName]);
+
   const result = await getESUserDataByEmail(email);
 
+  console.log(resultSql);
+
   //email does not exist
+  if (!resultSql.length) return res.status(401).json({ error: 'wrong email or password' });
   if (!result) return res.status(401).json({ error: 'wrong email or password' });
 
   //check password is correct or not
-  const isCorrectPassword = await bcrypt.compare(password, result._source.password);
+  const isCorrectPassword = await bcrypt.compare(password, resultSql[0].password);
   if (!isCorrectPassword) return res.status(401).json({ error: 'wrong email or password' });
 
   // Generate Token String
@@ -77,6 +83,7 @@ const signIn = async (req, res) => {
     email: result._source.email,
     picture: result._source.picture,
     role: result._source.role,
+    organizationId: resultSql[0].id,
     created_at: result._source.created_at,
   };
 
