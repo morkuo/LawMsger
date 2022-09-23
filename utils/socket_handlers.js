@@ -324,6 +324,8 @@ async function updateMatchedClausesHandler(io, socket) {
 
 async function searchEamilHandler(io, socket) {
   socket.on('searchEamil', async input => {
+    console.log('current organizationId: ' + socket.userdata.organizationId);
+
     const {
       hits: { hits: result },
     } = await es[socket.userdata.organizationId].search({
