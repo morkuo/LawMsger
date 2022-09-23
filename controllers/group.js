@@ -61,13 +61,15 @@ const getGroup = async (req, res) => {
     else unreadMessagesCount[msg._source.group_id]++;
   });
 
-  const groups = result.map(group => ({
-    id: group._id,
-    host: group._source.host,
-    name: group._source.name,
-    participants: group._source.participants,
-    unread: unreadMessagesCount[group._id] || 0,
-  }));
+  const groups = result
+    .map(group => ({
+      id: group._id,
+      host: group._source.host,
+      name: group._source.name,
+      participants: group._source.participants,
+      unread: unreadMessagesCount[group._id] || 0,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   res.json(groups);
 };
