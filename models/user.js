@@ -8,12 +8,12 @@ async function getOrganizationUserDataByEmail(email, organizationId) {
   return emailList;
 }
 
-async function getESUserDataByEmail(email) {
+async function getESUserDataByEmail(email, organizationId) {
   const {
     hits: {
       hits: [result],
     },
-  } = await es.search({
+  } = await es[organizationId].search({
     index: 'user',
     body: {
       query: {

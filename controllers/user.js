@@ -64,9 +64,9 @@ const signIn = async (req, res) => {
   const sql = `SELECT * FROM user JOIN organization ON user.organization_id = organization.id WHERE user.email = ? AND organization.name = ?;`;
   const [resultSql] = await promisePool.execute(sql, [email, organizationName]);
 
-  const result = await getESUserDataByEmail(email);
-
-  console.log(resultSql);
+  //get current user's organization id
+  const { organization_id: organizationId } = resultSql[0];
+  const result = await getESUserDataByEmail(email, organizationId);
 
   //email does not exist
   if (!resultSql.length) return res.status(401).json({ error: 'wrong email or password' });
