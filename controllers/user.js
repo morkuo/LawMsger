@@ -161,7 +161,7 @@ const deleteUser = async (req, res) => {
   const { email } = req.body;
 
   //check whether the email exists
-  const resultEmail = await getESUserDataByEmail(email);
+  const resultEmail = await getESUserDataByEmail(req.userdata.organizationId, email);
 
   if (!resultEmail) return res.status(400).json({ error: 'email not found' });
 

@@ -8,7 +8,7 @@ async function getOrganizationUserDataByEmail(email, organizationId) {
   return emailList;
 }
 
-async function getESUserDataByEmail(email, organizationId) {
+async function getESUserDataByEmail(organizationId, email) {
   const {
     hits: {
       hits: [result],
