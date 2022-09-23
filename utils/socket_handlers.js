@@ -147,15 +147,6 @@ async function idHandler(io, socket) {
 
   global.hashTable[socket.userdata.id] = socket.id;
 
-  //partial update user socket_id
-  const result = await es.update({
-    index: 'user',
-    id: socket.userdata.id,
-    doc: {
-      socket_id: socket.id,
-    },
-  });
-
   console.log('new socket connected: ' + socket.id);
   // console.log('new connection. all connected sockets: ', io.allSockets());
 }
