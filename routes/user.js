@@ -31,8 +31,8 @@ router
         `min length: ${process.env.AUTH_USERNAME_MIN_LENGTH}, max length: ${process.env.AUTH_USERNAME_MAX_LENGTH}`
       )
       .bail()
-      .isAlphanumeric()
-      .withMessage('only english letters and number'),
+      .isAlpha()
+      .withMessage('only english letters'),
     check('email')
       .isEmail()
       .withMessage('wrong email format')
