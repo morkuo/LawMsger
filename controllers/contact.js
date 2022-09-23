@@ -1,5 +1,5 @@
 const es = require('../utils/es');
-const { getAllUser } = require('../models/contact');
+const { getAllUser, getStarredUser, getStarredUserData } = require('../models/contact');
 require('dotenv').config;
 
 const getAllContacts = async (req, res) => {
@@ -46,37 +46,13 @@ const getAllContacts = async (req, res) => {
 };
 
 const getStarContacts = async (req, res) => {
-  const {
-    hits: { hits: resultStar },
-  } = await es.search({
-    index: 'star',
-    body: {
-      size: process.env.ES_SEARCH_LIMIT,
-      query: {
-        term: {
-          user_id: req.userdata.id,
-        },
-      },
-    },
-  });
+  const resultStar = await getStarredUser(req.userdata.organizationId, req.userdata.id);
 
   if (resultStar.length === 0) return res.json(resultStar);
 
   const stars = resultStar.map(star => star._source.contact_user_id);
 
-  const {
-    hits: { hits: resultStarDetail },
-  } = await es.search({
-    index: 'user',
-    body: {
-      size: process.env.ES_SEARCH_LIMIT,
-      query: {
-        terms: {
-          _id: stars,
-        },
-      },
-    },
-  });
+  const resultStarDetail = await getStarredUserData(req.userdata.organizationId, stars);
 
   if (stars.length === 0) return res.json(stars);
 
@@ -97,7 +73,7 @@ const getStarContacts = async (req, res) => {
     return querybody;
   }, []);
 
-  const { responses } = await es.msearch({
+  const { responses } = await es[req.userdata.organizationId].msearch({
     body: unreadMessagesQueryBody,
   });
 
