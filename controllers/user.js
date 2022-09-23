@@ -43,7 +43,7 @@ const createUser = async (req, res) => {
       email,
       password: hashedPassword,
       picture,
-      role: process.env.NEW_USER_ADMIN_ROLE || 1,
+      role: +process.env.NEW_USER_ADMIN_ROLE || 1,
       socket_id: null,
     },
   });
