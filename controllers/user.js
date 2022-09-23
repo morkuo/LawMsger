@@ -27,6 +27,8 @@ const createUser = async (req, res) => {
   const emailList = await getOrganizationUserDataByEmail(email, organizationId);
   if (emailList.length !== 0) return res.status(409).json({ error: 'email exists' });
 
+  console.log(es);
+
   const resultEmail = await getESUserDataByEmail(email);
   if (resultEmail) return res.status(409).json({ error: 'email exists' });
 
@@ -35,8 +37,6 @@ const createUser = async (req, res) => {
 
   const sql = `INSERT INTO user (email, password, organization_id) VALUES (?, ?, ?);`;
   const [resultSql] = await promisePool.execute(sql, [email, hashedPassword, organizationId]);
-
-  console.log(es);
 
   const result = await es[organizationId].index({
     index: 'user',
