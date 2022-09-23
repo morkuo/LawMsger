@@ -5,6 +5,7 @@ const { promisePool } = require('../utils/mysql');
 const { jwtSign } = require('../utils/helper');
 const {
   getOrganizationUserDataByEmail,
+  deleteOrganizationUserData,
   getESUserDataByEmail,
   deleteUserByEmail,
 } = require('../models/user');
@@ -164,6 +165,7 @@ const deleteUser = async (req, res) => {
 
   if (!resultEmail) return res.status(400).json({ error: 'email not found' });
 
+  const resultSql = await deleteOrganizationUserData(req.userdata.organizationId, email);
   const resultUser = await deleteUserByEmail(req.userdata.organizationId, 'user', email);
 
   if (!resultUser.deleted) return res.status(500).json({ error: 'failed' });

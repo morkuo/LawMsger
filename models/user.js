@@ -26,6 +26,13 @@ async function getESUserDataByEmail(email, organizationId) {
   return result;
 }
 
+async function deleteOrganizationUserData(organizationId, email) {
+  const sql = `DELETE FROM user WHERE email = ? AND organization_id = ?;`;
+  const [result] = await promisePool.execute(sql, [email, organizationId]);
+
+  return result;
+}
+
 async function deleteUserByEmail(organizationId, index, email) {
   const result = await es[organizationId].deleteByQuery({
     index,
@@ -40,6 +47,7 @@ async function deleteUserByEmail(organizationId, index, email) {
 
 module.exports = {
   getOrganizationUserDataByEmail,
+  deleteOrganizationUserData,
   getESUserDataByEmail,
   deleteUserByEmail,
 };
