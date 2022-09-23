@@ -28,7 +28,7 @@ const createUser = async (req, res) => {
   const emailList = await getOrganizationUserDataByEmail(email, organizationId);
   if (emailList.length !== 0) return res.status(409).json({ error: 'email exists' });
 
-  const resultEmail = await getESUserDataByEmail(email, organizationId);
+  const resultEmail = await getESUserDataByEmail(organizationId, email);
   if (resultEmail) return res.status(409).json({ error: 'email exists' });
 
   // hash password
