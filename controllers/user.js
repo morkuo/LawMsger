@@ -164,21 +164,6 @@ const updateUserPicture = async (req, res) => {
 
   if (!profilePicture) return res.status(400).json({ error: 'no picture found' });
 
-  const key = profilePicture.key;
-
-  const result = await es[req.userdata.organizationId].updateByQuery({
-    index: 'user',
-    script: {
-      lang: 'painless',
-      source: `ctx._source.picture = '${key}'`,
-    },
-    query: {
-      term: { '_id': req.userdata.id },
-    },
-  });
-
-  if (!result.updated) return res.status('500').json({ error: 'server error' });
-
   res.json({
     data: 'updated',
   });
