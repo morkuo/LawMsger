@@ -11,10 +11,6 @@ const {
 } = require('../models/user');
 require('dotenv').config;
 
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const client = new S3Client({ region: 'ap-northeast-1' });
-
 const saltRounds = 10;
 
 const createUser = async (req, res) => {
@@ -183,16 +179,8 @@ const updateUserPicture = async (req, res) => {
 
   if (!result.updated) return res.status('500').json({ error: 'server error' });
 
-  const command = new GetObjectCommand({
-    Bucket: profilePicture.bucket,
-    Key: `${profilePicture.key}`,
-    Expires: 60 * 60,
-  });
-  const url = await getSignedUrl(client, command, { expiresIn: 30 });
-
   res.json({
     data: 'updated',
-    picture: { location: url, key: profilePicture.key },
   });
 };
 
