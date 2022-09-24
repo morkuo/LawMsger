@@ -7,17 +7,22 @@ const { v4: uuidv4 } = require('uuid');
 const s3 = new S3Client({ region: 'ap-northeast-1' });
 
 const apiMap = { 'user/picture': profilePicture, 'message/upload': messageFile };
+const bucketMap = { 'user/picture': 'law-msger-frontend', 'message/upload': 'law-msger' };
 
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'law-msger',
+    bucket: function (req, file, cb) {
+      const url = req.originalUrl.slice(5);
+      const bucketName = bucketMap[url];
+      cb(null, bucketName);
+    },
     metadata: function (req, file, cb) {
       cb(null, { fieldName: file.fieldname });
     },
     key: function (req, file, cb) {
-      const apiPath = req.originalUrl.slice(5);
-      apiMap[apiPath](req, file, cb);
+      const url = req.originalUrl.slice(5);
+      apiMap[url](req, file, cb);
     },
   }),
   limits: {
