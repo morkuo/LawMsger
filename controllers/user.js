@@ -117,14 +117,6 @@ const getUserData = async (req, res) => {
   res.json(response);
 };
 
-// const getUserPicture = async (req, res) => {
-//   const response = {
-//     data: req.userdata,
-//   };
-
-//   res.json(response);
-// };
-
 const updateUserPassword = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
