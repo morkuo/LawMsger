@@ -159,6 +159,32 @@ const updateUserPassword = async (req, res) => {
   });
 };
 
+const updateUserPicture = async (req, res) => {
+  const imagesNumber = req.files;
+
+  console.log(req.files);
+  return console.log(req.files);
+
+  // if (!imagesNumber) return res.status(400).json({ error: 'no picture found' });
+
+  // const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
+  //   index: 'user',
+  //   script: {
+  //     lang: 'painless',
+  //     source: `ctx._source.password = '${hashedPassword}'`,
+  //   },
+  //   query: {
+  //     term: { '_id': req.userdata.id },
+  //   },
+  // });
+
+  // if (!resultUpdate.updated) return res.status(500).json({ error: 'failed' });
+
+  // res.json({
+  //   data: 'updated',
+  // });
+};
+
 const deleteUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -190,4 +216,11 @@ const deleteUser = async (req, res) => {
   res.json({ data: 'deleted' });
 };
 
-module.exports = { signIn, createUser, getUserData, updateUserPassword, deleteUser };
+module.exports = {
+  signIn,
+  createUser,
+  getUserData,
+  updateUserPassword,
+  updateUserPicture,
+  deleteUser,
+};

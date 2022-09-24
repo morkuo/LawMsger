@@ -1,12 +1,14 @@
 const router = require('express').Router();
 const { checkJwt, checkJson, checkRole } = require('../middlewares/validation');
 const { body: check } = require('express-validator');
+const { upload } = require('../middlewares/multer');
 const { tryCatch } = require('../utils/helper');
 const {
   signIn,
   createUser,
   getUserData,
   updateUserPassword,
+  updateUserPicture,
   deleteUser,
 } = require('../controllers/user');
 require('dotenv').config();
@@ -111,5 +113,7 @@ router.post(
     ),
   tryCatch(signIn)
 );
+
+router.post('/user/picture', tryCatch(checkJwt), upload.any('images'), tryCatch(updateUserPicture));
 
 module.exports = router;
