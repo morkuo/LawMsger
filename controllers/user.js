@@ -11,6 +11,10 @@ const {
 } = require('../models/user');
 require('dotenv').config;
 
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const client = new S3Client({ region: 'ap-northeast-1' });
+
 const saltRounds = 10;
 
 const createUser = async (req, res) => {
@@ -160,29 +164,36 @@ const updateUserPassword = async (req, res) => {
 };
 
 const updateUserPicture = async (req, res) => {
-  const imagesNumber = req.files;
+  const [profilePicture] = req.files;
 
-  console.log(req.files);
-  return console.log(req.files);
+  if (!profilePicture) return res.status(400).json({ error: 'no picture found' });
 
-  // if (!imagesNumber) return res.status(400).json({ error: 'no picture found' });
+  const key = profilePicture.key;
 
-  // const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
-  //   index: 'user',
-  //   script: {
-  //     lang: 'painless',
-  //     source: `ctx._source.password = '${hashedPassword}'`,
-  //   },
-  //   query: {
-  //     term: { '_id': req.userdata.id },
-  //   },
-  // });
+  const result = await es[req.userdata.organizationId].updateByQuery({
+    index: 'user',
+    script: {
+      lang: 'painless',
+      source: `ctx._source.picture = '${key}'`,
+    },
+    query: {
+      term: { '_id': req.userdata.id },
+    },
+  });
 
-  // if (!resultUpdate.updated) return res.status(500).json({ error: 'failed' });
+  if (!result.updated) return res.status('500').json({ error: 'server error' });
 
-  // res.json({
-  //   data: 'updated',
-  // });
+  const command = new GetObjectCommand({
+    Bucket: profilePicture.bucket,
+    Key: `${profilePicture.key}`,
+    Expires: 60 * 60,
+  });
+  const url = await getSignedUrl(client, command, { expiresIn: 30 });
+
+  res.json({
+    data: 'updated',
+    picture: { location: url, key: profilePicture.key },
+  });
 };
 
 const deleteUser = async (req, res) => {
