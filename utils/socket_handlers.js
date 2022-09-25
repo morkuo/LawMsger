@@ -197,6 +197,10 @@ async function drawGroupDivHandler(io, socket) {
 
 async function deleteGroupDivHandler(io, socket) {
   socket.on('deleteGroupDiv', async (userIds, groupId) => {
+    //host dissolved the group
+    if (!userIds) return socket.to(groupId).emit('deleteGroupDiv', groupId);
+
+    //host deleted certain member
     const socketIdsOnline = userIds
       .map(userId => global.hashTable[userId])
       .filter(userId => userId !== undefined);
