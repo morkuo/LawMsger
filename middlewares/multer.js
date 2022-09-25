@@ -6,8 +6,47 @@ const { v4: uuidv4 } = require('uuid');
 
 const s3 = new S3Client({ region: 'ap-northeast-1' });
 
-const apiMap = { 'user/picture': profilePicture, 'message/upload': messageFile };
-const bucketMap = { 'user/picture': 'law-msger-frontend', 'message/upload': 'law-msger' };
+const apiMap = {
+  'user/picture': profilePicture,
+  'firm/picture': firmPicture,
+  'message/upload': messageFile,
+};
+const bucketMap = {
+  'user/picture': 'law-msger-frontend',
+  'firm/picture': 'law-msger-frontend',
+  'message/upload': 'law-msger',
+};
+
+function profilePicture(req, file, cb) {
+  const isImage = checkFileType(file);
+
+  if (!isImage) return;
+
+  cb(null, `profile_picture/${req.userdata.id}.jpg`);
+}
+
+function firmPicture(req, file, cb) {
+  const isImage = checkFileType(file);
+
+  if (!isImage) return;
+
+  cb(null, `firm_picture/${req.userdata.organizationId}.jpg`);
+}
+
+function messageFile(req, file, cb) {
+  cb(null, Date.now().toString() + `-${uuidv4().slice(0, 5)}` + path.extname(file.originalname));
+}
+
+function checkFileType(file) {
+  const filetypes = /jpeg|jpg|png|gif/;
+
+  const isImgExt = filetypes.test(path.extname(file.originalname).toLowerCase());
+  const isImgType = filetypes.test(file.mimetype);
+
+  if (isImgExt && isImgType) return true;
+
+  return false;
+}
 
 const upload = multer({
   storage: multerS3({
@@ -30,29 +69,6 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024,
   },
 });
-
-function messageFile(req, file, cb) {
-  cb(null, Date.now().toString() + `-${uuidv4().slice(0, 5)}` + path.extname(file.originalname));
-}
-
-function profilePicture(req, file, cb) {
-  const isImage = checkFileType(file);
-
-  if (!isImage) return;
-
-  cb(null, `profile_picture/${req.userdata.id}.jpg`);
-}
-
-function checkFileType(file) {
-  const filetypes = /jpeg|jpg|png|gif/;
-
-  const isImgExt = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const isImgType = filetypes.test(file.mimetype);
-
-  if (isImgExt && isImgType) return true;
-
-  return false;
-}
 
 module.exports = {
   upload,

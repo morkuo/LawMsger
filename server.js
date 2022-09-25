@@ -17,6 +17,7 @@ app.use('/1.0', [
   require('./routes/contact'),
   require('./routes/message'),
   require('./routes/group'),
+  require('./routes/firm'),
 ]);
 
 server.listen(3000, () => {
