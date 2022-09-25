@@ -11,8 +11,13 @@ const {
 } = require('../models/user');
 require('dotenv').config;
 
+//for copying default pfp
 const { S3Client, CopyObjectCommand } = require('@aws-sdk/client-s3');
 const client = new S3Client({ region: 'ap-northeast-1' });
+
+//for invalidation
+const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
+const clientCloudFront = new CloudFrontClient({ region: 'ap-northeast-1' });
 
 const saltRounds = 10;
 
@@ -63,6 +68,22 @@ const createUser = async (req, res) => {
   const response = await client.send(command);
 
   console.log('S3 default PFP:', response);
+
+  const paramsInvalidation = {
+    DistributionId: 'E21OBVDL9ASI5Z',
+    InvalidationBatch: {
+      CallerReference: `${Date.now()}`,
+      Paths: {
+        Quantity: 1,
+        Items: [`/profile_picture/${result._id}.jpg`],
+      },
+    },
+  };
+
+  const commandInvalidation = new CreateInvalidationCommand(paramsInvalidation);
+  const responseInvalidation = await client.send(commandInvalidation);
+
+  console.log('CloudFront invalidation:', responseInvalidation);
 
   res.status(201).json({ data: 'created' });
 };
