@@ -11,6 +11,9 @@ const {
 } = require('../models/user');
 require('dotenv').config;
 
+const { S3Client, CopyObjectCommand } = require('@aws-sdk/client-s3');
+const client = new S3Client({ region: 'ap-northeast-1' });
+
 const saltRounds = 10;
 
 const createUser = async (req, res) => {
@@ -48,6 +51,17 @@ const createUser = async (req, res) => {
       socket_id: null,
     },
   });
+
+  const params = {
+    Bucket: 'law-msger-frontend',
+    CopySource: '/law-msger-frontend/images/default_pfp.jpg',
+    Key: `/law-msger-frontend/profile_picture/${result._id}.jpg`,
+  };
+
+  const command = new CopyObjectCommand(params);
+  const response = await client.send(command);
+
+  console.log(response);
 
   res.status(201).json({ data: 'created' });
 };
