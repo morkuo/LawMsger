@@ -52,8 +52,7 @@ const createUser = async (req, res) => {
     },
   });
 
-  console.log(result._id);
-
+  //set default pfp
   const params = {
     Bucket: 'law-msger-frontend',
     CopySource: '/law-msger-frontend/images/default_pfp.jpg',
@@ -63,7 +62,7 @@ const createUser = async (req, res) => {
   const command = new CopyObjectCommand(params);
   const response = await client.send(command);
 
-  console.log(response);
+  console.log('S3 default PFP:', response);
 
   res.status(201).json({ data: 'created' });
 };
