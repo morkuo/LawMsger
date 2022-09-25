@@ -40,7 +40,7 @@ function profilePicture(req, file, cb) {
 
   if (!isImage) return;
 
-  cb(null, `profile_picture/${req.userdata.id}${path.extname(file.originalname)}`);
+  cb(null, `profile_picture/${req.userdata.id}.jpg`);
 }
 
 function checkFileType(file) {
