@@ -69,22 +69,6 @@ const createUser = async (req, res) => {
 
   console.log('S3 default PFP:', response);
 
-  const paramsInvalidation = {
-    DistributionId: 'E21OBVDL9ASI5Z',
-    InvalidationBatch: {
-      CallerReference: `${Date.now()}`,
-      Paths: {
-        Quantity: 1,
-        Items: [`/profile_picture/${result._id}.jpg`],
-      },
-    },
-  };
-
-  const commandInvalidation = new CreateInvalidationCommand(paramsInvalidation);
-  const responseInvalidation = await client.send(commandInvalidation);
-
-  console.log('CloudFront invalidation:', responseInvalidation);
-
   res.status(201).json({ data: 'created' });
 };
 
@@ -199,6 +183,22 @@ const updateUserPicture = async (req, res) => {
   const [profilePicture] = req.files;
 
   if (!profilePicture) return res.status(400).json({ error: 'no picture found' });
+
+  const paramsInvalidation = {
+    DistributionId: 'E21OBVDL9ASI5Z',
+    InvalidationBatch: {
+      CallerReference: `${Date.now()}`,
+      Paths: {
+        Quantity: 1,
+        Items: [`/profile_picture/${req.userdata.id}.jpg`],
+      },
+    },
+  };
+
+  const commandInvalidation = new CreateInvalidationCommand(paramsInvalidation);
+  const responseInvalidation = await client.send(commandInvalidation);
+
+  console.log('CloudFront invalidation:', responseInvalidation);
 
   res.json({
     data: 'updated',
