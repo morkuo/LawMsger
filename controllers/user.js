@@ -52,6 +52,8 @@ const createUser = async (req, res) => {
     },
   });
 
+  console.log(result._id);
+
   const params = {
     Bucket: 'law-msger-frontend',
     CopySource: '/law-msger-frontend/images/default_pfp.jpg',
