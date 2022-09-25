@@ -196,7 +196,7 @@ const updateUserPicture = async (req, res) => {
   };
 
   const commandInvalidation = new CreateInvalidationCommand(paramsInvalidation);
-  const responseInvalidation = await client.send(commandInvalidation);
+  const responseInvalidation = await clientCloudFront.send(commandInvalidation);
 
   console.log('CloudFront invalidation:', responseInvalidation);
 
