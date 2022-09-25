@@ -57,7 +57,7 @@ const createUser = async (req, res) => {
   const params = {
     Bucket: 'law-msger-frontend',
     CopySource: '/law-msger-frontend/images/default_pfp.jpg',
-    Key: `/law-msger-frontend/profile_picture/${result._id}.jpg`,
+    Key: `profile_picture/${result._id}.jpg`,
   };
 
   const command = new CopyObjectCommand(params);
