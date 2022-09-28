@@ -262,7 +262,7 @@ const getGroupHistoryMessages = async (req, res) => {
 const uploadFiles = async (req, res) => {
   const filesInfo = [];
 
-  console.log(req.files);
+  if (!req.files) return res.status(400).json({ error: 'file error' });
 
   for (let file of req.files) {
     //S3 Presigned url
