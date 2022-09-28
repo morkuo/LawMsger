@@ -142,6 +142,10 @@ const updateUserPassword = async (req, res) => {
 
   const { oldPassword, newPassword, confirm } = req.body;
 
+  if (oldPassword === newPassword) {
+    return res.status(400).json({ error: 'new password and old password should not be identical' });
+  }
+
   if (newPassword !== confirm) return res.status(400).json({ error: 'new password should match' });
 
   //get old password
