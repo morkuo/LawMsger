@@ -261,6 +261,9 @@ const getGroupHistoryMessages = async (req, res) => {
 
 const uploadFiles = async (req, res) => {
   const filesInfo = [];
+
+  console.log(req.files);
+
   for (let file of req.files) {
     //S3 Presigned url
     const command = new GetObjectCommand({
