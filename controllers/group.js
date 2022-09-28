@@ -83,8 +83,6 @@ const getGroupParticipants = async (req, res) => {
 
   const { groupName } = req.query;
 
-  console.log(groupName);
-
   const {
     hits: {
       hits: [result],
@@ -98,8 +96,6 @@ const getGroupParticipants = async (req, res) => {
       },
     },
   });
-
-  console.log(result);
 
   const usersQuery = result._source.participants.map(userId => ({ term: { _id: userId } }));
 
