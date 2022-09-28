@@ -25,7 +25,7 @@ server.listen(3000, () => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.name === 'MulterError' || err.name === 'Error') {
+  if (err.name === 'MulterError') {
     return res.status(400).json({ error: err.message });
   }
 

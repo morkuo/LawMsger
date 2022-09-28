@@ -22,7 +22,7 @@ function profilePicture(req, file, cb) {
 
   if (!isImage) {
     const error = new Error('Only jpg gif png are allowed');
-    error.name = 'Test';
+    error.name = 'MulterError';
 
     cb(null, false);
     cb(error);
