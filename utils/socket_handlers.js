@@ -190,7 +190,7 @@ async function drawGroupDivHandler(io, socket) {
     }));
 
     if (socketIdsOnline.length !== 0) {
-      socket.to(socketIdsOnline).emit('drawGroupDiv', groupId, groupName, participants);
+      socket.to(socketIdsOnline).emit('drawGroupDiv', groupId, groupName, hostId, participants);
     }
   });
 }
