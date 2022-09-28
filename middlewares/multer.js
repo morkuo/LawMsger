@@ -21,7 +21,7 @@ function profilePicture(req, file, cb) {
   const isImage = checkFileType(file);
 
   if (!isImage) {
-    const error = { name: multerError, message: 'Only jpg gif png are allowed' };
+    const error = { name: 'multerError', message: 'Only jpg gif png are allowed' };
     error.name = 'multerError';
 
     cb(null, false);
