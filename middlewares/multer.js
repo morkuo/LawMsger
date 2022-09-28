@@ -20,12 +20,12 @@ const bucketMap = {
 function profilePicture(req, file, cb) {
   const isImage = checkFileType(file);
 
-  console.log('Here');
-
   if (!isImage) {
-    console.log('Yo');
+    const error = new Error('Only jpg gif png are allowed');
+    error.name = 'multerError';
+
     cb(null, false);
-    cb(new Error('Only jpg gif png are allowed'));
+    cb(error);
   }
 
   cb(null, `profile_picture/${req.userdata.id}.jpg`);
