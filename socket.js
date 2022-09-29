@@ -2,6 +2,7 @@ const { Server } = require('socket.io');
 const {
   idHandler,
   joinGroupHandler,
+  joinFirmHandler,
   drawGroupDivHandler,
   deleteGroupDivHandler,
   msgHandler,
@@ -15,6 +16,7 @@ const {
   deleteStarContact,
   searchEamilHandler,
   changeProfilePicture,
+  changeFirmPicture,
   disconnectionHandlers,
 } = require('./utils/socket_handlers');
 const es = require('./utils/es');
@@ -48,6 +50,7 @@ async function connect(server) {
     //handlers
     idHandler(io, socket);
     joinGroupHandler(io, socket);
+    joinFirmHandler(io, socket);
     drawGroupDivHandler(io, socket);
     deleteGroupDivHandler(io, socket);
     msgHandler(io, socket);
@@ -61,6 +64,7 @@ async function connect(server) {
     deleteStarContact(io, socket);
     searchEamilHandler(io, socket);
     changeProfilePicture(io, socket);
+    changeFirmPicture(io, socket);
     disconnectionHandlers(io, socket);
   });
 

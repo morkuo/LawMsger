@@ -159,6 +159,12 @@ async function joinGroupHandler(io, socket) {
   });
 }
 
+async function joinFirmHandler(io, socket) {
+  socket.on('joinFirm', async firmId => {
+    socket.join(firmId);
+  });
+}
+
 async function drawGroupDivHandler(io, socket) {
   socket.on('drawGroupDiv', async (newParticipantsUserId, hostId, groupId, groupName) => {
     const socketIdsOnline = newParticipantsUserId
@@ -359,9 +365,16 @@ async function changeProfilePicture(io, socket) {
   });
 }
 
+async function changeFirmPicture(io, socket) {
+  socket.on('changeProfilePicture', async firmId => {
+    socket.to(firmId).emit('changeProfilePicture', firmId);
+  });
+}
+
 module.exports = {
   idHandler,
   joinGroupHandler,
+  joinFirmHandler,
   drawGroupDivHandler,
   deleteGroupDivHandler,
   msgHandler,
@@ -375,5 +388,6 @@ module.exports = {
   deleteStarContact,
   searchEamilHandler,
   changeProfilePicture,
+  changeFirmPicture,
   disconnectionHandlers,
 };
