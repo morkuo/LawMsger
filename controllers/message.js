@@ -272,7 +272,7 @@ const uploadFiles = async (req, res) => {
       Bucket: file.bucket,
       Key: `${file.key}`,
       Expires: 60 * 60,
-      ResponseContentDisposition: `attachment; filename="${encodeURIComponent(file.originalName)}"`,
+      ResponseContentDisposition: `attachment; filename="${encodeURIComponent(file.originalname)}"`,
     });
     const url = await getSignedUrl(client, command, { expiresIn: 30 });
 
