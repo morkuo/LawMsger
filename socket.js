@@ -14,6 +14,7 @@ const {
   createStarContact,
   deleteStarContact,
   searchEamilHandler,
+  changeProfilePicture,
   disconnectionHandlers,
 } = require('./utils/socket_handlers');
 const es = require('./utils/es');
@@ -59,6 +60,7 @@ async function connect(server) {
     createStarContact(io, socket);
     deleteStarContact(io, socket);
     searchEamilHandler(io, socket);
+    changeProfilePicture(io, socket);
     disconnectionHandlers(io, socket);
   });
 

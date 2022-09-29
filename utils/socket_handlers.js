@@ -353,6 +353,12 @@ async function searchEamilHandler(io, socket) {
   });
 }
 
+async function changeProfilePicture(io, socket) {
+  socket.on('changeProfilePicture', async userId => {
+    socket.broadcast.emit('changeProfilePicture', userId);
+  });
+}
+
 module.exports = {
   idHandler,
   joinGroupHandler,
@@ -368,5 +374,6 @@ module.exports = {
   createStarContact,
   deleteStarContact,
   searchEamilHandler,
+  changeProfilePicture,
   disconnectionHandlers,
 };
