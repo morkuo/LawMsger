@@ -366,8 +366,8 @@ async function changeProfilePicture(io, socket) {
 }
 
 async function changeFirmPicture(io, socket) {
-  socket.on('changeProfilePicture', async firmId => {
-    socket.to(firmId).emit('changeProfilePicture', firmId);
+  socket.on('changeFirmPicture', async firmId => {
+    socket.to(firmId).emit('changeFirmPicture', firmId);
   });
 }
 
