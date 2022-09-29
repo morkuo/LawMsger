@@ -40,7 +40,7 @@ function firmPicture(req, file, cb) {
 }
 
 function messageFile(req, file, cb) {
-  file.originalname = Buffer.from(file.originalname, 'latin1').toString('uft8');
+  file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8');
 
   cb(null, Date.now().toString() + `-${uuidv4().slice(0, 5)}` + path.extname(file.originalname));
 }
