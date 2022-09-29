@@ -19,7 +19,9 @@ async function generateS3PresignedUrl(result) {
           Bucket: 'law-msger',
           Key: `${file.key}`,
           Expires: 60 * 60,
-          ResponseContentDisposition: `attachment; filename="${file.originalName}"`,
+          ResponseContentDisposition: `attachment; filename="${encodeURIComponent(
+            file.originalName
+          )}"`,
         });
         const url = await getSignedUrl(client, command, { expiresIn: 3600 });
 
