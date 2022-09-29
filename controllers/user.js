@@ -86,7 +86,7 @@ const signIn = async (req, res) => {
   const [resultSql] = await promisePool.execute(sql, [email, organizationName]);
 
   //get current user's organization id
-  if (!resultSql[0]) return res.status(401).json({ error: 'no firm found' });
+  if (!resultSql[0]) return res.status(401).json({ error: 'wrong firm or email' });
   const { organization_id: organizationId } = resultSql[0];
   const result = await getESUserDataByEmail(organizationId, email);
 
