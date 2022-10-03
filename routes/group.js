@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { checkJwt, checkJson } = require('../middlewares/validation');
+const { checkJwt, checkJson, validate } = require('../middlewares/validation');
 const { body: check } = require('express-validator');
 const { tryCatch } = require('../utils/helper');
 const {
@@ -32,6 +32,7 @@ router.post(
     )
     .bail()
     .escape(),
+  validate,
   tryCatch(createGroup)
 );
 
@@ -54,6 +55,7 @@ router.put(
     .bail()
     .escape(),
   check('userIds').isArray().withMessage('array not found'),
+  validate,
   tryCatch(updateParticipants)
 );
 
@@ -75,6 +77,7 @@ router.put(
     )
     .bail()
     .escape(),
+  validate,
   tryCatch(leaveGroup)
 );
 

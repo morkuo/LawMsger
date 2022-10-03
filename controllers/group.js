@@ -4,12 +4,6 @@ const { getParticipatedGroups, getUnreadGroupMessage } = require('../models/grou
 require('dotenv').config;
 
 const createGroup = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    return res.status(400).json({ error: errors.array() });
-  }
-
   const { name } = req.body;
 
   //check whether the name has been used
@@ -75,12 +69,6 @@ const getGroup = async (req, res) => {
 };
 
 const getGroupParticipants = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    return res.status(400).json({ error: errors.array() });
-  }
-
   const { groupName } = req.query;
 
   const {
@@ -123,12 +111,6 @@ const getGroupParticipants = async (req, res) => {
 };
 
 const updateParticipants = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    return res.status(400).json({ error: errors.array() });
-  }
-
   const { groupName, userIds, updateType } = req.body;
 
   const {
@@ -235,12 +217,6 @@ const updateParticipants = async (req, res) => {
 };
 
 const leaveGroup = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    return res.status(400).json({ error: errors.array() });
-  }
-
   const { groupName } = req.body;
 
   const userId = req.userdata.id;

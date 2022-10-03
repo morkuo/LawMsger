@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { checkJwt, checkJson, checkRole } = require('../middlewares/validation');
+const { checkJwt, checkJson, checkRole, validate } = require('../middlewares/validation');
 const { body: check } = require('express-validator');
 const { upload } = require('../middlewares/multer');
 const { tryCatch } = require('../utils/helper');
@@ -51,6 +51,7 @@ router
       .withMessage(
         `min length: ${process.env.AUTH_PASSWORD_MIN_LENGTH}, max length: ${process.env.AUTH_PASSWORD_MAX_LENGTH}`
       ),
+    validate,
     tryCatch(createUser)
   )
   .put(
@@ -78,6 +79,7 @@ router
       .withMessage(
         `min length: ${process.env.AUTH_PASSWORD_MIN_LENGTH}, max length: ${process.env.AUTH_PASSWORD_MAX_LENGTH}`
       ),
+    validate,
     tryCatch(updateUserPassword)
   )
   .delete(
@@ -89,6 +91,7 @@ router
       .withMessage('wrong email format')
       .bail()
       .normalizeEmail({ gmail_remove_dots: false }),
+    validate,
     tryCatch(deleteUser)
   );
 
@@ -111,6 +114,7 @@ router.post(
     .withMessage(
       `min length: ${process.env.AUTH_PASSWORD_MIN_LENGTH}, max length: ${process.env.AUTH_PASSWORD_MAX_LENGTH}`
     ),
+  validate,
   tryCatch(signIn)
 );
 

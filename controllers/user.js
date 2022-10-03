@@ -1,4 +1,3 @@
-const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const es = require('../utils/es');
 const { promisePool } = require('../utils/mysql');
@@ -22,12 +21,6 @@ const clientCloudFront = new CloudFrontClient({ region: 'ap-northeast-1' });
 const saltRounds = 10;
 
 const createUser = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    return res.status(400).json({ error: errors.array() });
-  }
-
   const { name, email, password } = req.body;
   const organizationId = process.env.NEW_USER_ORGANIZATION_ID || req.userdata.organizationId;
   const picture = '';
@@ -73,12 +66,6 @@ const createUser = async (req, res) => {
 };
 
 const signIn = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    return res.status(400).json({ error: errors.array() });
-  }
-
   const { email, password, organizationName } = req.body;
 
   //check whether the email exists
@@ -134,12 +121,6 @@ const getUserData = async (req, res) => {
 };
 
 const updateUserPassword = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    return res.status(400).json({ error: errors.array() });
-  }
-
   const { oldPassword, newPassword, confirm } = req.body;
 
   if (oldPassword === newPassword) {
@@ -210,12 +191,6 @@ const updateUserPicture = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    return res.status(400).json({ error: errors.array() });
-  }
-
   const { email } = req.body;
 
   //check whether the email exists
