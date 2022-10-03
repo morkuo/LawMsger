@@ -3,7 +3,6 @@ const {
   checkJwt,
   checkJson,
   checkRole,
-  validate,
   signInRule,
   createUserRule,
   updateUserPasswordRule,
@@ -21,15 +20,17 @@ const {
 } = require('../controllers/user');
 require('dotenv').config();
 
-router
-  .route('/user')
-  .get(tryCatch(checkJwt), tryCatch(getUserData))
-  .post(tryCatch(checkJwt), checkRole, checkJson, createUserRule(), tryCatch(createUser))
-  .put(tryCatch(checkJwt), checkJson, updateUserPasswordRule(), tryCatch(updateUserPassword))
-  .delete(tryCatch(checkJwt), checkRole, checkJson, deleteUserRule(), tryCatch(deleteUser));
-
 router.post('/user/signin', checkJson, signInRule(), tryCatch(signIn));
 
-router.post('/user/picture', tryCatch(checkJwt), upload.any('images'), tryCatch(updateUserPicture));
+router.use(tryCatch(checkJwt));
+
+router
+  .route('/user')
+  .get(tryCatch(getUserData))
+  .post(checkRole, checkJson, createUserRule(), tryCatch(createUser))
+  .put(checkJson, updateUserPasswordRule(), tryCatch(updateUserPassword))
+  .delete(checkRole, checkJson, deleteUserRule(), tryCatch(deleteUser));
+
+router.post('/user/picture', upload.any('images'), tryCatch(updateUserPicture));
 
 module.exports = router;
