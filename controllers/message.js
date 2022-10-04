@@ -1,4 +1,3 @@
-const es = require('../utils/es');
 const {
   getPrivateMessagesByUserId,
   getPrivateMessagesByUserIdMore,
