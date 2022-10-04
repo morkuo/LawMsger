@@ -1,6 +1,5 @@
-const { validationResult, check } = require('express-validator');
 const es = require('../utils/es');
-const { getParticipatedGroups, getUnreadGroupMessage } = require('../models/group');
+const { getGroupByName, getParticipatedGroups, getUnreadGroupMessage } = require('../models/group');
 require('dotenv').config;
 
 const createGroup = async (req, res) => {
@@ -113,18 +112,7 @@ const getGroupParticipants = async (req, res) => {
 const updateParticipants = async (req, res) => {
   const { groupName, userIds, updateType } = req.body;
 
-  const {
-    hits: {
-      hits: [result],
-    },
-  } = await es[req.userdata.organizationId].search({
-    index: 'group',
-    body: {
-      query: {
-        term: { 'name.keyword': groupName },
-      },
-    },
-  });
+  const result = await getGroupByName(req.userdata.organizationId, groupName);
 
   //check whether the group exist
   if (!result) return res.status(400).json({ error: 'group not found' });
@@ -221,18 +209,7 @@ const leaveGroup = async (req, res) => {
 
   const userId = req.userdata.id;
 
-  const {
-    hits: {
-      hits: [result],
-    },
-  } = await es[req.userdata.organizationId].search({
-    index: 'group',
-    body: {
-      query: {
-        term: { 'name.keyword': groupName },
-      },
-    },
-  });
+  const result = await getGroupByName(req.userdata.organizationId, groupName);
 
   //check whether the group exist
   if (!result) return res.status(400).json({ error: 'group not found' });

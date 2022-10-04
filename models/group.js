@@ -1,5 +1,22 @@
 const es = require('../utils/es');
 
+async function getGroupByName(organizationId, groupName) {
+  const {
+    hits: {
+      hits: [result],
+    },
+  } = await es[organizationId].search({
+    index: 'group',
+    body: {
+      query: {
+        term: { 'name.keyword': groupName },
+      },
+    },
+  });
+
+  return result;
+}
+
 async function getParticipatedGroups(organizationId, userId) {
   const {
     hits: { hits: result },
@@ -33,6 +50,7 @@ async function getUnreadGroupMessage(organizationId, userId, groupIds) {
 }
 
 module.exports = {
+  getGroupByName,
   getParticipatedGroups,
   getUnreadGroupMessage,
 };
