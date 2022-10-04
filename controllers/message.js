@@ -1,5 +1,5 @@
 const es = require('../utils/es');
-const { suggestions, matchedClauses } = require('../models/message');
+const { getPrivateMessages, updatePrivateMessagesIsRead } = require('../models/message');
 require('dotenv').config;
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
@@ -35,67 +35,18 @@ async function generateS3PresignedUrl(result) {
   return result.map(doc => doc._source);
 }
 
-const getHistoryMessages = async (req, res) => {
+const getPivateMessages = async (req, res) => {
   const { contactUserId } = req.query;
+  const { organizationId, id: userId } = req.userdata;
 
-  const {
-    hits: { hits: result },
-  } = await es[req.userdata.organizationId].search({
-    index: 'message',
-    size: messageSize,
-    sort: {
-      'created_at': 'desc',
-    },
-    query: {
-      bool: {
-        should: [
-          {
-            bool: {
-              filter: [
-                { term: { sender_id: req.userdata.id } },
-                { term: { receiver_id: contactUserId } },
-              ],
-            },
-          },
-          {
-            bool: {
-              filter: [
-                { term: { sender_id: contactUserId } },
-                { term: { receiver_id: req.userdata.id } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  // console.log(resultUpdate);
+  const result = await getPrivateMessages(organizationId, userId, contactUserId);
 
   const messages = await generateS3PresignedUrl(result);
 
-  const response = {
+  await updatePrivateMessagesIsRead(organizationId, userId, contactUserId);
+
+  res.json({
     data: messages,
-  };
-
-  res.json(response);
-
-  //after responsing messages, update isRead to true
-  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
-    index: 'message',
-    script: {
-      source: `ctx._source.isRead = true`,
-      lang: 'painless',
-    },
-    query: {
-      bool: {
-        filter: [
-          { term: { sender_id: contactUserId } },
-          { term: { receiver_id: req.userdata.id } },
-          { term: { isRead: false } },
-        ],
-      },
-    },
   });
 };
 
@@ -283,7 +234,7 @@ const uploadFiles = async (req, res) => {
 };
 
 module.exports = {
-  getHistoryMessages,
+  getPrivateMessages,
   getMoreMessages,
   getGroupHistoryMessages,
   getGroupMoreMessages,

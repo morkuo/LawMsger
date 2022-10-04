@@ -3,7 +3,7 @@ const { checkJwt } = require('../middlewares/validation');
 const { upload } = require('../middlewares/multer');
 const { tryCatch } = require('../utils/helper');
 const {
-  getHistoryMessages,
+  getPrivateMessages,
   getMoreMessages,
   uploadFiles,
   getGroupHistoryMessages,
@@ -12,7 +12,7 @@ const {
 
 router.use(checkJwt);
 
-router.get('/message', tryCatch(getHistoryMessages));
+router.get('/message', tryCatch(getPrivateMessages));
 
 router.get('/message/more', tryCatch(getMoreMessages));
 

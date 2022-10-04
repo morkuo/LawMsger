@@ -1,5 +1,7 @@
 const es = require('../utils/es');
 
+const messageSize = 15;
+
 async function suggestions(organizationId, input, index) {
   const {
     suggest: {
@@ -79,7 +81,57 @@ async function matchedClauses(organizationId, input) {
   return matchclauses;
 }
 
+async function getPrivateMessage(organizationId, userId, contactUserId) {
+  const {
+    hits: { hits: result },
+  } = await es[organizationId].search({
+    index: 'message',
+    size: messageSize,
+    sort: {
+      'created_at': 'desc',
+    },
+    query: {
+      bool: {
+        should: [
+          {
+            bool: {
+              filter: [{ term: { sender_id: userId } }, { term: { receiver_id: contactUserId } }],
+            },
+          },
+          {
+            bool: {
+              filter: [{ term: { sender_id: contactUserId } }, { term: { receiver_id: userId } }],
+            },
+          },
+        ],
+      },
+    },
+  });
+  return result;
+}
+
+async function updatePrivateMessageIsRead(organizationId, userId, contactUserId) {
+  const result = await es[organizationId].updateByQuery({
+    index: 'message',
+    script: {
+      source: `ctx._source.isRead = true`,
+      lang: 'painless',
+    },
+    query: {
+      bool: {
+        filter: [
+          { term: { sender_id: contactUserId } },
+          { term: { receiver_id: userId } },
+          { term: { isRead: false } },
+        ],
+      },
+    },
+  });
+  return result;
+}
+
 module.exports = {
   suggestions,
   matchedClauses,
+  getPrivateMessage,
 };
