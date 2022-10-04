@@ -1,23 +1,17 @@
 const es = require('../utils/es');
-const { getGroupByName, getParticipatedGroups, getUnreadGroupMessage } = require('../models/group');
+const {
+  getGroupByName,
+  getGroupCountByName,
+  getParticipatedGroups,
+  getUnreadGroupMessage,
+} = require('../models/group');
 require('dotenv').config;
 
 const createGroup = async (req, res) => {
   const { name } = req.body;
 
   //check whether the name has been used
-  const {
-    hits: {
-      total: { value: resultCount },
-    },
-  } = await es[req.userdata.organizationId].search({
-    index: 'group',
-    body: {
-      query: {
-        term: { 'name.keyword': name },
-      },
-    },
-  });
+  const resultCount = await getGroupCountByName(req.userdata.organizationId, name);
 
   if (resultCount) return res.status(409).json({ error: 'group exists' });
 
