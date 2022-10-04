@@ -192,6 +192,60 @@ const updateParticipants = async (req, res) => {
   });
 };
 
+const deleteParticipants = async (req, res) => {
+  const { groupName, userIds } = req.body;
+
+  const result = await getGroupByName(req.userdata.organizationId, groupName);
+
+  //check whether the group exist
+  if (!result) return res.status(400).json({ error: 'group not found' });
+
+  //check whether the request is send from host of the group
+  if (result._source.host !== req.userdata.id) {
+    return res.status(403).json({ error: 'forbidden' });
+  }
+
+  //check whether userIds include host Id
+  if (userIds.includes(result._source.host)) {
+    return res.status(400).json({ error: 'users should not include host user' });
+  }
+
+  const currentParticipants = result._source.participants;
+
+  //check target users are current participants
+  const isAllParticipants = userIds.every(userId => currentParticipants.includes(userId));
+  if (!isAllParticipants) return res.status(400).json({ error: 'some user are not member' });
+
+  //create new participants array
+  const participants = result._source.participants;
+  const newParticipants = participants.filter(
+    currentParticipant => !userIds.includes(currentParticipant)
+  );
+
+  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
+    index: 'group',
+    script: {
+      source: 'ctx._source.participants = params.newParticipants',
+      lang: 'painless',
+      params: {
+        newParticipants,
+      },
+    },
+    query: {
+      term: { 'name.keyword': groupName },
+    },
+  });
+
+  if (!resultUpdate.updated) return res.status(500).json({ error: 'server error' });
+
+  return res.json({
+    data: 'deleted',
+    group: {
+      id: result._id,
+    },
+  });
+};
+
 const leaveGroup = async (req, res) => {
   const { groupName } = req.body;
 
@@ -241,4 +295,11 @@ const leaveGroup = async (req, res) => {
   res.json({ data: 'updated' });
 };
 
-module.exports = { createGroup, getGroup, getGroupParticipants, updateParticipants, leaveGroup };
+module.exports = {
+  createGroup,
+  getGroup,
+  getGroupParticipants,
+  updateParticipants,
+  deleteParticipants,
+  leaveGroup,
+};

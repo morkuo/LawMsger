@@ -130,6 +130,14 @@ function updateParticipantsRule() {
   ];
 }
 
+function deleteParticipantsRule() {
+  return [
+    checkGroupName('groupName'),
+    check('userIds').isArray().withMessage('array not found'),
+    validate,
+  ];
+}
+
 function leaveGroupRule() {
   return [checkGroupName('groupName'), validate];
 }
@@ -145,5 +153,6 @@ module.exports = {
   deleteUserRule,
   createGroupRule,
   updateParticipantsRule,
+  deleteParticipantsRule,
   leaveGroupRule,
 };

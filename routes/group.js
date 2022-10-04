@@ -4,6 +4,7 @@ const {
   checkJson,
   createGroupRule,
   updateParticipantsRule,
+  deleteParticipantsRule,
   leaveGroupRule,
 } = require('../middlewares/validation');
 const { tryCatch } = require('../utils/helper');
@@ -12,6 +13,7 @@ const {
   getGroup,
   getGroupParticipants,
   updateParticipants,
+  deleteParticipants,
   leaveGroup,
 } = require('../controllers/group');
 
@@ -26,7 +28,8 @@ router.use(checkJson);
 router
   .route('/group')
   .post(createGroupRule(), tryCatch(createGroup))
-  .put(updateParticipantsRule(), tryCatch(updateParticipants));
+  .put(updateParticipantsRule(), tryCatch(updateParticipants))
+  .delete(deleteParticipantsRule(), tryCatch(deleteParticipants));
 
 router.put('/group/leave', leaveGroupRule(), tryCatch(leaveGroup));
 
