@@ -1,5 +1,11 @@
 const es = require('../utils/es');
-const { getPrivateMessagesByUserId, updatePrivateMessagesIsRead } = require('../models/message');
+const {
+  getPrivateMessagesByUserId,
+  getGroupMessagesByGroupId,
+  updatePrivateMessagesIsRead,
+  updateGroupMessagesIsRead,
+} = require('../models/message');
+const { getGroupById } = require('../models/group');
 require('dotenv').config;
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
@@ -147,68 +153,29 @@ const getGroupMoreMessages = async (req, res) => {
   res.json(response);
 };
 
-const getGroupHistoryMessages = async (req, res) => {
+const getGroupMessages = async (req, res) => {
   const { groupId } = req.query;
+  const { organizationId, id: userId } = req.userdata;
 
   // check whether the user is member of the group
-  const {
-    hits: {
-      hits: [resultUser],
-    },
-  } = await es[req.userdata.organizationId].search({
-    index: 'group',
-    sort: {
-      'created_at': 'desc',
-    },
-    query: {
-      term: { _id: groupId },
-    },
-  });
-
-  if (!resultUser._source.participants.includes(req.userdata.id)) {
+  const resultUser = getGroupById(organizationId, groupId);
+  if (!resultUser._source.participants.includes(userId)) {
     return res.status(403).json({ error: 'forbidden' });
   }
 
-  const {
-    hits: { hits: result },
-  } = await es[req.userdata.organizationId].search({
-    index: 'groupmessage',
-    size: messageSize,
-    sort: {
-      'created_at': 'desc',
-    },
-    query: {
-      term: { group_id: groupId },
-    },
-  });
+  const result = await getGroupMessagesByGroupId(organizationId, groupId);
 
   const messages = await generateS3PresignedUrl(result);
 
-  const response = {
-    data: messages,
-  };
-
-  res.json(response);
-
-  const messagesUnreadByCurrentUser = result
-    .filter(msg => !msg._source.isRead.includes(req.userdata.id))
+  const messagesUnreadByUser = result
+    .filter(msg => !msg._source.isRead.includes(userId))
     .map(msg => ({ term: { _id: msg._id } }));
 
-  // after responsing messages, update isRead, add current user into isRead
-  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
-    index: 'groupmessage',
-    script: {
-      source: `if(!ctx._source.isRead.contains(params.user_id)){ctx._source.isRead.add(params.user_id)}`,
-      lang: 'painless',
-      params: {
-        user_id: req.userdata.id,
-      },
-    },
-    query: {
-      bool: {
-        should: messagesUnreadByCurrentUser,
-      },
-    },
+  //update isRead, add current user into isRead
+  await updateGroupMessagesIsRead(organizationId, userId, messagesUnreadByUser);
+
+  res.json({
+    data: messages,
   });
 };
 
@@ -235,8 +202,8 @@ const uploadFiles = async (req, res) => {
 
 module.exports = {
   getPrivateMessages,
+  getGroupMessages,
   getMoreMessages,
-  getGroupHistoryMessages,
   getGroupMoreMessages,
   uploadFiles,
 };

@@ -110,6 +110,22 @@ async function getPrivateMessagesByUserId(organizationId, userId, contactUserId)
   return result;
 }
 
+async function getGroupMessagesByGroupId(organizationId, groupId) {
+  const {
+    hits: { hits: result },
+  } = await es[organizationId].search({
+    index: 'groupmessage',
+    size: messageSize,
+    sort: {
+      'created_at': 'desc',
+    },
+    query: {
+      term: { group_id: groupId },
+    },
+  });
+  return result;
+}
+
 async function updatePrivateMessagesIsRead(organizationId, userId, contactUserId) {
   const result = await es[organizationId].updateByQuery({
     index: 'message',
@@ -130,9 +146,30 @@ async function updatePrivateMessagesIsRead(organizationId, userId, contactUserId
   return result;
 }
 
+async function updateGroupMessagesIsRead(organizationId, userId, messagesUnreadByUser) {
+  const result = await es[organizationId].updateByQuery({
+    index: 'groupmessage',
+    script: {
+      source: `if(!ctx._source.isRead.contains(params.user_id)){ctx._source.isRead.add(params.user_id)}`,
+      lang: 'painless',
+      params: {
+        user_id: userId,
+      },
+    },
+    query: {
+      bool: {
+        should: messagesUnreadByUser,
+      },
+    },
+  });
+  return result;
+}
+
 module.exports = {
   suggestions,
   matchedClauses,
   getPrivateMessagesByUserId,
+  getGroupMessagesByGroupId,
   updatePrivateMessagesIsRead,
+  updateGroupMessagesIsRead,
 };

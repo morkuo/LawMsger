@@ -6,7 +6,7 @@ const {
   getPrivateMessages,
   getMoreMessages,
   uploadFiles,
-  getGroupHistoryMessages,
+  getGroupMessages,
   getGroupMoreMessages,
 } = require('../controllers/message');
 
@@ -18,7 +18,7 @@ router.get('/message/more', tryCatch(getMoreMessages));
 
 router.post('/message/upload', upload.any('images'), tryCatch(uploadFiles));
 
-router.get('/groupmessage', tryCatch(getGroupHistoryMessages));
+router.get('/groupmessage', tryCatch(getGroupMessages));
 
 router.get('/groupmessage/more', tryCatch(getGroupMoreMessages));
 
