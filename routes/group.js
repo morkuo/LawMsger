@@ -28,8 +28,9 @@ router.use(checkJson);
 router
   .route('/group')
   .post(createGroupRule(), tryCatch(createGroup))
-  .put(updateParticipantsRule(), tryCatch(updateParticipants))
-  .delete(deleteParticipantsRule(), tryCatch(deleteParticipants));
+  .put(updateParticipantsRule(), tryCatch(updateParticipants));
+
+router.route('/group/participants').delete(deleteParticipantsRule(), tryCatch(deleteParticipants));
 
 router.put('/group/leave', leaveGroupRule(), tryCatch(leaveGroup));
 
