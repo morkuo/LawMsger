@@ -26,7 +26,7 @@ router
 
 router
   .route('/group/participants')
-  .get('/group/participants', tryCatch(getGroupParticipants))
+  .get(tryCatch(getGroupParticipants))
   .put(checkJson, addParticipantsRule(), tryCatch(addParticipants))
   .delete(checkJson, deleteParticipantsRule(), tryCatch(deleteParticipants));
 
