@@ -8,6 +8,7 @@ const {
   getESUserDataByEmail,
   deleteUserByEmail,
 } = require('../models/user');
+const { deleteStarredUser } = require('../models/contact');
 require('dotenv').config;
 
 //for copying default pfp
@@ -18,11 +19,13 @@ const client = new S3Client({ region: 'ap-northeast-1' });
 const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
 const clientCloudFront = new CloudFrontClient({ region: 'ap-northeast-1' });
 
+const { NEW_USER_ORGANIZATION_ID, NEW_USER_ADMIN_ROLE, JWT_SECRET, JWT_EXPIRAION } = process.env;
+
 const saltRounds = 10;
 
 const createUser = async (req, res) => {
   const { name, email, password } = req.body;
-  const organizationId = process.env.NEW_USER_ORGANIZATION_ID || req.userdata.organizationId;
+  const organizationId = NEW_USER_ORGANIZATION_ID || req.userdata.organizationId;
   const picture = '';
 
   // check whether the email exists in RDS or ES
@@ -36,7 +39,7 @@ const createUser = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
   const sql = `INSERT INTO user (email, password, organization_id) VALUES (?, ?, ?);`;
-  const [resultSql] = await promisePool.execute(sql, [email, hashedPassword, organizationId]);
+  await promisePool.execute(sql, [email, hashedPassword, organizationId]);
 
   const result = await es[organizationId].index({
     index: 'user',
@@ -45,22 +48,19 @@ const createUser = async (req, res) => {
       email,
       password: hashedPassword,
       picture,
-      role: +process.env.NEW_USER_ADMIN_ROLE || 1,
+      role: +NEW_USER_ADMIN_ROLE || 1,
       socket_id: null,
     },
   });
 
   //set default pfp
-  const params = {
+  const command = new CopyObjectCommand({
     Bucket: 'law-msger-frontend',
     CopySource: '/law-msger-frontend/images/default_pfp.jpg',
     Key: `profile_picture/${result._id}.jpg`,
-  };
+  });
 
-  const command = new CopyObjectCommand(params);
-  const response = await client.send(command);
-
-  console.log('S3 default PFP:', response);
+  await client.send(command);
 
   res.status(201).json({ data: 'created' });
 };
@@ -96,32 +96,28 @@ const signIn = async (req, res) => {
     created_at: result._source.created_at,
   };
 
-  const jwtToken = await jwtSign(jwtPayload, process.env.JWT_SECRET, {
-    expiresIn: +process.env.JWT_EXPIRAION,
+  const jwtToken = await jwtSign(jwtPayload, JWT_SECRET, {
+    expiresIn: +JWT_EXPIRAION,
   });
 
-  // response to client
-  const response = {
+  res.json({
     data: {
       access_token: jwtToken,
-      access_expired: process.env.JWT_EXPIRAION,
+      access_expired: JWT_EXPIRAION,
       user: jwtPayload,
     },
-  };
-
-  res.json(response);
+  });
 };
 
 const getUserData = async (req, res) => {
-  const response = {
+  res.json({
     data: req.userdata,
-  };
-
-  res.json(response);
+  });
 };
 
 const updateUserPassword = async (req, res) => {
   const { oldPassword, newPassword, confirm } = req.body;
+  const { organizationId, id, email } = req.userdata;
 
   if (oldPassword === newPassword) {
     return res.status(400).json({ error: 'new password and old password should not be identical' });
@@ -130,7 +126,7 @@ const updateUserPassword = async (req, res) => {
   if (newPassword !== confirm) return res.status(400).json({ error: 'new password should match' });
 
   //get old password
-  const result = await getESUserDataByEmail(req.userdata.organizationId, req.userdata.email);
+  const result = await getESUserDataByEmail(organizationId, email);
 
   //check password is correct or not
   const isCorrectPassword = await bcrypt.compare(oldPassword, result._source.password);
@@ -140,24 +136,20 @@ const updateUserPassword = async (req, res) => {
 
   //update mysql
   const sql = `UPDATE user SET password = ? WHERE organization_id = ? AND email = ?`;
-  const resultSql = await promisePool.execute(sql, [
-    hashedPassword,
-    req.userdata.organizationId,
-    req.userdata.email,
-  ]);
+  await promisePool.execute(sql, [hashedPassword, organizationId, email]);
 
-  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
+  const resultUpdate = await es[organizationId].updateByQuery({
     index: 'user',
     script: {
       lang: 'painless',
       source: `ctx._source.password = '${hashedPassword}'`,
     },
     query: {
-      term: { '_id': req.userdata.id },
+      term: { '_id': id },
     },
   });
 
-  if (!resultUpdate.updated) return res.status(500).json({ error: 'failed' });
+  if (!resultUpdate.updated) return res.status(500).json({ error: 'update failed' });
 
   res.json({
     data: 'updated',
@@ -169,7 +161,7 @@ const updateUserPicture = async (req, res) => {
 
   if (!profilePicture) return res.status(400).json({ error: 'no picture found' });
 
-  const paramsInvalidation = {
+  const commandInvalidation = new CreateInvalidationCommand({
     DistributionId: 'E21OBVDL9ASI5Z',
     InvalidationBatch: {
       CallerReference: `${Date.now()}`,
@@ -178,12 +170,8 @@ const updateUserPicture = async (req, res) => {
         Items: [`/profile_picture/${req.userdata.id}.jpg`],
       },
     },
-  };
-
-  const commandInvalidation = new CreateInvalidationCommand(paramsInvalidation);
-  const responseInvalidation = await clientCloudFront.send(commandInvalidation);
-
-  console.log('CloudFront invalidation:', responseInvalidation);
+  });
+  await clientCloudFront.send(commandInvalidation);
 
   res.json({
     data: 'updated',
@@ -192,25 +180,18 @@ const updateUserPicture = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   const { email } = req.body;
+  const { organizationId } = req.userdata;
 
   //check whether the email exists
-  const resultEmail = await getESUserDataByEmail(req.userdata.organizationId, email);
-
+  const resultEmail = await getESUserDataByEmail(organizationId, email);
   if (!resultEmail) return res.status(400).json({ error: 'email not found' });
 
-  const resultSql = await deleteOrganizationUserData(req.userdata.organizationId, email);
-  const resultUser = await deleteUserByEmail(req.userdata.organizationId, 'user', email);
+  await deleteOrganizationUserData(organizationId, email);
+  const resultUser = await deleteUserByEmail(organizationId, email);
 
   if (!resultUser.deleted) return res.status(500).json({ error: 'failed' });
 
-  const resultStarred = await es[req.userdata.organizationId].deleteByQuery({
-    index: 'star',
-    body: {
-      query: {
-        term: { 'contact_user_id': resultEmail._id },
-      },
-    },
-  });
+  await deleteStarredUser(organizationId, resultEmail._id);
 
   res.json({ data: 'deleted' });
 };

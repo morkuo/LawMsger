@@ -51,9 +51,9 @@ async function deleteOrganizationUserData(organizationId, email) {
   return result;
 }
 
-async function deleteUserByEmail(organizationId, index, email) {
+async function deleteUserByEmail(organizationId, email) {
   const result = await es[organizationId].deleteByQuery({
-    index,
+    index: 'user',
     body: {
       query: {
         term: { 'email.keyword': email },
