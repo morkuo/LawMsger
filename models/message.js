@@ -81,7 +81,7 @@ async function matchedClauses(organizationId, input) {
   return matchclauses;
 }
 
-async function getPrivateMessage(organizationId, userId, contactUserId) {
+async function getPrivateMessages(organizationId, userId, contactUserId) {
   const {
     hits: { hits: result },
   } = await es[organizationId].search({
@@ -110,7 +110,7 @@ async function getPrivateMessage(organizationId, userId, contactUserId) {
   return result;
 }
 
-async function updatePrivateMessageIsRead(organizationId, userId, contactUserId) {
+async function updatePrivateMessagesIsRead(organizationId, userId, contactUserId) {
   const result = await es[organizationId].updateByQuery({
     index: 'message',
     script: {
@@ -133,5 +133,6 @@ async function updatePrivateMessageIsRead(organizationId, userId, contactUserId)
 module.exports = {
   suggestions,
   matchedClauses,
-  getPrivateMessage,
+  getPrivateMessages,
+  updatePrivateMessagesIsRead,
 };
