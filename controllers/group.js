@@ -64,19 +64,7 @@ const getGroup = async (req, res) => {
 const getGroupParticipants = async (req, res) => {
   const { groupName } = req.query;
 
-  const {
-    hits: {
-      hits: [result],
-    },
-  } = await es[req.userdata.organizationId].search({
-    index: 'group',
-    body: {
-      size: process.env.ES_SEARCH_LIMIT,
-      query: {
-        term: { 'name.keyword': groupName },
-      },
-    },
-  });
+  const result = await getGroupByName(req.userdata.organizationId, groupName);
 
   const usersQuery = result._source.participants.map(userId => ({ term: { _id: userId } }));
 
