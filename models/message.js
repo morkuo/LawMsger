@@ -81,7 +81,7 @@ async function matchedClauses(organizationId, input) {
   return matchclauses;
 }
 
-async function getPrivateMessages(organizationId, userId, contactUserId) {
+async function getPrivateMessagesByUserId(organizationId, userId, contactUserId) {
   const {
     hits: { hits: result },
   } = await es[organizationId].search({
@@ -133,6 +133,6 @@ async function updatePrivateMessagesIsRead(organizationId, userId, contactUserId
 module.exports = {
   suggestions,
   matchedClauses,
-  getPrivateMessages,
+  getPrivateMessagesByUserId,
   updatePrivateMessagesIsRead,
 };

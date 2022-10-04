@@ -1,5 +1,5 @@
 const es = require('../utils/es');
-const { getPrivateMessages, updatePrivateMessagesIsRead } = require('../models/message');
+const { getPrivateMessagesByUserId, updatePrivateMessagesIsRead } = require('../models/message');
 require('dotenv').config;
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
@@ -35,11 +35,11 @@ async function generateS3PresignedUrl(result) {
   return result.map(doc => doc._source);
 }
 
-const getPivateMessages = async (req, res) => {
+const getPrivateMessages = async (req, res) => {
   const { contactUserId } = req.query;
   const { organizationId, id: userId } = req.userdata;
 
-  const result = await getPrivateMessages(organizationId, userId, contactUserId);
+  const result = await getPrivateMessagesByUserId(organizationId, userId, contactUserId);
 
   const messages = await generateS3PresignedUrl(result);
 
