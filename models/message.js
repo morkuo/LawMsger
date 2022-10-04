@@ -1,7 +1,11 @@
 const es = require('../utils/es');
 
 async function suggestions(organizationId, input, index) {
-  const result = await es[organizationId].search({
+  const {
+    suggest: {
+      suggestions: [result],
+    },
+  } = await es[organizationId].search({
     index: index || 'words',
     body: {
       suggest: {
@@ -17,11 +21,11 @@ async function suggestions(organizationId, input, index) {
 
   //words suggestion
   if (!index) {
-    return result.suggest.suggestions[0].options.map(option => option.text);
+    return result.options.map(option => option.text);
   }
 
   //clauses suggestion
-  const suggestions = result.suggest.suggestions[0].options.map(option => ({
+  const suggestions = result.options.map(option => ({
     title: option._source.suggest.input.replace(option._source.number, ''),
     number: option._source.number,
     body: option._source.body,
