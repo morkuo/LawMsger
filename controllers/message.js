@@ -158,7 +158,7 @@ const getGroupMessages = async (req, res) => {
   const { organizationId, id: userId } = req.userdata;
 
   // check whether the user is member of the group
-  const resultUser = getGroupById(organizationId, groupId);
+  const resultUser = await getGroupById(organizationId, groupId);
   if (!resultUser._source.participants.includes(userId)) {
     return res.status(403).json({ error: 'forbidden' });
   }
