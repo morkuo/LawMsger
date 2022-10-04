@@ -240,8 +240,6 @@ async function updateGroupMessagesIsRead(organizationId, userId, groupId) {
     },
   });
 
-  console.log(result);
-
   return result;
 }
 

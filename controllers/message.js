@@ -88,11 +88,6 @@ const getGroupMessages = async (req, res) => {
 
   const messages = await generateS3PresignedUrl(result);
 
-  //update isRead, add current user into isRead
-  // const messagesUnreadByUser = result
-  //   .filter(msg => !msg._source.isRead.includes(userId))
-  //   .map(msg => ({ term: { _id: msg._id } }));
-
   await updateGroupMessagesIsRead(organizationId, userId, groupId);
 
   res.json({
