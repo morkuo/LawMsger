@@ -92,7 +92,7 @@ const getGroupParticipants = async (req, res) => {
 };
 
 const addParticipants = async (req, res) => {
-  const { groupName, userIds, updateType } = req.body;
+  const { groupName, userIds } = req.body;
 
   const result = await getGroupByName(req.userdata.organizationId, groupName);
 
@@ -126,41 +126,6 @@ const addParticipants = async (req, res) => {
 
   for (const userId of userIds) {
     if (!usersExisting.includes(userId)) return res.status(400).json({ error: 'wrong user ids' });
-  }
-
-  if (!updateType) {
-    const currentParticipants = result._source.participants;
-
-    const isAllParticipants = userIds.every(userId => currentParticipants.includes(userId));
-    if (!isAllParticipants) return res.status(400).json({ error: 'some user are not member' });
-
-    const participants = result._source.participants;
-    const newParticipants = participants.filter(
-      currentParticipant => !userIds.includes(currentParticipant)
-    );
-
-    const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
-      index: 'group',
-      script: {
-        source: 'ctx._source.participants = params.newParticipants',
-        lang: 'painless',
-        params: {
-          newParticipants,
-        },
-      },
-      query: {
-        term: { 'name.keyword': groupName },
-      },
-    });
-
-    if (!resultUpdate.updated) return res.status(500).json({ error: 'server error' });
-
-    return res.json({
-      data: 'deleted',
-      group: {
-        id: result._id,
-      },
-    });
   }
 
   //append user id to the group participants
