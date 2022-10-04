@@ -110,6 +110,55 @@ async function getPrivateMessagesByUserId(organizationId, userId, contactUserId)
   return result;
 }
 
+async function getPrivateMessagesByUserIdMore(organizationId, userId, contactUserId, baselineTime) {
+  const {
+    hits: { hits: result },
+  } = await es[organizationId].search({
+    index: 'message',
+    size: 20,
+    sort: {
+      'created_at': 'desc',
+    },
+    query: {
+      bool: {
+        should: [
+          {
+            bool: {
+              filter: [
+                { term: { sender_id: userId } },
+                { term: { receiver_id: contactUserId } },
+                {
+                  range: {
+                    created_at: {
+                      lt: baselineTime,
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            bool: {
+              filter: [
+                { term: { sender_id: contactUserId } },
+                { term: { receiver_id: userId } },
+                {
+                  range: {
+                    created_at: {
+                      lt: baselineTime,
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  });
+  return result;
+}
+
 async function getGroupMessagesByGroupId(organizationId, groupId) {
   const {
     hits: { hits: result },
@@ -121,6 +170,33 @@ async function getGroupMessagesByGroupId(organizationId, groupId) {
     },
     query: {
       term: { group_id: groupId },
+    },
+  });
+  return result;
+}
+
+async function getGroupMessagesByGroupIdMore(organizationId, groupId, baselineTime) {
+  const {
+    hits: { hits: result },
+  } = await es[organizationId].search({
+    index: 'groupmessage',
+    size: messageSize,
+    sort: {
+      'created_at': 'desc',
+    },
+    query: {
+      bool: {
+        filter: [
+          { term: { group_id: groupId } },
+          {
+            range: {
+              created_at: {
+                lt: baselineTime,
+              },
+            },
+          },
+        ],
+      },
     },
   });
   return result;
@@ -169,7 +245,9 @@ module.exports = {
   suggestions,
   matchedClauses,
   getPrivateMessagesByUserId,
+  getPrivateMessagesByUserIdMore,
   getGroupMessagesByGroupId,
+  getGroupMessagesByGroupIdMore,
   updatePrivateMessagesIsRead,
   updateGroupMessagesIsRead,
 };

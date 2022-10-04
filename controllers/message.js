@@ -1,7 +1,9 @@
 const es = require('../utils/es');
 const {
   getPrivateMessagesByUserId,
+  getPrivateMessagesByUserIdMore,
   getGroupMessagesByGroupId,
+  getGroupMessagesByGroupIdMore,
   updatePrivateMessagesIsRead,
   updateGroupMessagesIsRead,
 } = require('../models/message');
@@ -10,8 +12,6 @@ require('dotenv').config;
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const client = new S3Client({ region: 'ap-northeast-1' });
-
-const messageSize = 15;
 
 async function generateS3PresignedUrl(result) {
   let filesInfo = [];
@@ -56,101 +56,35 @@ const getPrivateMessages = async (req, res) => {
   });
 };
 
-const getMoreMessages = async (req, res) => {
+const getPrivateMessagesMore = async (req, res) => {
   const { contactUserId, baselineTime } = req.query;
+  const { organizationId, id: userId } = req.userdata;
 
-  // console.log(baselineTime);
-  // const contactUserId = '5zes_oIBewLNoasY_gsd';
-
-  const {
-    hits: { hits: result },
-  } = await es[req.userdata.organizationId].search({
-    index: 'message',
-    size: 20,
-    sort: {
-      'created_at': 'desc',
-    },
-    query: {
-      bool: {
-        should: [
-          {
-            bool: {
-              filter: [
-                { term: { sender_id: req.userdata.id } },
-                { term: { receiver_id: contactUserId } },
-                {
-                  range: {
-                    created_at: {
-                      lt: baselineTime,
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          {
-            bool: {
-              filter: [
-                { term: { sender_id: contactUserId } },
-                { term: { receiver_id: req.userdata.id } },
-                {
-                  range: {
-                    created_at: {
-                      lt: baselineTime,
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  });
+  const result = await getPrivateMessagesByUserIdMore(
+    organizationId,
+    userId,
+    contactUserId,
+    baselineTime
+  );
 
   const messages = await generateS3PresignedUrl(result);
 
-  const response = {
+  res.json({
     data: messages,
-  };
-
-  res.json(response);
+  });
 };
 
-const getGroupMoreMessages = async (req, res) => {
+const getGroupMessagesMore = async (req, res) => {
   const { groupId, baselineTime } = req.query;
+  const { organizationId, id: userId } = req.userdata;
 
-  const {
-    hits: { hits: result },
-  } = await es[req.userdata.organizationId].search({
-    index: 'groupmessage',
-    size: 20,
-    sort: {
-      'created_at': 'desc',
-    },
-    query: {
-      bool: {
-        filter: [
-          { term: { group_id: groupId } },
-          {
-            range: {
-              created_at: {
-                lt: baselineTime,
-              },
-            },
-          },
-        ],
-      },
-    },
-  });
+  const result = await getGroupMessagesByGroupIdMore(organizationId, groupId, baselineTime);
 
   const messages = await generateS3PresignedUrl(result);
 
-  const response = {
+  res.json({
     data: messages,
-  };
-
-  res.json(response);
+  });
 };
 
 const getGroupMessages = async (req, res) => {
@@ -203,7 +137,7 @@ const uploadFiles = async (req, res) => {
 module.exports = {
   getPrivateMessages,
   getGroupMessages,
-  getMoreMessages,
-  getGroupMoreMessages,
+  getPrivateMessagesMore,
+  getGroupMessagesMore,
   uploadFiles,
 };
