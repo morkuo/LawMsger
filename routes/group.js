@@ -15,7 +15,7 @@ const {
   leaveGroup,
 } = require('../controllers/group');
 
-router.use(tryCatch(checkJwt));
+router.use(checkJwt);
 
 router.get('/group', tryCatch(getGroup));
 

@@ -10,7 +10,7 @@ const {
   getGroupMoreMessages,
 } = require('../controllers/message');
 
-router.use(tryCatch(checkJwt));
+router.use(checkJwt);
 
 router.get('/message', tryCatch(getHistoryMessages));
 

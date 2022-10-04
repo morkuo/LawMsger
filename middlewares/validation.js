@@ -3,6 +3,7 @@ const { jwtVerify } = require('../utils/helper');
 require('dotenv').config();
 
 const {
+  JWT_SECRET,
   AUTH_PASSWORD_MIN_LENGTH,
   AUTH_PASSWORD_MAX_LENGTH,
   AUTH_USERNAME_MIN_LENGTH,
@@ -24,7 +25,7 @@ async function checkJwt(req, res, next) {
 
   //parse token to retrieve userdata
   try {
-    req.userdata = await jwtVerify(token, process.env.JWT_SECRET);
+    req.userdata = await jwtVerify(token, JWT_SECRET);
   } catch (error) {
     return res.status(401).json({ error: 'wrong token' });
   }

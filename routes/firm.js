@@ -7,7 +7,7 @@ require('dotenv').config();
 
 router.post(
   '/firm/picture',
-  tryCatch(checkJwt),
+  checkJwt,
   checkRole,
   upload.any('images'),
   tryCatch(updateFirmPicture)

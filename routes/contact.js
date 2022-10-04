@@ -3,7 +3,7 @@ const { checkJwt } = require('../middlewares/validation');
 const { tryCatch } = require('../utils/helper');
 const { getAllContacts, getStarContacts } = require('../controllers/contact');
 
-router.use(tryCatch(checkJwt));
+router.use(checkJwt);
 
 router.get('/contact', tryCatch(getAllContacts));
 router.get('/contact/star', tryCatch(getStarContacts));

@@ -21,7 +21,7 @@ const {
 
 router.post('/user/signin', checkJson, signInRule(), tryCatch(signIn));
 
-router.use(tryCatch(checkJwt));
+router.use(checkJwt);
 
 router
   .route('/user')
