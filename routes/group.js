@@ -19,18 +19,16 @@ const {
 
 router.use(checkJwt);
 
-router.get('/group', tryCatch(getGroup));
-
-router.get('/group/participants', tryCatch(getGroupParticipants));
-
-router.use(checkJson);
-
-router.route('/group').post(createGroupRule(), tryCatch(createGroup));
+router
+  .route('/group')
+  .get(tryCatch(getGroup))
+  .post(checkJson, createGroupRule(), tryCatch(createGroup));
 
 router
   .route('/group/participants')
-  .put(addParticipantsRule(), tryCatch(addParticipants))
-  .delete(deleteParticipantsRule(), tryCatch(deleteParticipants));
+  .get('/group/participants', tryCatch(getGroupParticipants))
+  .put(checkJson, addParticipantsRule(), tryCatch(addParticipants))
+  .delete(checkJson, deleteParticipantsRule(), tryCatch(deleteParticipants));
 
 router.put('/group/leave', leaveGroupRule(), tryCatch(leaveGroup));
 
