@@ -22,10 +22,13 @@ router.get('/group', tryCatch(getGroup));
 
 router.get('/group/participants', tryCatch(getGroupParticipants));
 
-router.post('/group', tryCatch(checkJson), createGroupRule(), tryCatch(createGroup));
+router.use(checkJson);
 
-router.put('/group', tryCatch(checkJson), updateParticipantsRule(), tryCatch(updateParticipants));
+router
+  .route('/group')
+  .post(createGroupRule(), tryCatch(createGroup))
+  .put(updateParticipantsRule(), tryCatch(updateParticipants));
 
-router.put('/group/leave', tryCatch(checkJson), leaveGroupRule(), tryCatch(leaveGroup));
+router.put('/group/leave', leaveGroupRule(), tryCatch(leaveGroup));
 
 module.exports = router;
