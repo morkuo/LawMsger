@@ -222,7 +222,7 @@ async function updatePrivateMessagesIsRead(organizationId, userId, contactUserId
   return result;
 }
 
-async function updateGroupMessagesIsRead(organizationId, userId, messagesUnreadByUser) {
+async function updateGroupMessagesIsRead(organizationId, userId, groupId) {
   const result = await es[organizationId].updateByQuery({
     index: 'groupmessage',
     script: {
@@ -234,10 +234,14 @@ async function updateGroupMessagesIsRead(organizationId, userId, messagesUnreadB
     },
     query: {
       bool: {
-        should: messagesUnreadByUser,
+        filter: { term: { group_id: groupId } },
+        must_not: { term: { isRead: userId } },
       },
     },
   });
+
+  console.log(result);
+
   return result;
 }
 

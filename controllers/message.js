@@ -69,8 +69,6 @@ const getPrivateMessagesMore = async (req, res) => {
 
   const messages = await generateS3PresignedUrl(result);
 
-  await updatePrivateMessagesIsRead(organizationId, userId, contactUserId);
-
   res.json({
     data: messages,
   });
@@ -91,11 +89,11 @@ const getGroupMessages = async (req, res) => {
   const messages = await generateS3PresignedUrl(result);
 
   //update isRead, add current user into isRead
-  const messagesUnreadByUser = result
-    .filter(msg => !msg._source.isRead.includes(userId))
-    .map(msg => ({ term: { _id: msg._id } }));
+  // const messagesUnreadByUser = result
+  //   .filter(msg => !msg._source.isRead.includes(userId))
+  //   .map(msg => ({ term: { _id: msg._id } }));
 
-  await updateGroupMessagesIsRead(organizationId, userId, messagesUnreadByUser);
+  await updateGroupMessagesIsRead(organizationId, userId, groupId);
 
   res.json({
     data: messages,
@@ -109,13 +107,6 @@ const getGroupMessagesMore = async (req, res) => {
   const result = await getGroupMessagesByGroupIdMore(organizationId, groupId, baselineTime);
 
   const messages = await generateS3PresignedUrl(result);
-
-  //update isRead, add current user into isRead
-  const messagesUnreadByUser = result
-    .filter(msg => !msg._source.isRead.includes(userId))
-    .map(msg => ({ term: { _id: msg._id } }));
-
-  await updateGroupMessagesIsRead(organizationId, userId, messagesUnreadByUser);
 
   res.json({
     data: messages,
