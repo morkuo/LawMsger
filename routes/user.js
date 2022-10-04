@@ -18,7 +18,6 @@ const {
   updateUserPicture,
   deleteUser,
 } = require('../controllers/user');
-require('dotenv').config();
 
 router.post('/user/signin', checkJson, signInRule(), tryCatch(signIn));
 

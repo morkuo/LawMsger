@@ -6,7 +6,6 @@ const {
   updateParticipantsRule,
   leaveGroupRule,
 } = require('../middlewares/validation');
-const { body: check } = require('express-validator');
 const { tryCatch } = require('../utils/helper');
 const {
   createGroup,
