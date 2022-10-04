@@ -69,6 +69,8 @@ const getPrivateMessagesMore = async (req, res) => {
 
   const messages = await generateS3PresignedUrl(result);
 
+  await updatePrivateMessagesIsRead(organizationId, userId, contactUserId);
+
   res.json({
     data: messages,
   });
