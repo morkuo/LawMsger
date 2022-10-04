@@ -7,6 +7,8 @@ const {
   AUTH_PASSWORD_MAX_LENGTH,
   AUTH_USERNAME_MIN_LENGTH,
   AUTH_USERNAME_MAX_LENGTH,
+  GROUP_NAME_MIN_LENGTH,
+  GROUP_NAME_MAX_LENGTH,
 } = process.env;
 
 async function checkJwt(req, res, next) {
@@ -59,6 +61,20 @@ const checkPassword = passwordFieldName =>
       `min length: ${AUTH_PASSWORD_MIN_LENGTH}, max length: ${AUTH_PASSWORD_MAX_LENGTH}`
     );
 
+const checkGroupName = groupNameField =>
+  check(groupNameField)
+    .isString()
+    .withMessage('string not found')
+    .bail()
+    .trim()
+    .isLength({
+      min: GROUP_NAME_MIN_LENGTH,
+      max: GROUP_NAME_MAX_LENGTH,
+    })
+    .withMessage(`min length: ${GROUP_NAME_MIN_LENGTH}, max length: ${GROUP_NAME_MAX_LENGTH}`)
+    .bail()
+    .escape();
+
 function validate(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ error: errors.array() });
@@ -101,6 +117,22 @@ function signInRule() {
   return [checkEmail, checkPassword('password'), validate];
 }
 
+function createGroupRule() {
+  return [checkGroupName('name'), validate];
+}
+
+function updateParticipantsRule() {
+  return [
+    checkGroupName('groupName'),
+    check('userIds').isArray().withMessage('array not found'),
+    validate,
+  ];
+}
+
+function leaveGroupRule() {
+  return [checkGroupName('groupName'), validate];
+}
+
 module.exports = {
   checkJwt,
   checkJson,
@@ -110,4 +142,7 @@ module.exports = {
   createUserRule,
   updateUserPasswordRule,
   deleteUserRule,
+  createGroupRule,
+  updateParticipantsRule,
+  leaveGroupRule,
 };

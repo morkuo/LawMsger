@@ -1,5 +1,11 @@
 const router = require('express').Router();
-const { checkJwt, checkJson, validate } = require('../middlewares/validation');
+const {
+  checkJwt,
+  checkJson,
+  createGroupRule,
+  updateParticipantsRule,
+  leaveGroupRule,
+} = require('../middlewares/validation');
 const { body: check } = require('express-validator');
 const { tryCatch } = require('../utils/helper');
 const {
@@ -16,68 +22,10 @@ router.get('/group', tryCatch(getGroup));
 
 router.get('/group/participants', tryCatch(getGroupParticipants));
 
-router.post(
-  '/group',
-  tryCatch(checkJson),
-  check('name')
-    .isString()
-    .withMessage('string not found')
-    .bail()
-    .trim()
-    .isLength({
-      min: process.env.GROUP_NAME_MIN_LENGTH,
-      max: process.env.GROUP_NAME_MAX_LENGTH,
-    })
-    .withMessage(
-      `min length: ${process.env.GROUP_NAME_MIN_LENGTH}, max length: ${process.env.GROUP_NAME_MAX_LENGTH}`
-    )
-    .bail()
-    .escape(),
-  validate,
-  tryCatch(createGroup)
-);
+router.post('/group', tryCatch(checkJson), createGroupRule(), tryCatch(createGroup));
 
-router.put(
-  '/group',
-  tryCatch(checkJson),
-  check('groupName')
-    .isString()
-    .withMessage('string not found')
-    .bail()
-    .trim()
-    .isLength({
-      min: process.env.GROUP_NAME_MIN_LENGTH,
-      max: process.env.GROUP_NAME_MAX_LENGTH,
-    })
-    .withMessage(
-      `min length: ${process.env.GROUP_NAME_MIN_LENGTH}, max length: ${process.env.GROUP_NAME_MAX_LENGTH}`
-    )
-    .bail()
-    .escape(),
-  check('userIds').isArray().withMessage('array not found'),
-  validate,
-  tryCatch(updateParticipants)
-);
+router.put('/group', tryCatch(checkJson), updateParticipantsRule(), tryCatch(updateParticipants));
 
-router.put(
-  '/group/leave',
-  tryCatch(checkJson),
-  check('groupName')
-    .isString()
-    .withMessage('string not found')
-    .bail()
-    .trim()
-    .isLength({
-      min: process.env.GROUP_NAME_MIN_LENGTH,
-      max: process.env.GROUP_NAME_MAX_LENGTH,
-    })
-    .withMessage(
-      `min length: ${process.env.GROUP_NAME_MIN_LENGTH}, max length: ${process.env.GROUP_NAME_MAX_LENGTH}`
-    )
-    .bail()
-    .escape(),
-  validate,
-  tryCatch(leaveGroup)
-);
+router.put('/group/leave', tryCatch(checkJson), leaveGroupRule(), tryCatch(leaveGroup));
 
 module.exports = router;
