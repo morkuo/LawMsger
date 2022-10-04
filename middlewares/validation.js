@@ -122,7 +122,7 @@ function createGroupRule() {
   return [checkGroupName('name'), validate];
 }
 
-function updateParticipantsRule() {
+function addParticipantsRule() {
   return [
     checkGroupName('groupName'),
     check('userIds').isArray().withMessage('array not found'),
@@ -152,7 +152,7 @@ module.exports = {
   updateUserPasswordRule,
   deleteUserRule,
   createGroupRule,
-  updateParticipantsRule,
+  addParticipantsRule,
   deleteParticipantsRule,
   leaveGroupRule,
 };

@@ -91,7 +91,7 @@ const getGroupParticipants = async (req, res) => {
   res.json(users);
 };
 
-const updateParticipants = async (req, res) => {
+const addParticipants = async (req, res) => {
   const { groupName, userIds, updateType } = req.body;
 
   const result = await getGroupByName(req.userdata.organizationId, groupName);
@@ -299,7 +299,7 @@ module.exports = {
   createGroup,
   getGroup,
   getGroupParticipants,
-  updateParticipants,
+  addParticipants,
   deleteParticipants,
   leaveGroup,
 };
