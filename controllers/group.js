@@ -5,6 +5,7 @@ const {
   getParticipatedGroups,
   getUnreadGroupMessage,
 } = require('../models/group');
+const { getAllUser } = require('../models/user');
 require('dotenv').config;
 
 const createGroup = async (req, res) => {
@@ -110,17 +111,7 @@ const addParticipants = async (req, res) => {
   }
 
   //check whether userIds exist
-  const {
-    hits: { hits: resultUser },
-  } = await es[req.userdata.organizationId].search({
-    index: 'user',
-    body: {
-      size: process.env.ES_SEARCH_LIMIT,
-      query: {
-        match_all: {},
-      },
-    },
-  });
+  const resultUser = await getAllUser(req.userdata.organizationId);
 
   const usersExisting = resultUser.map(user => user._id);
 
