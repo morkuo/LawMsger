@@ -3,7 +3,9 @@ const { checkJwt } = require('../middlewares/validation');
 const { tryCatch } = require('../utils/helper');
 const { getAllContacts, getStarContacts } = require('../controllers/contact');
 
-router.get('/contact', tryCatch(checkJwt), tryCatch(getAllContacts));
-router.get('/contact/star', tryCatch(checkJwt), tryCatch(getStarContacts));
+router.use(tryCatch(checkJwt));
+
+router.get('/contact', tryCatch(getAllContacts));
+router.get('/contact/star', tryCatch(getStarContacts));
 
 module.exports = router;

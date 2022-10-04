@@ -2,6 +2,13 @@ const { body: check, validationResult } = require('express-validator');
 const { jwtVerify } = require('../utils/helper');
 require('dotenv').config();
 
+const {
+  AUTH_PASSWORD_MIN_LENGTH,
+  AUTH_PASSWORD_MAX_LENGTH,
+  AUTH_USERNAME_MIN_LENGTH,
+  AUTH_USERNAME_MAX_LENGTH,
+} = process.env;
+
 async function checkJwt(req, res, next) {
   let token = req.get('Authorization');
 
@@ -45,11 +52,11 @@ const checkPassword = passwordFieldName =>
     .withMessage('string not found')
     .bail()
     .isLength({
-      min: process.env.AUTH_PASSWORD_MIN_LENGTH,
-      max: process.env.AUTH_PASSWORD_MAX_LENGTH,
+      min: AUTH_PASSWORD_MIN_LENGTH,
+      max: AUTH_PASSWORD_MAX_LENGTH,
     })
     .withMessage(
-      `min length: ${process.env.AUTH_PASSWORD_MIN_LENGTH}, max length: ${process.env.AUTH_PASSWORD_MAX_LENGTH}`
+      `min length: ${AUTH_PASSWORD_MIN_LENGTH}, max length: ${AUTH_PASSWORD_MAX_LENGTH}`
     );
 
 function validate(req, res, next) {
@@ -67,11 +74,11 @@ function createUserRule() {
       .bail()
       .trim()
       .isLength({
-        min: process.env.AUTH_USERNAME_MIN_LENGTH,
-        max: process.env.AUTH_USERNAME_MAX_LENGTH,
+        min: AUTH_USERNAME_MIN_LENGTH,
+        max: AUTH_USERNAME_MAX_LENGTH,
       })
       .withMessage(
-        `min length: ${process.env.AUTH_USERNAME_MIN_LENGTH}, max length: ${process.env.AUTH_USERNAME_MAX_LENGTH}`
+        `min length: ${AUTH_USERNAME_MIN_LENGTH}, max length: ${AUTH_USERNAME_MAX_LENGTH}`
       )
       .bail()
       .isAlpha()

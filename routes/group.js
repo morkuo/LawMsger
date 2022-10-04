@@ -10,13 +10,14 @@ const {
   leaveGroup,
 } = require('../controllers/group');
 
-router.get('/group', tryCatch(checkJwt), tryCatch(getGroup));
+router.use(tryCatch(checkJwt));
 
-router.get('/group/participants', tryCatch(checkJwt), tryCatch(getGroupParticipants));
+router.get('/group', tryCatch(getGroup));
+
+router.get('/group/participants', tryCatch(getGroupParticipants));
 
 router.post(
   '/group',
-  tryCatch(checkJwt),
   tryCatch(checkJson),
   check('name')
     .isString()
@@ -38,7 +39,6 @@ router.post(
 
 router.put(
   '/group',
-  tryCatch(checkJwt),
   tryCatch(checkJson),
   check('groupName')
     .isString()
@@ -61,7 +61,6 @@ router.put(
 
 router.put(
   '/group/leave',
-  tryCatch(checkJwt),
   tryCatch(checkJson),
   check('groupName')
     .isString()
