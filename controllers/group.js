@@ -194,13 +194,9 @@ const leaveGroup = async (req, res) => {
 };
 
 function checkUpdateSafety(targetGroup, hostUserId, newParticipants) {
-  const {
-    _source: { host },
-  } = targetGroup;
-
   if (!targetGroup) throw new customError('group not found', 400);
-  if (host !== hostUserId) throw new customError('forbidden', 403);
-  if (newParticipants.includes(host)) {
+  if (targetGroup._source.host !== hostUserId) throw new customError('forbidden', 403);
+  if (newParticipants.includes(targetGroup._source.host)) {
     throw new customError('users should not include host user', 400);
   }
 
