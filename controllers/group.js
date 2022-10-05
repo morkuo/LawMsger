@@ -95,7 +95,7 @@ const addParticipants = async (req, res) => {
   try {
     checkUpdateSafety(result, hostUserId, userIds);
   } catch (error) {
-    return res.status(error.status).json(error.msg);
+    return res.status(error.status).json({ error: error.msg });
   }
 
   //check whether userIds exist
