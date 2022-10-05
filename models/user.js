@@ -44,6 +44,23 @@ async function getAllUser(organizationId) {
   return result;
 }
 
+async function getUsersByIds(organizationId, usersId) {
+  const {
+    hits: { hits: result },
+  } = await es[organizationId].search({
+    index: 'user',
+    body: {
+      size: ES_SEARCH_LIMIT,
+      query: {
+        bool: {
+          should: usersId,
+        },
+      },
+    },
+  });
+  return result;
+}
+
 async function deleteOrganizationUserData(organizationId, email) {
   const sql = `DELETE FROM user WHERE email = ? AND organization_id = ?;`;
   const [result] = await promisePool.execute(sql, [email, organizationId]);
@@ -65,6 +82,7 @@ async function deleteUserByEmail(organizationId, email) {
 
 module.exports = {
   getAllUser,
+  getUsersByIds,
   getOrganizationUserDataByEmail,
   deleteOrganizationUserData,
   getESUserDataByEmail,

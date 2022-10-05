@@ -1,13 +1,9 @@
 const es = require('./es');
-const { jwtVerify, tryCatch } = require('../utils/helper');
 const { suggestions, matchedClauses } = require('../models/message');
 require('dotenv').config();
 
 function msgHandler(io, socket) {
   socket.on('msg', async (msg, targetSocketId, targetUserId, targetUserName, filesInfo) => {
-    // console.log('Server receives: ' + msg);
-    // console.log('received' + fileUrls);
-
     const fromSocketId = socket.id;
     const fromUserId = socket.userdata.id;
     const fromUserName = socket.userdata.name;
@@ -45,8 +41,6 @@ function msgHandler(io, socket) {
           filesInfo
         );
     }
-
-    // console.log('Msg has been sent to: ' + targetSocketId);
   });
 }
 

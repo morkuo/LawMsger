@@ -5,6 +5,7 @@ const {
   getParticipatedGroups,
   getUnreadGroupMessage,
 } = require('../models/group');
+const { getUsersByIds } = require('../models/group');
 const { getAllUser } = require('../models/user');
 require('dotenv').config;
 
@@ -64,32 +65,21 @@ const getGroup = async (req, res) => {
 
 const getGroupParticipants = async (req, res) => {
   const { groupName } = req.query;
+  const { organizationId } = req.userdata;
 
-  const result = await getGroupByName(req.userdata.organizationId, groupName);
+  const resultGroup = await getGroupByName(organizationId, groupName);
 
-  const usersQuery = result._source.participants.map(userId => ({ term: { _id: userId } }));
+  const usersIds = resultGroup._source.participants.map(userId => ({ term: { _id: userId } }));
 
-  const {
-    hits: { hits: resultUsers },
-  } = await es[req.userdata.organizationId].search({
-    index: 'user',
-    body: {
-      size: process.env.ES_SEARCH_LIMIT,
-      query: {
-        bool: {
-          should: usersQuery,
-        },
-      },
-    },
-  });
+  const result = getUsersByIds(organizationId, usersIds);
 
-  const users = resultUsers.map(user => ({
-    name: user._source.name,
-    email: user._source.email,
-    picture: user._source.picture,
-  }));
-
-  res.json(users);
+  res.json(
+    result.map(user => ({
+      name: user._source.name,
+      email: user._source.email,
+      picture: user._source.picture,
+    }))
+  );
 };
 
 const addParticipants = async (req, res) => {
