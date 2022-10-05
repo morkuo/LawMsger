@@ -71,7 +71,7 @@ const getGroupParticipants = async (req, res) => {
 
   const usersIds = resultGroup._source.participants.map(userId => ({ term: { _id: userId } }));
 
-  const result = getUsersByIds(organizationId, usersIds);
+  const result = await getUsersByIds(organizationId, usersIds);
 
   res.json(
     result.map(user => ({
