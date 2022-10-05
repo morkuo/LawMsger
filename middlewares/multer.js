@@ -1,10 +1,8 @@
 const multer = require('multer');
-const { S3Client } = require('@aws-sdk/client-s3');
+const { s3 } = require('../utils/aws');
 const multerS3 = require('multer-s3');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-
-const s3 = new S3Client({ region: 'ap-northeast-1' });
 
 const apiMap = {
   'user/picture': profilePicture,
