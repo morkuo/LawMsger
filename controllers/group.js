@@ -93,7 +93,7 @@ const addParticipants = async (req, res) => {
   const result = await getGroupByName(organizationId, groupName);
 
   try {
-    checkUpdateSafety(result, hostUserId, newParticipants);
+    checkUpdateSafety(result, hostUserId, userIds);
   } catch (error) {
     return res.status(error.status).json(error.msg);
   }
