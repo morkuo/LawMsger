@@ -113,24 +113,9 @@ const addParticipants = async (req, res) => {
     if (!usersExisting.includes(userId)) return res.status(400).json({ error: 'wrong user ids' });
   }
 
-  //append user id to the group participants
-  const resultUpdate = await es[organizationId].updateByQuery({
-    index: 'group',
-    script: {
-      source: `for(int i=0; i<params.userIds.length; i++){
-        if(!ctx._source.participants.contains(params.userIds[i])){
-          ctx._source.participants.add(params.userIds[i])
-        }
-      }`,
-      lang: 'painless',
-      params: {
-        userIds,
-      },
-    },
-    query: {
-      term: { 'name.keyword': groupName },
-    },
-  });
+  //create new participants array
+  const newParticipants = [...result._source.participants, ...userIds];
+  const resultUpdate = await updateParticipants(organizationId, groupName, newParticipants);
 
   if (!resultUpdate.updated) return res.status(500).json({ error: 'server error' });
 
@@ -208,24 +193,6 @@ const leaveGroup = async (req, res) => {
   const newParticipants = participants.filter(currentParticipant => currentParticipant !== userId);
 
   const resultUpdate = await updateParticipants(organizationId, groupName, newParticipants);
-
-  // const resultUpdate = await es[organizationId].updateByQuery({
-  //   index: 'group',
-  //   script: {
-  //     source: `for(int i=0; i<ctx._source.participants.length; i++){
-  //         if(params.userId == ctx._source.participants[i]){
-  //           ctx._source.participants.remove(i)
-  //         }
-  //       }`,
-  //     lang: 'painless',
-  //     params: {
-  //       userId,
-  //     },
-  //   },
-  //   query: {
-  //     term: { 'name.keyword': groupName },
-  //   },
-  // });
 
   if (!resultUpdate.updated) return res.status(500).json({ error: 'server error' });
 
