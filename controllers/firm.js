@@ -1,6 +1,5 @@
 require('dotenv').config;
-const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
-const clientCloudFront = new CloudFrontClient({ region: 'ap-northeast-1' });
+const { cf, CreateInvalidationCommand } = require('../utils/aws');
 
 const updateFirmPicture = async (req, res) => {
   const [firmPicture] = req.files;
@@ -19,7 +18,7 @@ const updateFirmPicture = async (req, res) => {
   };
 
   const commandInvalidation = new CreateInvalidationCommand(paramsInvalidation);
-  const responseInvalidation = await clientCloudFront.send(commandInvalidation);
+  const responseInvalidation = await cf.send(commandInvalidation);
 
   console.log('CloudFront invalidation:', responseInvalidation);
 
