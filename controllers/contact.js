@@ -3,9 +3,11 @@ const { getAllUser, getStarredUser, getStarredUserData } = require('../models/co
 require('dotenv').config;
 
 const getAllContacts = async (req, res) => {
-  const result = await getAllUser(req.userdata.organizationId);
+  const { organizationId, id: currentUserId } = req.userdata;
 
-  const users = result.filter(user => user._id !== req.userdata.id);
+  const result = await getAllUser(organizationId);
+
+  const users = result.filter(user => user._id !== currentUserId);
 
   //no other users other than current user
   if (users.length === 0) return res.json(users);
@@ -17,7 +19,7 @@ const getAllContacts = async (req, res) => {
           bool: {
             filter: [
               { term: { sender_id: user._id } },
-              { term: { receiver_id: req.userdata.id } },
+              { term: { receiver_id: currentUserId } },
               { term: { isRead: false } },
             ],
           },
@@ -27,7 +29,7 @@ const getAllContacts = async (req, res) => {
     return querybody;
   }, []);
 
-  const { responses } = await es[req.userdata.organizationId].msearch({
+  const { responses } = await es[organizationId].msearch({
     body: unreadMessagesQueryBody,
   });
 
@@ -51,13 +53,15 @@ const getAllContacts = async (req, res) => {
 };
 
 const getStarContacts = async (req, res) => {
-  const resultStar = await getStarredUser(req.userdata.organizationId, req.userdata.id);
+  const { organizationId, id: currentUserId } = req.userdata;
+
+  const resultStar = await getStarredUser(organizationId, currentUserId);
 
   if (resultStar.length === 0) return res.json(resultStar);
 
   const stars = resultStar.map(star => star._source.contact_user_id);
 
-  const resultStarDetail = await getStarredUserData(req.userdata.organizationId, stars);
+  const resultStarDetail = await getStarredUserData(organizationId, stars);
 
   if (stars.length === 0) return res.json(stars);
 
@@ -68,7 +72,7 @@ const getStarContacts = async (req, res) => {
           bool: {
             filter: [
               { term: { sender_id: userId } },
-              { term: { receiver_id: req.userdata.id } },
+              { term: { receiver_id: currentUserId } },
               { term: { isRead: false } },
             ],
           },
@@ -78,7 +82,7 @@ const getStarContacts = async (req, res) => {
     return querybody;
   }, []);
 
-  const { responses } = await es[req.userdata.organizationId].msearch({
+  const { responses } = await es[organizationId].msearch({
     body: unreadMessagesQueryBody,
   });
 
