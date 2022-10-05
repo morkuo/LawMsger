@@ -13,30 +13,11 @@ const getAllContacts = async (req, res) => {
   //no other users other than current user
   if (users.length === 0) return res.json(users);
 
-  const unreadMessagesQueryBody = users.reduce((querybody, user) => {
-    querybody.push({ index: 'message' }),
-      querybody.push({
-        query: {
-          bool: {
-            filter: [
-              { term: { sender_id: user._id } },
-              { term: { receiver_id: currentUserId } },
-              { term: { isRead: false } },
-            ],
-          },
-        },
-      });
+  const userIds = users.map(user => user._id);
 
-    return querybody;
-  }, []);
-
-  const { responses } = await es[organizationId].msearch({
-    body: unreadMessagesQueryBody,
-  });
+  const responses = await getUnreadMessages(organizationId, currentUserId, userIds);
 
   const unreadMessagesCount = responses.map(response => response.hits.total.value);
-
-  // console.log('Hashtable on controller:', global.hashTable);
 
   let i = 0;
   const contacts = users
