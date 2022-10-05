@@ -127,17 +127,10 @@ const deleteParticipants = async (req, res) => {
 
   const result = await getGroupByName(organizationId, groupName);
 
-  //check whether the group exist
-  if (!result) return res.status(400).json({ error: 'group not found' });
-
-  //check whether the request is send from host of the group
-  if (result._source.host !== hostUserId) {
-    return res.status(403).json({ error: 'forbidden' });
-  }
-
-  //check whether userIds include host Id
-  if (userIds.includes(result._source.host)) {
-    return res.status(400).json({ error: 'users should not include host user' });
+  try {
+    checkUpdateSafety(result, hostUserId, userIds);
+  } catch (error) {
+    return res.status(error.status).json({ error: error.message });
   }
 
   const currentParticipants = result._source.participants;
