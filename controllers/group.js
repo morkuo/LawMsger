@@ -1,5 +1,5 @@
-const es = require('../utils/es');
 const {
+  createNewGroup,
   getGroupByName,
   getGroupCountByName,
   getParticipatedGroups,
@@ -17,18 +17,11 @@ const createGroup = async (req, res) => {
   const { organizationId, id: userId } = req.userdata;
 
   //check whether the name has been used
-  const resultCount = await getGroupCountByName(organizationId, name);
+  const resultCount = await getGroupCountByName(organizationId, name, userId);
 
   if (resultCount) return res.status(409).json({ error: 'group exists' });
 
-  const result = await es[organizationId].index({
-    index: 'group',
-    document: {
-      host: userId,
-      name,
-      participants: [userId],
-    },
-  });
+  const result = await createNewGroup(organizationId, name, userId);
 
   res.status(201).json({
     data: 'created',
