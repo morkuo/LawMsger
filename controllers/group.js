@@ -9,6 +9,7 @@ const {
 } = require('../models/group');
 const { getUsersByIds } = require('../models/user');
 const { getAllUser } = require('../models/user');
+const { check } = require('express-validator');
 require('dotenv').config;
 
 const createGroup = async (req, res) => {
@@ -91,17 +92,10 @@ const addParticipants = async (req, res) => {
 
   const result = await getGroupByName(organizationId, groupName);
 
-  //check whether the group exist
-  if (!result) return res.status(400).json({ error: 'group not found' });
-
-  //check whether the request is send from host of the group
-  if (result._source.host !== hostUserId) {
-    return res.status(403).json({ error: 'forbidden' });
-  }
-
-  //check whether userIds include host Id
-  if (userIds.includes(result._source.host)) {
-    return res.status(400).json({ error: 'users should not include host user' });
+  try {
+    checkUpdateSafety(result, hostUserId, newParticipants);
+  } catch (error) {
+    return res.status(error.status).json(error.msg);
   }
 
   //check whether userIds exist
@@ -198,6 +192,20 @@ const leaveGroup = async (req, res) => {
 
   res.json({ data: 'updated' });
 };
+
+function checkUpdateSafety(targetGroup, hostUserId, newParticipants) {
+  const {
+    _source: { host },
+  } = targetGroup._source.host;
+
+  if (!targetGroup) throw new Error({ status: 400, msg: 'group not found' });
+  if (host !== hostUserId) throw new Error({ status: 403, msg: 'forbidden' });
+  if (newParticipants.includes(host)) {
+    throw new Error({ status: 400, msg: 'users should not include host user' });
+  }
+
+  return true;
+}
 
 module.exports = {
   createGroup,
