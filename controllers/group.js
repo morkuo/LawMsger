@@ -203,23 +203,29 @@ const leaveGroup = async (req, res) => {
     return res.json({ data: 'deleted' });
   }
 
-  const resultUpdate = await es[organizationId].updateByQuery({
-    index: 'group',
-    script: {
-      source: `for(int i=0; i<ctx._source.participants.length; i++){
-          if(params.userId == ctx._source.participants[i]){
-            ctx._source.participants.remove(i)
-          }
-        }`,
-      lang: 'painless',
-      params: {
-        userId,
-      },
-    },
-    query: {
-      term: { 'name.keyword': groupName },
-    },
-  });
+  //create new participants array
+  const participants = result._source.participants;
+  const newParticipants = participants.filter(currentParticipant => currentParticipant !== userId);
+
+  const resultUpdate = await updateParticipants(organizationId, groupName, newParticipants);
+
+  // const resultUpdate = await es[organizationId].updateByQuery({
+  //   index: 'group',
+  //   script: {
+  //     source: `for(int i=0; i<ctx._source.participants.length; i++){
+  //         if(params.userId == ctx._source.participants[i]){
+  //           ctx._source.participants.remove(i)
+  //         }
+  //       }`,
+  //     lang: 'painless',
+  //     params: {
+  //       userId,
+  //     },
+  //   },
+  //   query: {
+  //     term: { 'name.keyword': groupName },
+  //   },
+  // });
 
   if (!resultUpdate.updated) return res.status(500).json({ error: 'server error' });
 
