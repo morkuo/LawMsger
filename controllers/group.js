@@ -11,18 +11,19 @@ require('dotenv').config;
 
 const createGroup = async (req, res) => {
   const { name } = req.body;
+  const { organizationId, id: userId } = req.userdata;
 
   //check whether the name has been used
-  const resultCount = await getGroupCountByName(req.userdata.organizationId, name);
+  const resultCount = await getGroupCountByName(organizationId, name);
 
   if (resultCount) return res.status(409).json({ error: 'group exists' });
 
-  const result = await es[req.userdata.organizationId].index({
+  const result = await es[organizationId].index({
     index: 'group',
     document: {
-      host: req.userdata.id,
+      host: userId,
       name,
-      participants: [req.userdata.id],
+      participants: [userId],
     },
   });
 
