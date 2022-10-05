@@ -9,7 +9,7 @@ const {
 } = require('../models/group');
 const { getUsersByIds } = require('../models/user');
 const { getAllUser } = require('../models/user');
-const { check } = require('express-validator');
+const { customError } = require('../utils/error');
 require('dotenv').config;
 
 const createGroup = async (req, res) => {
@@ -196,12 +196,12 @@ const leaveGroup = async (req, res) => {
 function checkUpdateSafety(targetGroup, hostUserId, newParticipants) {
   const {
     _source: { host },
-  } = targetGroup._source.host;
+  } = targetGroup;
 
-  if (!targetGroup) throw new Error({ status: 400, msg: 'group not found' });
-  if (host !== hostUserId) throw new Error({ status: 403, msg: 'forbidden' });
+  if (!targetGroup) throw new customError('group not found', 400);
+  if (host !== hostUserId) throw new customError('forbidden', 403);
   if (newParticipants.includes(host)) {
-    throw new Error({ status: 400, msg: 'users should not include host user' });
+    throw new customError('users should not include host user', 400);
   }
 
   return true;
