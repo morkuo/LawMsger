@@ -12,14 +12,6 @@ const { deleteStarredUser } = require('../models/contact');
 const { s3, CopyObjectCommand, cf, CreateInvalidationCommand } = require('../utils/aws');
 require('dotenv').config;
 
-// //for copying default pfp
-// const { S3Client, CopyObjectCommand } = require('@aws-sdk/client-s3');
-// const client = new S3Client({ region: 'ap-northeast-1' });
-
-// //for invalidation
-// const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
-// const clientCloudFront = new CloudFrontClient({ region: 'ap-northeast-1' });
-
 const { NEW_USER_ORGANIZATION_ID, NEW_USER_ADMIN_ROLE, JWT_SECRET, JWT_EXPIRAION } = process.env;
 
 const saltRounds = 10;

@@ -9,8 +9,7 @@ const {
 const { getGroupById } = require('../models/group');
 require('dotenv').config;
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const client = new S3Client({ region: 'ap-northeast-1' });
+const { s3, GetObjectCommand } = require('../utils/aws');
 
 async function generateS3PresignedUrl(result) {
   let filesInfo = [];
@@ -28,7 +27,7 @@ async function generateS3PresignedUrl(result) {
             file.originalName
           )}"`,
         });
-        const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+        const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
         filesInfo.push({ location: url, key: file.key, originalName: file.originalName });
       }
@@ -120,7 +119,7 @@ const uploadFiles = async (req, res) => {
       Expires: 60 * 60,
       ResponseContentDisposition: `attachment; filename="${encodeURIComponent(file.originalname)}"`,
     });
-    const url = await getSignedUrl(client, command, { expiresIn: 30 });
+    const url = await getSignedUrl(s3, command, { expiresIn: 30 });
 
     filesInfo.push({ location: url, key: file.key, originalName: file.originalname });
   }
