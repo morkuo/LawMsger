@@ -36,13 +36,13 @@ const createGroup = async (req, res) => {
 };
 
 const getGroup = async (req, res) => {
-  const userId = req.userdata.id;
+  const { organizationId, id: userId } = req.userdata;
 
-  const result = await getParticipatedGroups(req.userdata.organizationId, userId);
+  const result = await getParticipatedGroups(organizationId, userId);
 
   const groupIds = result.map(group => ({ term: { group_id: group._id } }));
 
-  const unreadMessages = await getUnreadGroupMessage(req.userdata.organizationId, userId, groupIds);
+  const unreadMessages = await getUnreadGroupMessage(organizationId, userId, groupIds);
 
   let unreadMessagesCount = {};
   unreadMessages.forEach(msg => {
@@ -85,14 +85,15 @@ const getGroupParticipants = async (req, res) => {
 
 const addParticipants = async (req, res) => {
   const { groupName, userIds } = req.body;
+  const { organizationId, id: hostUserId } = req.userdata;
 
-  const result = await getGroupByName(req.userdata.organizationId, groupName);
+  const result = await getGroupByName(organizationId, groupName);
 
   //check whether the group exist
   if (!result) return res.status(400).json({ error: 'group not found' });
 
   //check whether the request is send from host of the group
-  if (result._source.host !== req.userdata.id) {
+  if (result._source.host !== hostUserId) {
     return res.status(403).json({ error: 'forbidden' });
   }
 
@@ -102,7 +103,7 @@ const addParticipants = async (req, res) => {
   }
 
   //check whether userIds exist
-  const resultUser = await getAllUser(req.userdata.organizationId);
+  const resultUser = await getAllUser(organizationId);
 
   const usersExisting = resultUser.map(user => user._id);
 
@@ -111,7 +112,7 @@ const addParticipants = async (req, res) => {
   }
 
   //append user id to the group participants
-  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
+  const resultUpdate = await es[organizationId].updateByQuery({
     index: 'group',
     script: {
       source: `for(int i=0; i<params.userIds.length; i++){
@@ -141,14 +142,15 @@ const addParticipants = async (req, res) => {
 
 const deleteParticipants = async (req, res) => {
   const { groupName, userIds } = req.body;
+  const { organizationId, id: hostUserId } = req.userdata;
 
-  const result = await getGroupByName(req.userdata.organizationId, groupName);
+  const result = await getGroupByName(organizationId, groupName);
 
   //check whether the group exist
   if (!result) return res.status(400).json({ error: 'group not found' });
 
   //check whether the request is send from host of the group
-  if (result._source.host !== req.userdata.id) {
+  if (result._source.host !== hostUserId) {
     return res.status(403).json({ error: 'forbidden' });
   }
 
@@ -169,7 +171,7 @@ const deleteParticipants = async (req, res) => {
     currentParticipant => !userIds.includes(currentParticipant)
   );
 
-  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
+  const resultUpdate = await es[organizationId].updateByQuery({
     index: 'group',
     script: {
       source: 'ctx._source.participants = params.newParticipants',
@@ -195,17 +197,16 @@ const deleteParticipants = async (req, res) => {
 
 const leaveGroup = async (req, res) => {
   const { groupName } = req.body;
+  const { organizationId, id: userId } = req.userdata;
 
-  const userId = req.userdata.id;
-
-  const result = await getGroupByName(req.userdata.organizationId, groupName);
+  const result = await getGroupByName(organizationId, groupName);
 
   //check whether the group exist
   if (!result) return res.status(400).json({ error: 'group not found' });
 
   //if current user is the host, delete the group
   if (result._source.host === userId) {
-    const resultUpdate = await es[req.userdata.organizationId].deleteByQuery({
+    const resultUpdate = await es[organizationId].deleteByQuery({
       index: 'group',
       body: {
         query: {
@@ -219,7 +220,7 @@ const leaveGroup = async (req, res) => {
     return res.json({ data: 'deleted' });
   }
 
-  const resultUpdate = await es[req.userdata.organizationId].updateByQuery({
+  const resultUpdate = await es[organizationId].updateByQuery({
     index: 'group',
     script: {
       source: `for(int i=0; i<ctx._source.participants.length; i++){
