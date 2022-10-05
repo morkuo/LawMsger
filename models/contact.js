@@ -1,20 +1,5 @@
 const es = require('../utils/es');
 
-async function getAllUser(organizationId) {
-  const {
-    hits: { hits: result },
-  } = await es[organizationId].search({
-    index: 'user',
-    body: {
-      size: process.env.ES_SEARCH_LIMIT,
-      query: {
-        match_all: {},
-      },
-    },
-  });
-  return result;
-}
-
 async function getStarredUser(organizationId, userId) {
   const {
     hits: { hits: resultStar },
@@ -62,7 +47,6 @@ async function deleteStarredUser(organizationId, starredUserId) {
 }
 
 module.exports = {
-  getAllUser,
   getStarredUser,
   getStarredUserData,
   deleteStarredUser,

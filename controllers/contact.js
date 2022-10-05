@@ -1,4 +1,5 @@
-const { getAllUser, getStarredUser, getStarredUserData } = require('../models/contact');
+const { getStarredUser, getStarredUserData } = require('../models/contact');
+const { getAllUser } = require('../models/user');
 const { getUnreadMessages } = require('../models/message');
 require('dotenv').config;
 
