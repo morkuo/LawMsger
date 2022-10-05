@@ -63,13 +63,13 @@ const getStarContacts = async (req, res) => {
 
   if (stars.length === 0) return res.json(stars);
 
-  const unreadMessagesQueryBody = stars.reduce((querybody, userId) => {
+  const unreadMessagesQueryBody = resultStarDetail.reduce((querybody, user) => {
     querybody.push({ index: 'message' }),
       querybody.push({
         query: {
           bool: {
             filter: [
-              { term: { sender_id: userId } },
+              { term: { sender_id: user._id } },
               { term: { receiver_id: req.userdata.id } },
               { term: { isRead: false } },
             ],
