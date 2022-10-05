@@ -261,7 +261,7 @@ async function getUnreadMessages(organizationId, userId, senderIds) {
     return querybody;
   }, []);
 
-  const { result } = await es[organizationId].msearch({
+  const { responses: result } = await es[organizationId].msearch({
     body: unreadMessagesQueryBody,
   });
 
