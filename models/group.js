@@ -1,6 +1,6 @@
 const es = require('../utils/es');
 
-async function createGroupInES(organizationId, name, userId) {
+async function createNewGroup(organizationId, name, userId) {
   const result = await es[organizationId].index({
     index: 'group',
     document: {
@@ -125,7 +125,7 @@ async function updateParticipants(organizationId, groupName, newParticipants) {
 }
 
 module.exports = {
-  createGroupInES,
+  createNewGroup,
   getGroupById,
   getGroupByName,
   getGroupCountByName,
