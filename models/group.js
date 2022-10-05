@@ -83,10 +83,41 @@ async function getUnreadGroupMessage(organizationId, userId, groupIds) {
   return unreadMessages;
 }
 
+async function deleteGroupById(organizationId, groupId) {
+  const result = await es[organizationId].deleteByQuery({
+    index: 'group',
+    body: {
+      query: {
+        term: { _id: groupId },
+      },
+    },
+  });
+  return result;
+}
+
+async function updateParticipants(organizationId, groupName, newParticipants) {
+  const result = await es[organizationId].updateByQuery({
+    index: 'group',
+    script: {
+      source: 'ctx._source.participants = params.newParticipants',
+      lang: 'painless',
+      params: {
+        newParticipants,
+      },
+    },
+    query: {
+      term: { 'name.keyword': groupName },
+    },
+  });
+  return result;
+}
+
 module.exports = {
   getGroupById,
   getGroupByName,
   getGroupCountByName,
   getParticipatedGroups,
   getUnreadGroupMessage,
+  deleteGroupById,
+  updateParticipants,
 };

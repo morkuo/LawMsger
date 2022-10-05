@@ -4,6 +4,8 @@ const {
   getGroupCountByName,
   getParticipatedGroups,
   getUnreadGroupMessage,
+  deleteGroupById,
+  updateParticipants,
 } = require('../models/group');
 const { getUsersByIds } = require('../models/user');
 const { getAllUser } = require('../models/user');
@@ -171,19 +173,7 @@ const deleteParticipants = async (req, res) => {
     currentParticipant => !userIds.includes(currentParticipant)
   );
 
-  const resultUpdate = await es[organizationId].updateByQuery({
-    index: 'group',
-    script: {
-      source: 'ctx._source.participants = params.newParticipants',
-      lang: 'painless',
-      params: {
-        newParticipants,
-      },
-    },
-    query: {
-      term: { 'name.keyword': groupName },
-    },
-  });
+  const resultUpdate = await updateParticipants(organizationId, groupName, newParticipants);
 
   if (!resultUpdate.updated) return res.status(500).json({ error: 'server error' });
 
@@ -206,14 +196,7 @@ const leaveGroup = async (req, res) => {
 
   //if current user is the host, delete the group
   if (result._source.host === userId) {
-    const resultUpdate = await es[organizationId].deleteByQuery({
-      index: 'group',
-      body: {
-        query: {
-          term: { _id: result._id },
-        },
-      },
-    });
+    const resultUpdate = await deleteGroupById(organizationId, result._id);
 
     if (!resultUpdate.deleted) return res.status(500).json({ error: 'server error' });
 
