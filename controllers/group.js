@@ -5,7 +5,7 @@ const {
   getParticipatedGroups,
   getUnreadGroupMessage,
 } = require('../models/group');
-const { getUsersByIds } = require('../models/group');
+const { getUsersByIds } = require('../models/user');
 const { getAllUser } = require('../models/user');
 require('dotenv').config;
 
