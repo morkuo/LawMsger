@@ -243,6 +243,31 @@ async function updateGroupMessagesIsRead(organizationId, userId, groupId) {
   return result;
 }
 
+async function getUnreadMessages(organizationId, userId, senderIds) {
+  const unreadMessagesQueryBody = senderIds.reduce((querybody, senderId) => {
+    querybody.push({ index: 'message' }),
+      querybody.push({
+        query: {
+          bool: {
+            filter: [
+              { term: { sender_id: senderId } },
+              { term: { receiver_id: userId } },
+              { term: { isRead: false } },
+            ],
+          },
+        },
+      });
+
+    return querybody;
+  }, []);
+
+  const { result } = await es[organizationId].msearch({
+    body: unreadMessagesQueryBody,
+  });
+
+  return result;
+}
+
 module.exports = {
   suggestions,
   matchedClauses,
@@ -252,4 +277,5 @@ module.exports = {
   getGroupMessagesByGroupIdMore,
   updatePrivateMessagesIsRead,
   updateGroupMessagesIsRead,
+  getUnreadMessages,
 };
