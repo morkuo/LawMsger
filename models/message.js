@@ -268,6 +268,32 @@ async function getUnreadMessages(organizationId, userId, senderIds) {
   return result;
 }
 
+async function createMessage(
+  organizationId,
+  senderId,
+  senderName,
+  receiverId,
+  receiverName,
+  message,
+  files,
+  isRead
+) {
+  const result = await es[organizationId].index({
+    index: 'message',
+    document: {
+      sender_id: senderId,
+      sender_name: senderName,
+      receiver_id: receiverId,
+      receiver_name: receiverName,
+      message,
+      files,
+      isRead,
+    },
+  });
+
+  return result;
+}
+
 module.exports = {
   suggestions,
   matchedClauses,
@@ -278,4 +304,5 @@ module.exports = {
   updatePrivateMessagesIsRead,
   updateGroupMessagesIsRead,
   getUnreadMessages,
+  createMessage,
 };

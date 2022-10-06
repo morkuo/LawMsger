@@ -1,5 +1,5 @@
 const es = require('./es');
-const { suggestions, matchedClauses } = require('../models/message');
+const { suggestions, matchedClauses, createMessage } = require('../models/message');
 const { deleteStarredUserFromSpecificUser } = require('../models/contact');
 require('dotenv').config();
 
@@ -92,6 +92,8 @@ async function checkChatWindow(socket) {
       filesInfo,
       isAtWindow
     ) => {
+      const { organizationId } = socket.userdata;
+
       const parsedFilesInfo = await JSON.parse(filesInfo);
       parsedFilesInfo.data.forEach(fileObj => {
         //S3 presigned url which is going to expires
@@ -103,18 +105,16 @@ async function checkChatWindow(socket) {
 
       socket.to(targetSocketId).emit('msg', msg, fromSocketId, filesInfo);
 
-      await es[socket.userdata.organizationId].index({
-        index: 'message',
-        document: {
-          sender_id: fromUserId,
-          sender_name: fromUserName,
-          receiver_id: targetUserId,
-          receiver_name: targetUserName,
-          message: msg,
-          files: JSON.stringify(parsedFilesInfo),
-          isRead,
-        },
-      });
+      await createMessage(
+        organizationId,
+        fromUserId,
+        fromUserName,
+        targetUserId,
+        targetUserName,
+        msg,
+        JSON.stringify(parsedFilesInfo),
+        isRead
+      );
     }
   );
 }
