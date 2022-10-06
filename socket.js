@@ -1,5 +1,4 @@
 const { Server } = require('socket.io');
-const { httpServer } = require('./server');
 const {
   setOnlineStatus,
   joinGroup,
@@ -24,8 +23,6 @@ const { jwtVerify } = require('./utils/helper');
 
 require('dotenv').config();
 
-connect(httpServer);
-
 async function connect(httpServer) {
   const io = new Server(httpServer, {
     cors: '*',
@@ -43,7 +40,7 @@ async function connect(httpServer) {
       socket.userdata = user;
       next();
     } catch (err) {
-      //pass to express error handler and emit connect_error event
+      //emit connect_error event
       next(err);
     }
   });
@@ -73,4 +70,4 @@ async function connect(httpServer) {
   return io;
 }
 
-// module.exports = connect;
+module.exports = connect;
