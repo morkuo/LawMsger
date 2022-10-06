@@ -1,4 +1,4 @@
-const es = require('./es');
+const es = require('../utils/es');
 const {
   suggestions,
   matchedClauses,

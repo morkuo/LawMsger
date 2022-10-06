@@ -18,9 +18,8 @@ const {
   changeProfilePicture,
   changeFirmPicture,
   disconnection,
-} = require('./utils/socket_handlers');
-const { jwtVerify } = require('./utils/helper');
-
+} = require('./socket/controllers');
+const { jwtVerify, socketTryCatch: tryCatch } = require('./utils/helper');
 require('dotenv').config();
 
 async function connect(httpServer) {
@@ -32,18 +31,15 @@ async function connect(httpServer) {
 
   global.hashTable = {};
 
-  io.use(async (socket, next) => {
-    try {
+  io.use(
+    tryCatch(async (socket, next) => {
       const { jwtToken } = socket.handshake.query;
       const user = await jwtVerify(jwtToken, process.env.JWT_SECRET);
 
       socket.userdata = user;
       next();
-    } catch (err) {
-      //emit connect_error event
-      next(err);
-    }
-  });
+    })
+  );
 
   io.on('connection', async socket => {
     //handlers

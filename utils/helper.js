@@ -11,11 +11,22 @@ function tryCatch(cb) {
   };
 }
 
+function socketTryCatch(cb) {
+  return async (socket, next) => {
+    try {
+      await cb(socket, next);
+    } catch (err) {
+      next(err);
+    }
+  };
+}
+
 const jwtSign = promisify(jwt.sign);
 const jwtVerify = promisify(jwt.verify);
 
 module.exports = {
   tryCatch,
+  socketTryCatch,
   jwtSign,
   jwtVerify,
 };
