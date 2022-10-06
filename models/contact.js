@@ -34,7 +34,7 @@ async function getStarredUserData(organizationId, starredUserIds) {
   return resultStarDetail;
 }
 
-async function deleteStarredUser(organizationId, starredUserId) {
+async function deleteStarredUserFromAllUser(organizationId, starredUserId) {
   const result = await es[organizationId].deleteByQuery({
     index: 'star',
     body: {
@@ -46,8 +46,23 @@ async function deleteStarredUser(organizationId, starredUserId) {
   return result;
 }
 
+async function deleteStarredUserFromSpecificUser(organizationId, userId, starredUserId) {
+  const result = await es[organizationId].deleteByQuery({
+    index: 'star',
+    body: {
+      query: {
+        bool: {
+          filter: [{ term: { user_id: userId } }, { term: { contact_user_id: starredUserId } }],
+        },
+      },
+    },
+  });
+  return result;
+}
+
 module.exports = {
   getStarredUser,
   getStarredUserData,
-  deleteStarredUser,
+  deleteStarredUserFromAllUser,
+  deleteStarredUserFromSpecificUser,
 };

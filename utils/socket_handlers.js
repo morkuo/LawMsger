@@ -1,5 +1,6 @@
 const es = require('./es');
 const { suggestions, matchedClauses } = require('../models/message');
+const { deleteStarredUserFromSpecificUser } = require('../models/contact');
 require('dotenv').config();
 
 function msg(io, socket) {
@@ -260,29 +261,23 @@ async function createStarContact(socket) {
 
 async function deleteStarContact(socket) {
   socket.on('deleteStarContact', async targetContactUserId => {
-    const result = await es[socket.userdata.organizationId].deleteByQuery({
-      index: 'star',
-      body: {
-        query: {
-          bool: {
-            filter: [
-              { term: { user_id: socket.userdata.id } },
-              { term: { contact_user_id: targetContactUserId } },
-            ],
-          },
-        },
-      },
-    });
+    const { organizationId, id: userId } = socket.userdata;
 
-    if (result.deleted === 1) {
-      socket.emit('deleteStarContact', {
-        data: targetContactUserId,
-      });
-    } else {
+    const result = await deleteStarredUserFromSpecificUser(
+      organizationId,
+      userId,
+      targetContactUserId
+    );
+
+    if (!result.deleted) {
       socket.emit('deleteStarContact', {
         error: 'failed',
       });
     }
+
+    socket.emit('deleteStarContact', {
+      data: targetContactUserId,
+    });
   });
 }
 

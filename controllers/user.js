@@ -8,7 +8,7 @@ const {
   getESUserDataByEmail,
   deleteUserByEmail,
 } = require('../models/user');
-const { deleteStarredUser } = require('../models/contact');
+const { deleteStarredUserFromAllUser } = require('../models/contact');
 const { s3, CopyObjectCommand, cf, CreateInvalidationCommand } = require('../utils/aws');
 require('dotenv').config;
 
@@ -184,7 +184,7 @@ const deleteUser = async (req, res) => {
 
   if (!resultUser.deleted) return res.status(500).json({ error: 'failed' });
 
-  await deleteStarredUser(organizationId, resultEmail._id);
+  await deleteStarredUserFromAllUser(organizationId, resultEmail._id);
 
   res.json({ data: 'deleted' });
 };

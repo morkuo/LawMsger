@@ -17,7 +17,7 @@ app.use('/1.0', [
 const httpServer = app.listen(3000, () => {
   console.log('Running!');
 });
-const io = require('./socket.js')(httpServer);
+require('./socket.js')(httpServer);
 
 app.use((err, req, res, next) => {
   if (err.name === 'MulterError') {
