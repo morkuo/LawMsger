@@ -312,6 +312,21 @@ async function createMessage(
   return result;
 }
 
+async function updateMatchedClauseSearchTime(organizationId, time, clauseTitle, clauseNumber) {
+  await es[organizationId].updateByQuery({
+    index: 'matchedclauses',
+    script: {
+      source: `ctx._source.last_searched = '${time}'`,
+      lang: 'painless',
+    },
+    query: {
+      bool: {
+        filter: [{ term: { title: clauseTitle } }, { term: { number: clauseNumber } }],
+      },
+    },
+  });
+}
+
 module.exports = {
   suggestions,
   matchedClauses,
@@ -322,6 +337,7 @@ module.exports = {
   updatePrivateMessagesIsRead,
   updateGroupMessagesIsRead,
   updateOneGroupMessageIsRead,
+  updateMatchedClauseSearchTime,
   getUnreadMessages,
   createMessage,
 };

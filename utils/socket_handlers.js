@@ -4,6 +4,7 @@ const {
   matchedClauses,
   createMessage,
   updateOneGroupMessageIsRead,
+  updateMatchedClauseSearchTime,
 } = require('../models/message');
 const {
   createStarredUser,
@@ -273,18 +274,8 @@ async function searchClausesByContent(socket) {
 async function updateClausesLastSearchTime(socket) {
   socket.on('updateMatchedClauses', async (origin, title, number) => {
     try {
-      await es[socket.userdata.organizationId].updateByQuery({
-        index: 'matchedclauses',
-        script: {
-          source: `ctx._source.last_searched = '${origin}'`,
-          lang: 'painless',
-        },
-        query: {
-          bool: {
-            filter: [{ term: { title: title } }, { term: { number: number } }],
-          },
-        },
-      });
+      const { organizationId } = socket.userdata;
+      await updateMatchedClauseSearchTime(organizationId, origin, title, number);
     } catch (error) {
       console.log(error);
     }
