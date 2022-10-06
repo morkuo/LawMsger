@@ -1,4 +1,5 @@
 const { Server } = require('socket.io');
+const { httpServer } = require('./server');
 const {
   setOnlineStatus,
   joinGroup,
@@ -23,8 +24,10 @@ const { jwtVerify } = require('./utils/helper');
 
 require('dotenv').config();
 
-async function connect(server) {
-  const io = new Server(server, {
+connect(httpServer);
+
+async function connect(httpServer) {
+  const io = new Server(httpServer, {
     cors: '*',
   });
 
@@ -48,8 +51,7 @@ async function connect(server) {
   io.on('connection', async socket => {
     //handlers
     setOnlineStatus(socket);
-    socket.on('join', joinGroup);
-
+    joinGroup(io, socket);
     joinFirm(io, socket);
     drawGroupDiv(io, socket);
     deleteGroupDiv(io, socket);
@@ -71,4 +73,4 @@ async function connect(server) {
   return io;
 }
 
-module.exports = connect;
+// module.exports = connect;

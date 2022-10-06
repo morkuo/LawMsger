@@ -1,9 +1,9 @@
 const express = require('express');
 const app = express();
-const http = require('http');
-const server = http.createServer(app);
-const io = require('./socket.js')(server);
-app.io = io;
+// const http = require('http');
+// const server = http.createServer(app);
+// const io = require('./socket.js')(server);
+// app.io = io;
 
 const cors = require('cors');
 
@@ -20,7 +20,7 @@ app.use('/1.0', [
   require('./routes/firm'),
 ]);
 
-server.listen(3000, () => {
+const httpServer = app.listen(3000, () => {
   console.log('Running!');
 });
 
@@ -33,3 +33,5 @@ app.use((err, req, res, next) => {
 
   console.log(err);
 });
+
+module.exports = { httpServer };

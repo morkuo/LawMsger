@@ -144,10 +144,12 @@ async function setOnlineStatus(socket) {
   console.log('new socket connected: ' + socket.id);
 }
 
-async function joinGroup(socket, groups) {
-  const groupIds = groups.map(group => group.id);
+async function joinGroup(io, socket) {
+  socket.on('join', async groups => {
+    const groupIds = groups.map(group => group.id);
 
-  socket.join(groupIds);
+    socket.join(groupIds);
+  });
 }
 
 async function joinFirm(io, socket) {
