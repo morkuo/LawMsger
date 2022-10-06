@@ -15,8 +15,9 @@ function socketTryCatch(cb) {
   return async (socket, next) => {
     try {
       await cb(socket, next);
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      if (next) next(error);
+      console.log(error.message);
     }
   };
 }

@@ -41,27 +41,30 @@ async function connect(httpServer) {
     })
   );
 
-  io.on('connection', async socket => {
-    //handlers
-    setOnlineStatus(socket);
-    msg(io, socket);
-    joinGroup(socket);
-    joinFirm(socket);
-    drawGroupDiv(socket);
-    deleteGroupDiv(socket);
-    groupMsg(socket);
-    searchClausesByArticle(socket);
-    searchClausesByContent(socket);
-    updateClausesLastSearchTime(socket);
-    checkChatWindow(socket);
-    checkGroupChatWindow(socket);
-    createStarContact(socket);
-    deleteStarContact(socket);
-    searchEamil(socket);
-    changeProfilePicture(socket);
-    changeFirmPicture(socket);
-    disconnection(socket);
-  });
+  io.on(
+    'connection',
+    tryCatch(async socket => {
+      //handlers
+      setOnlineStatus(socket);
+      msg(io, socket);
+      joinGroup(socket);
+      joinFirm(socket);
+      drawGroupDiv(socket);
+      deleteGroupDiv(socket);
+      groupMsg(socket);
+      searchClausesByArticle(socket);
+      searchClausesByContent(socket);
+      updateClausesLastSearchTime(socket);
+      checkChatWindow(socket);
+      checkGroupChatWindow(socket);
+      createStarContact(socket);
+      deleteStarContact(socket);
+      searchEamil(socket);
+      changeProfilePicture(socket);
+      changeFirmPicture(socket);
+      disconnection(socket);
+    })
+  );
 
   return io;
 }
