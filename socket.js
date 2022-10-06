@@ -48,23 +48,23 @@ async function connect(httpServer) {
   io.on('connection', async socket => {
     //handlers
     setOnlineStatus(socket);
-    joinGroup(io, socket);
-    joinFirm(io, socket);
-    drawGroupDiv(io, socket);
-    deleteGroupDiv(io, socket);
     msg(io, socket);
-    groupMsg(io, socket);
-    searchClausesByArticle(io, socket);
-    searchClausesByContent(io, socket);
-    updateClausesLastSearchTime(io, socket);
-    checkChatWindow(io, socket);
-    checkGroupChatWindow(io, socket);
-    createStarContact(io, socket);
-    deleteStarContact(io, socket);
-    searchEamil(io, socket);
-    changeProfilePicture(io, socket);
-    changeFirmPicture(io, socket);
-    disconnection(io, socket);
+    joinGroup(socket);
+    joinFirm(socket);
+    drawGroupDiv(socket);
+    deleteGroupDiv(socket);
+    groupMsg(socket);
+    searchClausesByArticle(socket);
+    searchClausesByContent(socket);
+    updateClausesLastSearchTime(socket);
+    checkChatWindow(socket);
+    checkGroupChatWindow(socket);
+    createStarContact(socket);
+    deleteStarContact(socket);
+    searchEamil(socket);
+    changeProfilePicture(socket);
+    changeFirmPicture(socket);
+    disconnection(socket);
   });
 
   return io;
