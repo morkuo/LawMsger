@@ -34,6 +34,22 @@ async function getStarredUserData(organizationId, starredUserIds) {
   return resultStarDetail;
 }
 
+async function getOneStarredUserFromSpecificUser(organizationId, userId, starredUserId) {
+  const {
+    hits: { hits: result },
+  } = await es[organizationId].search({
+    index: 'star',
+    body: {
+      query: {
+        bool: {
+          filter: [{ term: { user_id: userId } }, { term: { contact_user_id: starredUserId } }],
+        },
+      },
+    },
+  });
+  return result;
+}
+
 async function deleteStarredUserFromAllUser(organizationId, starredUserId) {
   const result = await es[organizationId].deleteByQuery({
     index: 'star',
@@ -60,9 +76,22 @@ async function deleteStarredUserFromSpecificUser(organizationId, userId, starred
   return result;
 }
 
+async function createStarredUser(organizationId, userId, starredUserId) {
+  const result = await es[organizationId].index({
+    index: 'star',
+    document: {
+      user_id: userId,
+      contact_user_id: starredUserId,
+    },
+  });
+  return result;
+}
+
 module.exports = {
+  createStarredUser,
   getStarredUser,
   getStarredUserData,
+  getOneStarredUserFromSpecificUser,
   deleteStarredUserFromAllUser,
   deleteStarredUserFromSpecificUser,
 };

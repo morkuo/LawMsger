@@ -5,7 +5,11 @@ const {
   createMessage,
   updateOneGroupMessageIsRead,
 } = require('../models/message');
-const { deleteStarredUserFromSpecificUser } = require('../models/contact');
+const {
+  createStarredUser,
+  getOneStarredUserFromSpecificUser,
+  deleteStarredUserFromSpecificUser,
+} = require('../models/contact');
 const { getUsersByIds } = require('../models/user');
 require('dotenv').config();
 
@@ -190,9 +194,9 @@ async function deleteGroupDiv(socket) {
       .map(userId => global.hashTable[userId])
       .filter(userId => userId !== undefined);
 
-    if (socketIdsOnline.length !== 0) {
-      socket.to(socketIdsOnline).emit('deleteGroupDiv', groupId);
-    }
+    if (!socketIdsOnline.length) return;
+
+    socket.to(socketIdsOnline).emit('deleteGroupDiv', groupId);
   });
 }
 
@@ -208,35 +212,17 @@ async function disconnection(socket) {
 
 async function createStarContact(socket) {
   socket.on('createStarContact', async targetContactUserId => {
-    const {
-      hits: { hits: resultCheckDuplicate },
-    } = await es[socket.userdata.organizationId].search({
-      index: 'star',
-      body: {
-        query: {
-          bool: {
-            filter: [
-              { term: { user_id: socket.userdata.id } },
-              { term: { contact_user_id: targetContactUserId } },
-            ],
-          },
-        },
-      },
-    });
+    const { organizationId, id: userId } = socket.userdata;
 
-    if (resultCheckDuplicate.length !== 0) {
-      return socket.emit('createStarContact', { error: 'star exists' });
-    }
+    const isDuplicate = await getOneStarredUserFromSpecificUser(
+      organizationId,
+      userId,
+      targetContactUserId
+    );
 
-    const result = await es[socket.userdata.organizationId].index({
-      index: 'star',
-      document: {
-        user_id: socket.userdata.id,
-        contact_user_id: targetContactUserId,
-      },
-    });
+    if (isDuplicate.length) return socket.emit('createStarContact', { error: 'star exists' });
 
-    // console.log(result);
+    const result = await createStarredUser(organizationId, userId, targetContactUserId);
 
     socket.emit('createStarContact', {
       data: { result: result.result, targetContactUserId },
