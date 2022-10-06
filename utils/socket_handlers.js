@@ -1,5 +1,10 @@
 const es = require('./es');
-const { suggestions, matchedClauses, createMessage } = require('../models/message');
+const {
+  suggestions,
+  matchedClauses,
+  createMessage,
+  updateOneGroupMessageIsRead,
+} = require('../models/message');
 const { deleteStarredUserFromSpecificUser } = require('../models/contact');
 require('dotenv').config();
 
@@ -121,19 +126,8 @@ async function checkChatWindow(socket) {
 
 async function checkGroupChatWindow(socket) {
   socket.on('checkGroupChatWindow', async (receiverUserId, messageId) => {
-    //add user into isRead array
-    const result = await es[socket.userdata.organizationId].update({
-      index: 'groupmessage',
-      id: messageId,
-      script: {
-        source: `if(!ctx._source.isRead.contains(params.user_id)){ctx._source.isRead.add(params.user_id)}`,
-        lang: 'painless',
-        params: {
-          user_id: receiverUserId,
-        },
-      },
-      retry_on_conflict: process.env.GROUP_MEMBER_LIMIT,
-    });
+    const { organizationId } = socket.userdata;
+    await updateOneGroupMessageIsRead(organizationId, receiverUserId, messageId);
   });
 }
 

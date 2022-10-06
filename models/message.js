@@ -1,4 +1,6 @@
 const es = require('../utils/es');
+require('dotenv').config();
+const { GROUP_MEMBER_LIMIT } = process.env;
 
 const messageSize = 15;
 
@@ -243,6 +245,22 @@ async function updateGroupMessagesIsRead(organizationId, userId, groupId) {
   return result;
 }
 
+async function updateOneGroupMessageIsRead(organizationId, messageId, receiverUserId) {
+  const result = await es[organizationId].update({
+    index: 'groupmessage',
+    id: messageId,
+    script: {
+      source: `if(!ctx._source.isRead.contains(params.user_id)){ctx._source.isRead.add(params.user_id)}`,
+      lang: 'painless',
+      params: {
+        user_id: receiverUserId,
+      },
+    },
+    retry_on_conflict: GROUP_MEMBER_LIMIT,
+  });
+  return result;
+}
+
 async function getUnreadMessages(organizationId, userId, senderIds) {
   const unreadMessagesQueryBody = senderIds.reduce((querybody, senderId) => {
     querybody.push({ index: 'message' }),
@@ -303,6 +321,7 @@ module.exports = {
   getGroupMessagesByGroupIdMore,
   updatePrivateMessagesIsRead,
   updateGroupMessagesIsRead,
+  updateOneGroupMessageIsRead,
   getUnreadMessages,
   createMessage,
 };
