@@ -2,7 +2,7 @@ const es = require('./es');
 const { suggestions, matchedClauses } = require('../models/message');
 require('dotenv').config();
 
-function msgHandler(io, socket) {
+function msg(io, socket) {
   socket.on('msg', async (msg, targetSocketId, targetUserId, targetUserName, filesInfo) => {
     const fromSocketId = socket.id;
     const fromUserId = socket.userdata.id;
@@ -44,7 +44,7 @@ function msgHandler(io, socket) {
   });
 }
 
-function groupMsgHandler(io, socket) {
+function groupMsg(io, socket) {
   socket.on('groupmsg', async (msg, groupId, filesInfo) => {
     const fromSocketId = socket.id;
     const fromUserId = socket.userdata.id;
@@ -77,7 +77,7 @@ function groupMsgHandler(io, socket) {
   });
 }
 
-async function checkChatWindowHandler(io, socket) {
+async function checkChatWindow(io, socket) {
   socket.on(
     'checkChatWindow',
     async (
@@ -118,7 +118,7 @@ async function checkChatWindowHandler(io, socket) {
   );
 }
 
-async function checkGroupChatWindowHandler(io, socket) {
+async function checkGroupChatWindow(io, socket) {
   socket.on('checkGroupChatWindow', async (receiverUserId, messageId) => {
     //add user into isRead array
     const result = await es[socket.userdata.organizationId].update({
@@ -136,30 +136,27 @@ async function checkGroupChatWindowHandler(io, socket) {
   });
 }
 
-async function idHandler(io, socket) {
+async function setOnlineStatus(socket) {
   socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'on');
 
   global.hashTable[socket.userdata.id] = socket.id;
 
   console.log('new socket connected: ' + socket.id);
-  // console.log('new connection. all connected sockets: ', io.allSockets());
 }
 
-async function joinGroupHandler(io, socket) {
-  socket.on('join', async groups => {
-    const groupIds = groups.map(group => group.id);
+async function joinGroup(socket, groups) {
+  const groupIds = groups.map(group => group.id);
 
-    socket.join(groupIds);
-  });
+  socket.join(groupIds);
 }
 
-async function joinFirmHandler(io, socket) {
+async function joinFirm(io, socket) {
   socket.on('joinFirm', async firmId => {
     socket.join(firmId);
   });
 }
 
-async function drawGroupDivHandler(io, socket) {
+async function drawGroupDiv(io, socket) {
   socket.on('drawGroupDiv', async (newParticipantsUserId, hostId, groupId, groupName) => {
     const socketIdsOnline = newParticipantsUserId
       .map(userId => global.hashTable[userId])
@@ -195,7 +192,7 @@ async function drawGroupDivHandler(io, socket) {
   });
 }
 
-async function deleteGroupDivHandler(io, socket) {
+async function deleteGroupDiv(io, socket) {
   socket.on('deleteGroupDiv', async (userIds, groupId) => {
     //host dissolved the group
     if (!userIds) return socket.to(groupId).emit('deleteGroupDiv', groupId);
@@ -211,7 +208,7 @@ async function deleteGroupDivHandler(io, socket) {
   });
 }
 
-async function disconnectionHandlers(io, socket) {
+async function disconnection(io, socket) {
   socket.on('disconnect', async () => {
     socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
 
@@ -287,7 +284,7 @@ async function deleteStarContact(io, socket) {
   });
 }
 
-async function suggestionsHandler(io, socket) {
+async function searchClausesByArticle(io, socket) {
   socket.on('suggestion', async (input, index) => {
     const result = await suggestions(socket.userdata.organizationId, input, index);
 
@@ -296,7 +293,7 @@ async function suggestionsHandler(io, socket) {
   });
 }
 
-async function matchedClausesHandler(io, socket) {
+async function searchClausesByContent(io, socket) {
   socket.on('matchedClauses', async input => {
     if (!input) return;
     const result = await matchedClauses(socket.userdata.organizationId, input);
@@ -305,7 +302,7 @@ async function matchedClausesHandler(io, socket) {
   });
 }
 
-async function updateMatchedClausesHandler(io, socket) {
+async function updateClausesLastSearchTime(io, socket) {
   socket.on('updateMatchedClauses', async (origin, title, number) => {
     try {
       await es[socket.userdata.organizationId].updateByQuery({
@@ -326,7 +323,7 @@ async function updateMatchedClausesHandler(io, socket) {
   });
 }
 
-async function searchEamilHandler(io, socket) {
+async function searchEamil(io, socket) {
   socket.on('searchEamil', async input => {
     console.log('current organizationId: ' + socket.userdata.organizationId);
 
@@ -366,22 +363,23 @@ async function changeFirmPicture(io, socket) {
 }
 
 module.exports = {
-  idHandler,
-  joinGroupHandler,
-  joinFirmHandler,
-  drawGroupDivHandler,
-  deleteGroupDivHandler,
-  msgHandler,
-  groupMsgHandler,
-  suggestionsHandler,
-  matchedClausesHandler,
-  updateMatchedClausesHandler,
-  checkChatWindowHandler,
-  checkGroupChatWindowHandler,
+  setOnlineStatus,
+  joinGroup,
+  joinFirm,
+  drawGroupDiv,
+  deleteGroupDiv,
+  msg,
+  groupMsg,
+  searchClausesByArticle,
+  searchClausesByContent,
+  matchedClauses,
+  updateClausesLastSearchTime,
+  checkChatWindow,
+  checkGroupChatWindow,
   createStarContact,
   deleteStarContact,
-  searchEamilHandler,
+  searchEamil,
   changeProfilePicture,
   changeFirmPicture,
-  disconnectionHandlers,
+  disconnection,
 };

@@ -1,25 +1,24 @@
 const { Server } = require('socket.io');
 const {
-  idHandler,
-  joinGroupHandler,
-  joinFirmHandler,
-  drawGroupDivHandler,
-  deleteGroupDivHandler,
-  msgHandler,
-  groupMsgHandler,
-  suggestionsHandler,
-  matchedClausesHandler,
-  updateMatchedClausesHandler,
-  checkChatWindowHandler,
-  checkGroupChatWindowHandler,
+  setOnlineStatus,
+  joinGroup,
+  joinFirm,
+  drawGroupDiv,
+  deleteGroupDiv,
+  msg,
+  groupMsg,
+  searchClausesByArticle,
+  searchClausesByContent,
+  updateClausesLastSearchTime,
+  checkChatWindow,
+  checkGroupChatWindow,
   createStarContact,
   deleteStarContact,
-  searchEamilHandler,
+  searchEamil,
   changeProfilePicture,
   changeFirmPicture,
-  disconnectionHandlers,
+  disconnection,
 } = require('./utils/socket_handlers');
-const es = require('./utils/es');
 const { jwtVerify } = require('./utils/helper');
 
 require('dotenv').config();
@@ -48,24 +47,25 @@ async function connect(server) {
 
   io.on('connection', async socket => {
     //handlers
-    idHandler(io, socket);
-    joinGroupHandler(io, socket);
-    joinFirmHandler(io, socket);
-    drawGroupDivHandler(io, socket);
-    deleteGroupDivHandler(io, socket);
-    msgHandler(io, socket);
-    groupMsgHandler(io, socket);
-    suggestionsHandler(io, socket);
-    matchedClausesHandler(io, socket);
-    updateMatchedClausesHandler(io, socket);
-    checkChatWindowHandler(io, socket);
-    checkGroupChatWindowHandler(io, socket);
+    setOnlineStatus(socket);
+    socket.on('join', joinGroup);
+
+    joinFirm(io, socket);
+    drawGroupDiv(io, socket);
+    deleteGroupDiv(io, socket);
+    msg(io, socket);
+    groupMsg(io, socket);
+    searchClausesByArticle(io, socket);
+    searchClausesByContent(io, socket);
+    updateClausesLastSearchTime(io, socket);
+    checkChatWindow(io, socket);
+    checkGroupChatWindow(io, socket);
     createStarContact(io, socket);
     deleteStarContact(io, socket);
-    searchEamilHandler(io, socket);
+    searchEamil(io, socket);
     changeProfilePicture(io, socket);
     changeFirmPicture(io, socket);
-    disconnectionHandlers(io, socket);
+    disconnection(io, socket);
   });
 
   return io;
