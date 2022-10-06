@@ -6,6 +6,7 @@ const {
   updateOneGroupMessageIsRead,
 } = require('../models/message');
 const { deleteStarredUserFromSpecificUser } = require('../models/contact');
+const { getUsersByIds } = require('../models/user');
 require('dotenv').config();
 
 function msg(io, socket) {
@@ -155,37 +156,27 @@ async function joinFirm(socket) {
 
 async function drawGroupDiv(socket) {
   socket.on('drawGroupDiv', async (newParticipantsUserId, hostId, groupId, groupName) => {
+    const { organizationId } = socket.userdata;
+
     const socketIdsOnline = newParticipantsUserId
       .map(userId => global.hashTable[userId])
       .filter(userId => userId !== undefined);
+
+    if (!socketIdsOnline.length) return;
 
     const participantsUserId = [hostId, ...newParticipantsUserId];
 
     const usersQuery = participantsUserId.map(userId => ({ term: { _id: userId } }));
 
-    const {
-      hits: { hits: resultUsers },
-    } = await es[socket.userdata.organizationId].search({
-      index: 'user',
-      body: {
-        size: process.env.ES_SEARCH_LIMIT,
-        query: {
-          bool: {
-            should: usersQuery,
-          },
-        },
-      },
-    });
+    const result = await getUsersByIds(organizationId, usersQuery);
 
-    const participants = resultUsers.map(user => ({
+    const participants = result.map(user => ({
       name: user._source.name,
       email: user._source.email,
       picture: user._source.picture,
     }));
 
-    if (socketIdsOnline.length !== 0) {
-      socket.to(socketIdsOnline).emit('drawGroupDiv', groupId, groupName, hostId, participants);
-    }
+    socket.to(socketIdsOnline).emit('drawGroupDiv', groupId, groupName, hostId, participants);
   });
 }
 
