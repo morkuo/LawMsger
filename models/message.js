@@ -245,7 +245,7 @@ async function updateGroupMessagesIsRead(organizationId, userId, groupId) {
   return result;
 }
 
-async function updateOneGroupMessageIsRead(organizationId, messageId, receiverUserId) {
+async function updateOneGroupMessageIsRead(organizationId, receiverUserId, messageId) {
   const result = await es[organizationId].update({
     index: 'groupmessage',
     id: messageId,
