@@ -11,7 +11,7 @@ const {
   getOneStarredUserFromSpecificUser,
   deleteStarredUserFromSpecificUser,
 } = require('../models/contact');
-const { getUsersByIds } = require('../models/user');
+const { getUsersByIds, getUserByEmailAsYouType } = require('../models/user');
 require('dotenv').config();
 
 function msg(io, socket) {
@@ -284,19 +284,11 @@ async function updateClausesLastSearchTime(socket) {
 
 async function searchEamil(socket) {
   socket.on('searchEamil', async input => {
-    console.log('current organizationId: ' + socket.userdata.organizationId);
+    const { organizationId } = socket.userdata;
 
-    const {
-      hits: { hits: result },
-    } = await es[socket.userdata.organizationId].search({
-      index: 'user',
-      body: {
-        size: 5,
-        query: {
-          prefix: { 'email.search_as_you_type': input },
-        },
-      },
-    });
+    console.log('current organizationId: ' + organizationId);
+
+    const result = await getUserByEmailAsYouType(organizationId, input);
 
     const users = result.map(user => ({
       id: user._id,

@@ -29,6 +29,21 @@ async function getESUserDataByEmail(organizationId, email) {
   return result;
 }
 
+async function getUserByEmailAsYouType(organizationId, emailInput) {
+  const {
+    hits: { hits: result },
+  } = await es[organizationId].search({
+    index: 'user',
+    body: {
+      size: 5,
+      query: {
+        prefix: { 'email.search_as_you_type': emailInput },
+      },
+    },
+  });
+  return result;
+}
+
 async function getAllUser(organizationId) {
   const {
     hits: { hits: result },
@@ -84,7 +99,8 @@ module.exports = {
   getAllUser,
   getUsersByIds,
   getOrganizationUserDataByEmail,
-  deleteOrganizationUserData,
   getESUserDataByEmail,
+  getUserByEmailAsYouType,
+  deleteOrganizationUserData,
   deleteUserByEmail,
 };
