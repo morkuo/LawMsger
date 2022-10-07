@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 
+app.get('/health', (req, res) => res.end());
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
