@@ -12,7 +12,7 @@ const {
   deleteStarredUserFromSpecificUser,
 } = require('../models/contact');
 const { getUsersByIds, getUserByEmailAsYouType } = require('../models/user');
-const { pubClient, subClient } = require('../utils/redis');
+const { pubClient } = require('../utils/redis');
 require('dotenv').config();
 
 function msg(io, socket) {
@@ -76,18 +76,16 @@ function groupMsg(io, socket) {
       },
     });
 
-    socket
-      .to(groupId)
-      .emit(
-        'checkGroupChatWindow',
-        msg,
-        fromSocketId,
-        fromUserId,
-        fromUserName,
-        groupId,
-        result._id,
-        filesInfo
-      );
+    io.to(groupId).emit(
+      'checkGroupChatWindow',
+      msg,
+      fromSocketId,
+      fromUserId,
+      fromUserName,
+      groupId,
+      result._id,
+      filesInfo
+    );
   });
 }
 
@@ -168,8 +166,10 @@ async function drawGroupDiv(io, socket) {
   socket.on('drawGroupDiv', async (newParticipantsUserId, hostId, groupId, groupName) => {
     const { organizationId } = socket.userdata;
 
+    const onlineUsers = await pubClient.hgetall('onlineUsers');
+
     const socketIdsOnline = newParticipantsUserId
-      .map(userId => global.hashTable[userId])
+      .map(userId => onlineUsers[userId])
       .filter(userId => userId !== undefined);
 
     if (!socketIdsOnline.length) return;
@@ -186,23 +186,25 @@ async function drawGroupDiv(io, socket) {
       picture: user._source.picture,
     }));
 
-    socket.to(socketIdsOnline).emit('drawGroupDiv', groupId, groupName, hostId, participants);
+    io.to(socketIdsOnline).emit('drawGroupDiv', groupId, groupName, hostId, participants);
   });
 }
 
 async function deleteGroupDiv(io, socket) {
   socket.on('deleteGroupDiv', async (userIds, groupId) => {
     //host dissolved the group
-    if (!userIds) return socket.to(groupId).emit('deleteGroupDiv', groupId);
+    if (!userIds) return io.to(groupId).emit('deleteGroupDiv', groupId);
+
+    const onlineUsers = await pubClient.hgetall('onlineUsers');
 
     //host deleted certain member
     const socketIdsOnline = userIds
-      .map(userId => global.hashTable[userId])
+      .map(userId => onlineUsers[userId])
       .filter(userId => userId !== undefined);
 
     if (!socketIdsOnline.length) return;
 
-    socket.to(socketIdsOnline).emit('deleteGroupDiv', groupId);
+    io.to(socketIdsOnline).emit('deleteGroupDiv', groupId);
   });
 }
 
@@ -308,13 +310,13 @@ async function searchEamil(io, socket) {
 
 async function changeProfilePicture(io, socket) {
   socket.on('changeProfilePicture', async userId => {
-    socket.broadcast.emit('changeProfilePicture', userId);
+    io.emit('changeProfilePicture', userId);
   });
 }
 
 async function changeFirmPicture(io, socket) {
   socket.on('changeFirmPicture', async firmId => {
-    socket.to(firmId).emit('changeFirmPicture', firmId);
+    io.to(firmId).emit('changeFirmPicture', firmId);
   });
 }
 

@@ -33,8 +33,6 @@ async function connect(httpServer) {
 
   console.log('Socket Server is running');
 
-  global.hashTable = {};
-
   io.use(
     tryCatch(async (socket, next) => {
       const { jwtToken } = socket.handshake.query;

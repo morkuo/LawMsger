@@ -1,7 +1,7 @@
 const { getStarredUser, getStarredUserData } = require('../models/contact');
 const { getAllUser } = require('../models/user');
 const { getUnreadMessages } = require('../models/message');
-const { pubClient, subClient } = require('../utils/redis');
+const { pubClient } = require('../utils/redis');
 require('dotenv').config;
 
 const getAllContacts = async (req, res) => {
