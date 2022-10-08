@@ -16,7 +16,9 @@ app.use('/1.0', [
   require('./routes/firm'),
 ]);
 
-const httpServer = app.listen(3000, () => {
+const PORT = process.argv[2] || 3000;
+
+const httpServer = app.listen(PORT, () => {
   console.log('Running!');
 });
 require('./socket.js')(httpServer);

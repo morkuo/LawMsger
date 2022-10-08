@@ -1,4 +1,6 @@
 const { Server } = require('socket.io');
+const { createAdapter } = require('@socket.io/redis-adapter');
+const { pubClient, subClient } = require('./utils/redis');
 const {
   setOnlineStatus,
   joinGroup,
@@ -27,6 +29,8 @@ async function connect(httpServer) {
     cors: '*',
   });
 
+  io.adapter(createAdapter(pubClient, subClient));
+
   console.log('Socket Server is running');
 
   global.hashTable = {};
@@ -45,24 +49,24 @@ async function connect(httpServer) {
     'connection',
     tryCatch(async socket => {
       //handlers
-      setOnlineStatus(socket);
+      setOnlineStatus(io, socket);
       msg(io, socket);
-      joinGroup(socket);
-      joinFirm(socket);
-      drawGroupDiv(socket);
-      deleteGroupDiv(socket);
-      groupMsg(socket);
-      searchClausesByArticle(socket);
-      searchClausesByContent(socket);
-      updateClausesLastSearchTime(socket);
-      checkChatWindow(socket);
-      checkGroupChatWindow(socket);
-      createStarContact(socket);
-      deleteStarContact(socket);
-      searchEamil(socket);
-      changeProfilePicture(socket);
-      changeFirmPicture(socket);
-      disconnection(socket);
+      joinGroup(io, socket);
+      joinFirm(io, socket);
+      drawGroupDiv(io, socket);
+      deleteGroupDiv(io, socket);
+      groupMsg(io, socket);
+      searchClausesByArticle(io, socket);
+      searchClausesByContent(io, socket);
+      updateClausesLastSearchTime(io, socket);
+      checkChatWindow(io, socket);
+      checkGroupChatWindow(io, socket);
+      createStarContact(io, socket);
+      deleteStarContact(io, socket);
+      searchEamil(io, socket);
+      changeProfilePicture(io, socket);
+      changeFirmPicture(io, socket);
+      disconnection(io, socket);
     })
   );
 

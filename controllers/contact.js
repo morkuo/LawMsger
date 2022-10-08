@@ -1,6 +1,7 @@
 const { getStarredUser, getStarredUserData } = require('../models/contact');
 const { getAllUser } = require('../models/user');
 const { getUnreadMessages } = require('../models/message');
+const { pubClient, subClient } = require('../utils/redis');
 require('dotenv').config;
 
 const getAllContacts = async (req, res) => {
@@ -19,6 +20,8 @@ const getAllContacts = async (req, res) => {
 
   const unreadMessagesCount = responses.map(response => response.hits.total.value);
 
+  const onlineUsers = await pubClient.hgetall('onlineUsers');
+
   let i = 0;
   const contacts = users
     .map(user => ({
@@ -26,7 +29,7 @@ const getAllContacts = async (req, res) => {
       name: user._source.name,
       email: user._source.email,
       picture: user._source.picture,
-      socket_id: global.hashTable[user._id],
+      socket_id: onlineUsers[user._id],
       unread: unreadMessagesCount[i++],
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -53,6 +56,8 @@ const getStarContacts = async (req, res) => {
 
   const unreadMessagesCount = responses.map(response => response.hits.total.value);
 
+  const onlineUsers = await pubClient.hgetall('onlineUsers');
+
   let i = 0;
   const starDetails = resultStarDetail
     .map(star => ({
@@ -60,7 +65,7 @@ const getStarContacts = async (req, res) => {
       name: star._source.name,
       email: star._source.email,
       picture: star._source.picture,
-      socket_id: global.hashTable[star._id],
+      socket_id: onlineUsers[star._id],
       unread: unreadMessagesCount[i++],
     }))
     .sort((a, b) => a.name.localeCompare(b.name));

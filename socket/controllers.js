@@ -12,6 +12,7 @@ const {
   deleteStarredUserFromSpecificUser,
 } = require('../models/contact');
 const { getUsersByIds, getUserByEmailAsYouType } = require('../models/user');
+const { pubClient, subClient } = require('../utils/redis');
 require('dotenv').config();
 
 function msg(io, socket) {
@@ -20,7 +21,10 @@ function msg(io, socket) {
     const fromUserId = socket.userdata.id;
     const fromUserName = socket.userdata.name;
 
-    if (!io.sockets.adapter.rooms.has(targetSocketId)) {
+    const allSockets = await await io.allSockets();
+    console.log(allSockets.has(targetSocketId));
+
+    if (!allSockets.has(targetSocketId)) {
       const parsedFilesInfo = await JSON.parse(filesInfo);
       parsedFilesInfo.data.forEach(fileObj => {
         //S3 presigned url which is going to expires
@@ -39,24 +43,24 @@ function msg(io, socket) {
         },
       });
     } else {
-      socket
-        .to(targetSocketId)
-        .emit(
-          'checkChatWindow',
-          msg,
-          fromSocketId,
-          fromUserId,
-          fromUserName,
-          targetSocketId,
-          targetUserId,
-          targetUserName,
-          filesInfo
-        );
+      console.log('io emit');
+
+      io.to(targetSocketId).emit(
+        'checkChatWindow',
+        msg,
+        fromSocketId,
+        fromUserId,
+        fromUserName,
+        targetSocketId,
+        targetUserId,
+        targetUserName,
+        filesInfo
+      );
     }
   });
 }
 
-function groupMsg(socket) {
+function groupMsg(io, socket) {
   socket.on('groupmsg', async (msg, groupId, filesInfo) => {
     const fromSocketId = socket.id;
     const fromUserId = socket.userdata.id;
@@ -89,7 +93,7 @@ function groupMsg(socket) {
   });
 }
 
-async function checkChatWindow(socket) {
+async function checkChatWindow(io, socket) {
   socket.on(
     'checkChatWindow',
     async (
@@ -114,7 +118,7 @@ async function checkChatWindow(socket) {
       let isRead = true;
       if (!isAtWindow) isRead = false;
 
-      socket.to(targetSocketId).emit('msg', msg, fromSocketId, filesInfo);
+      io.to(targetSocketId).emit('msg', msg, fromSocketId, filesInfo);
 
       await createMessage(
         organizationId,
@@ -130,22 +134,21 @@ async function checkChatWindow(socket) {
   );
 }
 
-async function checkGroupChatWindow(socket) {
+async function checkGroupChatWindow(io, socket) {
   socket.on('checkGroupChatWindow', async (receiverUserId, messageId) => {
     const { organizationId } = socket.userdata;
     await updateOneGroupMessageIsRead(organizationId, receiverUserId, messageId);
   });
 }
 
-async function setOnlineStatus(socket) {
-  socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'on');
+async function setOnlineStatus(io, socket) {
+  io.emit('onlineStatus', socket.userdata.id, socket.id, 'on');
 
-  global.hashTable[socket.userdata.id] = socket.id;
-
+  await pubClient.hset('onlineUsers', [socket.userdata.id, socket.id]);
   console.log('new socket connected: ' + socket.id);
 }
 
-async function joinGroup(socket) {
+async function joinGroup(io, socket) {
   socket.on('join', async groups => {
     const groupIds = groups.map(group => group.id);
 
@@ -153,13 +156,13 @@ async function joinGroup(socket) {
   });
 }
 
-async function joinFirm(socket) {
+async function joinFirm(io, socket) {
   socket.on('joinFirm', async firmId => {
     socket.join(firmId);
   });
 }
 
-async function drawGroupDiv(socket) {
+async function drawGroupDiv(io, socket) {
   socket.on('drawGroupDiv', async (newParticipantsUserId, hostId, groupId, groupName) => {
     const { organizationId } = socket.userdata;
 
@@ -185,7 +188,7 @@ async function drawGroupDiv(socket) {
   });
 }
 
-async function deleteGroupDiv(socket) {
+async function deleteGroupDiv(io, socket) {
   socket.on('deleteGroupDiv', async (userIds, groupId) => {
     //host dissolved the group
     if (!userIds) return socket.to(groupId).emit('deleteGroupDiv', groupId);
@@ -201,17 +204,17 @@ async function deleteGroupDiv(socket) {
   });
 }
 
-async function disconnection(socket) {
+async function disconnection(io, socket) {
   socket.on('disconnect', async () => {
-    socket.broadcast.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
+    io.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
 
-    delete global.hashTable[socket.userdata.id];
+    await pubClient.hdel('onlineUsers', socket.userdata.id);
 
     console.log('user disconnected: ' + socket.id);
   });
 }
 
-async function createStarContact(socket) {
+async function createStarContact(io, socket) {
   socket.on('createStarContact', async targetContactUserId => {
     const { organizationId, id: userId } = socket.userdata;
 
@@ -231,7 +234,7 @@ async function createStarContact(socket) {
   });
 }
 
-async function deleteStarContact(socket) {
+async function deleteStarContact(io, socket) {
   socket.on('deleteStarContact', async targetContactUserId => {
     const { organizationId, id: userId } = socket.userdata;
 
@@ -253,7 +256,7 @@ async function deleteStarContact(socket) {
   });
 }
 
-async function searchClausesByArticle(socket) {
+async function searchClausesByArticle(io, socket) {
   socket.on('suggestion', async (input, index) => {
     const result = await suggestions(socket.userdata.organizationId, input, index);
 
@@ -262,7 +265,7 @@ async function searchClausesByArticle(socket) {
   });
 }
 
-async function searchClausesByContent(socket) {
+async function searchClausesByContent(io, socket) {
   socket.on('matchedClauses', async input => {
     if (!input) return;
     const result = await matchedClauses(socket.userdata.organizationId, input);
@@ -271,7 +274,7 @@ async function searchClausesByContent(socket) {
   });
 }
 
-async function updateClausesLastSearchTime(socket) {
+async function updateClausesLastSearchTime(io, socket) {
   socket.on('updateMatchedClauses', async (origin, title, number) => {
     try {
       const { organizationId } = socket.userdata;
@@ -282,7 +285,7 @@ async function updateClausesLastSearchTime(socket) {
   });
 }
 
-async function searchEamil(socket) {
+async function searchEamil(io, socket) {
   socket.on('searchEamil', async input => {
     const { organizationId } = socket.userdata;
 
@@ -301,13 +304,13 @@ async function searchEamil(socket) {
   });
 }
 
-async function changeProfilePicture(socket) {
+async function changeProfilePicture(io, socket) {
   socket.on('changeProfilePicture', async userId => {
     socket.broadcast.emit('changeProfilePicture', userId);
   });
 }
 
-async function changeFirmPicture(socket) {
+async function changeFirmPicture(io, socket) {
   socket.on('changeFirmPicture', async firmId => {
     socket.to(firmId).emit('changeFirmPicture', firmId);
   });
