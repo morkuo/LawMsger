@@ -21,7 +21,7 @@ function msg(io, socket) {
     const fromUserId = socket.userdata.id;
     const fromUserName = socket.userdata.name;
 
-    const allSockets = await await io.allSockets();
+    const allSockets = await io.allSockets();
     console.log(allSockets.has(targetSocketId));
 
     if (!allSockets.has(targetSocketId)) {
@@ -43,8 +43,6 @@ function msg(io, socket) {
         },
       });
     } else {
-      console.log('io emit');
-
       io.to(targetSocketId).emit(
         'checkChatWindow',
         msg,
@@ -118,7 +116,11 @@ async function checkChatWindow(io, socket) {
       let isRead = true;
       if (!isAtWindow) isRead = false;
 
-      io.to(targetSocketId).emit('msg', msg, fromSocketId, filesInfo);
+      const allSockets = await await io.allSockets();
+      console.log('all sockets: ' + allSockets.has(targetSocketId));
+      console.log('target SocketId:' + targetSocketId);
+
+      if (!isRead) io.to(targetSocketId).emit('msg', msg, fromSocketId, filesInfo);
 
       await createMessage(
         organizationId,
