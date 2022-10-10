@@ -15,7 +15,9 @@ const { getUsersByIds, getUserByEmailAsYouType } = require('../models/user');
 const { pubClient } = require('../utils/redis');
 require('dotenv').config();
 
-function msg(io, socket) {
+let io;
+
+function msg(socket) {
   socket.on('msg', async (msg, targetSocketId, targetUserId, targetUserName, filesInfo) => {
     const fromSocketId = socket.id;
     const fromUserId = socket.userdata.id;
@@ -58,7 +60,7 @@ function msg(io, socket) {
   });
 }
 
-function groupMsg(io, socket) {
+function groupMsg(socket) {
   socket.on('groupmsg', async (msg, groupId, filesInfo) => {
     const fromSocketId = socket.id;
     const fromUserId = socket.userdata.id;
@@ -89,7 +91,7 @@ function groupMsg(io, socket) {
   });
 }
 
-async function checkChatWindow(io, socket) {
+async function checkChatWindow(socket) {
   socket.on(
     'checkChatWindow',
     async (
@@ -134,21 +136,21 @@ async function checkChatWindow(io, socket) {
   );
 }
 
-async function checkGroupChatWindow(io, socket) {
+async function checkGroupChatWindow(socket) {
   socket.on('checkGroupChatWindow', async (receiverUserId, messageId) => {
     const { organizationId } = socket.userdata;
     await updateOneGroupMessageIsRead(organizationId, receiverUserId, messageId);
   });
 }
 
-async function setOnlineStatus(io, socket) {
+async function setOnlineStatus(socket) {
   io.emit('onlineStatus', socket.userdata.id, socket.id, 'on');
 
   await pubClient.hset('onlineUsers', [socket.userdata.id, socket.id]);
   console.log('new socket connected: ' + socket.id);
 }
 
-async function joinGroup(io, socket) {
+async function joinGroup(socket) {
   socket.on('join', async groups => {
     const groupIds = groups.map(group => group.id);
 
@@ -156,13 +158,13 @@ async function joinGroup(io, socket) {
   });
 }
 
-async function joinFirm(io, socket) {
+async function joinFirm(socket) {
   socket.on('joinFirm', async firmId => {
     socket.join(firmId);
   });
 }
 
-async function drawGroupDiv(io, socket) {
+async function drawGroupDiv(socket) {
   socket.on('drawGroupDiv', async (newParticipantsUserId, hostId, groupId, groupName) => {
     const { organizationId } = socket.userdata;
 
@@ -190,7 +192,7 @@ async function drawGroupDiv(io, socket) {
   });
 }
 
-async function deleteGroupDiv(io, socket) {
+async function deleteGroupDiv(socket) {
   socket.on('deleteGroupDiv', async (userIds, groupId) => {
     //host dissolved the group
     if (!userIds) return io.to(groupId).emit('deleteGroupDiv', groupId);
@@ -208,7 +210,7 @@ async function deleteGroupDiv(io, socket) {
   });
 }
 
-async function disconnection(io, socket) {
+async function disconnection(socket) {
   socket.on('disconnect', async () => {
     io.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
 
@@ -218,7 +220,7 @@ async function disconnection(io, socket) {
   });
 }
 
-async function createStarContact(io, socket) {
+async function createStarContact(socket) {
   socket.on('createStarContact', async targetContactUserId => {
     const { organizationId, id: userId } = socket.userdata;
 
@@ -238,7 +240,7 @@ async function createStarContact(io, socket) {
   });
 }
 
-async function deleteStarContact(io, socket) {
+async function deleteStarContact(socket) {
   socket.on('deleteStarContact', async targetContactUserId => {
     const { organizationId, id: userId } = socket.userdata;
 
@@ -260,7 +262,7 @@ async function deleteStarContact(io, socket) {
   });
 }
 
-async function searchClausesByArticle(io, socket) {
+async function searchClausesByArticle(socket) {
   socket.on('suggestion', async (input, index) => {
     const result = await suggestions(socket.userdata.organizationId, input, index);
 
@@ -269,7 +271,7 @@ async function searchClausesByArticle(io, socket) {
   });
 }
 
-async function searchClausesByContent(io, socket) {
+async function searchClausesByContent(socket) {
   socket.on('matchedClauses', async input => {
     if (!input) return;
     const result = await matchedClauses(socket.userdata.organizationId, input);
@@ -278,7 +280,7 @@ async function searchClausesByContent(io, socket) {
   });
 }
 
-async function updateClausesLastSearchTime(io, socket) {
+async function updateClausesLastSearchTime(socket) {
   socket.on('updateMatchedClauses', async (origin, title, number) => {
     try {
       const { organizationId } = socket.userdata;
@@ -289,7 +291,7 @@ async function updateClausesLastSearchTime(io, socket) {
   });
 }
 
-async function searchEamil(io, socket) {
+async function searchEamil(socket) {
   socket.on('searchEamil', async input => {
     const { organizationId } = socket.userdata;
 
@@ -308,36 +310,40 @@ async function searchEamil(io, socket) {
   });
 }
 
-async function changeProfilePicture(io, socket) {
+async function changeProfilePicture(socket) {
   socket.on('changeProfilePicture', async userId => {
     io.emit('changeProfilePicture', userId);
   });
 }
 
-async function changeFirmPicture(io, socket) {
+async function changeFirmPicture(socket) {
   socket.on('changeFirmPicture', async firmId => {
     io.to(firmId).emit('changeFirmPicture', firmId);
   });
 }
 
-module.exports = {
-  setOnlineStatus,
-  joinGroup,
-  joinFirm,
-  drawGroupDiv,
-  deleteGroupDiv,
-  msg,
-  groupMsg,
-  searchClausesByArticle,
-  searchClausesByContent,
-  matchedClauses,
-  updateClausesLastSearchTime,
-  checkChatWindow,
-  checkGroupChatWindow,
-  createStarContact,
-  deleteStarContact,
-  searchEamil,
-  changeProfilePicture,
-  changeFirmPicture,
-  disconnection,
+module.exports = ioServer => {
+  io = ioServer;
+
+  return {
+    setOnlineStatus,
+    joinGroup,
+    joinFirm,
+    drawGroupDiv,
+    deleteGroupDiv,
+    msg,
+    groupMsg,
+    searchClausesByArticle,
+    searchClausesByContent,
+    matchedClauses,
+    updateClausesLastSearchTime,
+    checkChatWindow,
+    checkGroupChatWindow,
+    createStarContact,
+    deleteStarContact,
+    searchEamil,
+    changeProfilePicture,
+    changeFirmPicture,
+    disconnection,
+  };
 };

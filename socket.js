@@ -1,26 +1,7 @@
 const { Server } = require('socket.io');
 const { createAdapter } = require('@socket.io/redis-adapter');
 const { pubClient, subClient } = require('./utils/redis');
-const {
-  setOnlineStatus,
-  joinGroup,
-  joinFirm,
-  drawGroupDiv,
-  deleteGroupDiv,
-  msg,
-  groupMsg,
-  searchClausesByArticle,
-  searchClausesByContent,
-  updateClausesLastSearchTime,
-  checkChatWindow,
-  checkGroupChatWindow,
-  createStarContact,
-  deleteStarContact,
-  searchEamil,
-  changeProfilePicture,
-  changeFirmPicture,
-  disconnection,
-} = require('./socket/controllers');
+const controllers = require('./socket/controllers');
 const { jwtVerify, socketTryCatch: tryCatch } = require('./utils/helper');
 require('dotenv').config();
 
@@ -28,6 +9,8 @@ async function connect(httpServer) {
   const io = new Server(httpServer, {
     cors: '*',
   });
+
+  const controller = controllers(io);
 
   io.adapter(createAdapter(pubClient, subClient));
 
@@ -47,24 +30,24 @@ async function connect(httpServer) {
     'connection',
     tryCatch(async socket => {
       //handlers
-      setOnlineStatus(io, socket);
-      msg(io, socket);
-      joinGroup(io, socket);
-      joinFirm(io, socket);
-      drawGroupDiv(io, socket);
-      deleteGroupDiv(io, socket);
-      groupMsg(io, socket);
-      searchClausesByArticle(io, socket);
-      searchClausesByContent(io, socket);
-      updateClausesLastSearchTime(io, socket);
-      checkChatWindow(io, socket);
-      checkGroupChatWindow(io, socket);
-      createStarContact(io, socket);
-      deleteStarContact(io, socket);
-      searchEamil(io, socket);
-      changeProfilePicture(io, socket);
-      changeFirmPicture(io, socket);
-      disconnection(io, socket);
+      controller.setOnlineStatus(socket);
+      controller.msg(socket);
+      controller.joinGroup(socket);
+      controller.joinFirm(socket);
+      controller.drawGroupDiv(socket);
+      controller.deleteGroupDiv(socket);
+      controller.groupMsg(socket);
+      controller.searchClausesByArticle(socket);
+      controller.searchClausesByContent(socket);
+      controller.updateClausesLastSearchTime(socket);
+      controller.checkChatWindow(socket);
+      controller.checkGroupChatWindow(socket);
+      controller.createStarContact(socket);
+      controller.deleteStarContact(socket);
+      controller.searchEamil(socket);
+      controller.changeProfilePicture(socket);
+      controller.changeFirmPicture(socket);
+      controller.disconnection(socket);
     })
   );
 
