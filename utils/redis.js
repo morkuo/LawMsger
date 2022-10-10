@@ -1,13 +1,14 @@
 require('dotenv').config();
 const Redis = require('ioredis');
 
-const { CACHE_HOST, CACHE_PORT, CACHE_USER, CACHE_PASSWORD } = process.env;
+const { REDIS_ADAPTER_HOST, REDIS_ADAPTER_PORT, REDIS_ADAPTER_USER, REDIS_ADAPTER_PASSWORD } =
+  process.env;
 
 const pubClient = new Redis({
-  port: CACHE_PORT,
-  host: CACHE_HOST,
-  username: CACHE_USER,
-  password: CACHE_PASSWORD,
+  host: REDIS_ADAPTER_HOST,
+  port: REDIS_ADAPTER_PORT,
+  username: REDIS_ADAPTER_USER,
+  password: REDIS_ADAPTER_PASSWORD,
 });
 
 const subClient = pubClient.duplicate();
