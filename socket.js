@@ -1,8 +1,8 @@
 const { Server } = require('socket.io');
 const { createAdapter } = require('@socket.io/redis-adapter');
 const { pubClient, subClient } = require('./utils/redis');
-const controllers = require('./socket/controllers');
 const { jwtVerify, socketTryCatch: tryCatch } = require('./utils/helper');
+const controllers = require('./socket/controllers');
 require('dotenv').config();
 
 async function connect(httpServer) {
@@ -10,7 +10,7 @@ async function connect(httpServer) {
     cors: '*',
   });
 
-  const controller = controllers(io);
+  const ctr = controllers(io);
 
   io.adapter(createAdapter(pubClient, subClient));
 
@@ -26,30 +26,26 @@ async function connect(httpServer) {
     })
   );
 
-  io.on(
-    'connection',
-    tryCatch(async socket => {
-      //handlers
-      controller.setOnlineStatus(socket);
-      controller.msg(socket);
-      controller.joinGroup(socket);
-      controller.joinFirm(socket);
-      controller.drawGroupDiv(socket);
-      controller.deleteGroupDiv(socket);
-      controller.groupMsg(socket);
-      controller.searchClausesByArticle(socket);
-      controller.searchClausesByContent(socket);
-      controller.updateClausesLastSearchTime(socket);
-      controller.checkChatWindow(socket);
-      controller.checkGroupChatWindow(socket);
-      controller.createStarContact(socket);
-      controller.deleteStarContact(socket);
-      controller.searchEamil(socket);
-      controller.changeProfilePicture(socket);
-      controller.changeFirmPicture(socket);
-      controller.disconnection(socket);
-    })
-  );
+  io.on('connection', async socket => {
+    ctr.setOnlineStatus(socket);
+    ctr.msg(socket);
+    ctr.joinGroup(socket);
+    ctr.joinFirm(socket);
+    ctr.drawGroupDiv(socket);
+    ctr.deleteGroupDiv(socket);
+    ctr.groupMsg(socket);
+    ctr.searchClausesByArticle(socket);
+    ctr.searchClausesByContent(socket);
+    ctr.updateClausesLastSearchTime(socket);
+    ctr.checkChatWindow(socket);
+    ctr.checkGroupChatWindow(socket);
+    ctr.createStarContact(socket);
+    ctr.deleteStarContact(socket);
+    ctr.searchEamil(socket);
+    ctr.changeProfilePicture(socket);
+    ctr.changeFirmPicture(socket);
+    ctr.disconnection(socket);
+  });
 
   return io;
 }
