@@ -3,18 +3,23 @@ const { Cluster } = require('ioredis');
 
 const { REDIS_ADAPTER_HOST, REDIS_ADAPTER_PORT, REDIS_ADAPTER_PASSWORD } = process.env;
 
-const pubClient = new Cluster([
+const pubClient = new Cluster(
+  [
+    {
+      host: REDIS_ADAPTER_HOST,
+      port: REDIS_ADAPTER_PORT,
+    },
+    {
+      host: REDIS_ADAPTER_HOST,
+      port: REDIS_ADAPTER_PORT,
+    },
+  ],
   {
-    host: REDIS_ADAPTER_HOST,
-    port: REDIS_ADAPTER_PORT,
-    password: REDIS_ADAPTER_PASSWORD,
-  },
-  {
-    host: REDIS_ADAPTER_HOST,
-    port: REDIS_ADAPTER_PORT,
-    password: REDIS_ADAPTER_PASSWORD,
-  },
-]);
+    redisOptions: {
+      password: REDIS_ADAPTER_PASSWORD,
+    },
+  }
+);
 
 const subClient = pubClient.duplicate();
 
