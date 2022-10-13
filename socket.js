@@ -16,15 +16,18 @@ async function connect(httpServer) {
 
   console.log('Socket Server is running');
 
-  io.use(
-    tryCatch(async (socket, next) => {
+  io.use(async (socket, next) => {
+    try {
       const { jwtToken } = socket.handshake.query;
       const user = await jwtVerify(jwtToken, process.env.JWT_SECRET);
 
       socket.userdata = user;
       next();
-    })
-  );
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  });
 
   io.on('connection', async socket => {
     ctr.setOnlineStatus(socket);
