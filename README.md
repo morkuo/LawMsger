@@ -6,7 +6,8 @@
 
 :link: https://mortonkuo.solutions/
 
-[![Mac OS](https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/morkuo/LawMsger_desktop/releases/download/1.0.0/Law.Msger.zip)
+[![Mac OS](https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/morkuo/LawMsger_desktop/releases/download/1.0.0/Law.Msger_mac.zip)
+[![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/morkuo/LawMsger_desktop/releases/download/1.0.0/Law.Msger_win.zip)
 
 ## Table of Content
 
