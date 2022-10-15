@@ -68,6 +68,8 @@ Normal User
 
 ## How to use Regulation Search
 
+![search_typing](https://mortonkuo.solutions/github_images/regulation_search_typing.gif)
+
 Currently, three types of search modes are supported in the chat rooms.
 To use each search mode, enter the corresponding symbol into the input field.
 The examples are as follows:
@@ -89,16 +91,14 @@ The examples are as follows:
   Enter `＃` symbol, then the keyword.
 
         ＃著作
-
-- Tab through Search Results
+        
+- Tab through Search Results, then select the regulation
 
   The search results will appear on top of the input field. When the search results appear, press `Tab` to navigate between them.
+  
+  Press `Enter` or `left click` on the search result to select.
 
-  ![search_result](https://mortonkuo.solutions/github_images/regulation_search.png)
-
-- Press `Enter` to select the regulation
-
-  ![search_result](https://mortonkuo.solutions/github_images/regulation_search_2.png)
+  ![search_result](https://mortonkuo.solutions/github_images/regulation_search_tab.gif)
 
 ## Tech Stack
 
