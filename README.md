@@ -9,7 +9,7 @@
 [![Mac OS](https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/morkuo/LawMsger_desktop/releases/download/1.0.0/Law.Msger_mac.zip)
 [![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/morkuo/LawMsger_desktop/releases/download/1.0.0/Law.Msger_win.zip)
 
-## Table of Content
+## Table of Contents
 
 - [Features](https://github.com/morkuo/LawMsger#features)
 - [Try out](https://github.com/morkuo/LawMsger#try-out)
@@ -102,13 +102,24 @@ The examples are as follows:
 
 ## Tech Stack
 
-**Client:** Vanilla JS, Electron
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+![Electron](https://img.shields.io/badge/Electron-191970?style=for-the-badge&logo=Electron&logoColor=white)
 
-**Server:** Node.js, Express, Socket.IO
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
+![Socket.io](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101)
 
-**Database:** Elasticsearch, MySQL, Redis
+![ElasticSearch](https://img.shields.io/badge/-ElasticSearch-005571?style=for-the-badge&logo=elasticsearch)
+![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?&style=for-the-badge&logo=redis&logoColor=white)
 
-**Cloud Service (AWS):** EC2, RDS, S3, CloudFront, ELB, Auto Scaling
+![AWS](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![EC2](https://img.shields.io/badge/EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white)
+![RDS](https://img.shields.io/badge/RDS-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white)
+![S3](https://img.shields.io/badge/S3-C9292C?style=for-the-badge&logo=amazons3&logoColor=white)
+![CloudFront](https://img.shields.io/badge/CloudFront-A21CDC?style=for-the-badge&logo=amazonaws&logoColor=white)
+![ELB](https://img.shields.io/badge/ELB-1D2A6B?style=for-the-badge&logo=amazonaws&logoColor=white)
+![Auto_Scailing](https://img.shields.io/badge/Auto_Scaling-D6138F?style=for-the-badge&logo=amazonaws&logoColor=white)
 
 ## Architecture
 
