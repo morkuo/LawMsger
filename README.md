@@ -120,6 +120,7 @@ The examples are as follows:
 ![RDS](https://img.shields.io/badge/RDS-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white)
 ![S3](https://img.shields.io/badge/S3-C9292C?style=for-the-badge&logo=amazons3&logoColor=white)
 ![CloudFront](https://img.shields.io/badge/CloudFront-A21CDC?style=for-the-badge&logo=amazonaws&logoColor=white)
+![Route_53](https://img.shields.io/badge/Route_53-034a24?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![ELB](https://img.shields.io/badge/ELB-1D2A6B?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![Auto_Scailing](https://img.shields.io/badge/Auto_Scaling-D6138F?style=for-the-badge&logo=amazonaws&logoColor=white)
 
