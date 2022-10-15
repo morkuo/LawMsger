@@ -148,9 +148,16 @@ The examples are as follows:
 
   Redis cluster are created to exchange messages between multiple Socket.IO servers.
 
-## Appendix
+## Front-End Repos
 
 For the Front-End repositories, please refer to:
 
 - [Web](https://github.com/morkuo/LawMsger_frontend)
 - [Desktop](https://github.com/morkuo/LawMsger_desktop)
+
+## Contacts
+
+If you would like to sign up for the service or provide feedback, please feel free to contact me at:
+
+[![Email](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:menghsinkuo@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mortonkuo)
