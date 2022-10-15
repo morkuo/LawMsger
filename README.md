@@ -18,7 +18,8 @@
 - [How to use Regulation Search](https://github.com/morkuo/LawMsger#how-to-use-regulation-search)
 - [Tech Stack](https://github.com/morkuo/LawMsger#tech-stack)
 - [Architecture](https://github.com/morkuo/LawMsger#architecture)
-- [Appendix](https://github.com/morkuo/LawMsger#appendix)
+- [Front-End Repos](https://github.com/morkuo/LawMsger#front-end-repos)
+- [Contacts](https://github.com/morkuo/LawMsger#contacts)
 
 ## Features
 
