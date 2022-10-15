@@ -4,10 +4,12 @@
 
 #### By incorporating the feature, Law Msger frees lawyers from trivial operations - copying regulations from web pages and pasting them into chat rooms - thereby facilitating workflows in law firms.
 
-:link: https://mortonkuo.solutions/
+<br>
 
+[![Browser](https://img.shields.io/badge/Browser-FF7139?style=for-the-badge&logo=GoogleChrome&logoColor=white)](https://mortonkuo.solutions)
 [![Mac OS](https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/morkuo/LawMsger_desktop/releases/download/1.0.0/Law.Msger_mac.zip)
 [![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/morkuo/LawMsger_desktop/releases/download/1.0.0/Law.Msger_win.zip)
+
 
 ## Table of Contents
 
