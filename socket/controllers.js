@@ -116,7 +116,7 @@ async function checkChatWindow(socket) {
       let isRead = true;
       if (!isAtWindow) isRead = false;
 
-      const allSockets = await await io.allSockets();
+      const allSockets = await io.allSockets();
       console.log('all sockets: ' + allSockets.has(targetSocketId));
       console.log('target SocketId:' + targetSocketId);
 
