@@ -120,8 +120,6 @@ async function checkChatWindow(socket) {
       console.log('all sockets: ' + allSockets.has(targetSocketId));
       console.log('target SocketId:' + targetSocketId);
 
-      if (!isRead) io.to(targetSocketId).emit('msg', msg, fromSocketId, filesInfo);
-
       await createMessage(
         organizationId,
         fromUserId,
