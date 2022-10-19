@@ -12,11 +12,10 @@ function tryCatch(cb) {
 }
 
 function socketTryCatch(cb) {
-  return async (socket, next) => {
+  return async (...args) => {
     try {
-      await cb(socket, next);
+      await cb(...args);
     } catch (error) {
-      if (next) next(error);
       console.log(error.message);
     }
   };

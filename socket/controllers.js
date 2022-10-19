@@ -13,40 +13,96 @@ const {
 } = require('../models/contact');
 const { getUsersByIds, getUserByEmailAsYouType } = require('../models/user');
 const { pubClient } = require('../utils/redis');
+const { socketTryCatch: tryCatch } = require('../utils/helper');
 require('dotenv').config();
 
 let io;
 
 function msg(socket) {
-  socket.on('msg', async (msg, targetSocketId, targetUserId, targetUserName, filesInfo) => {
-    const fromSocketId = socket.id;
-    const fromUserId = socket.userdata.id;
-    const fromUserName = socket.userdata.name;
+  socket.on(
+    'msg',
+    tryCatch(async (msg, targetSocketId, targetUserId, targetUserName, filesInfo) => {
+      const fromSocketId = socket.id;
+      const fromUserId = socket.userdata.id;
+      const fromUserName = socket.userdata.name;
 
-    const allSockets = await io.allSockets();
-    console.log(allSockets.has(targetSocketId));
+      const allSockets = await io.allSockets();
+      console.log(allSockets.has(targetSocketId));
 
-    if (!allSockets.has(targetSocketId)) {
-      const parsedFilesInfo = await JSON.parse(filesInfo);
-      parsedFilesInfo.data.forEach(fileObj => {
-        //S3 presigned url which is going to expires
-        delete fileObj.location;
-      });
-      await es[socket.userdata.organizationId].index({
-        index: 'message',
+      if (!allSockets.has(targetSocketId)) {
+        const parsedFilesInfo = await JSON.parse(filesInfo);
+        parsedFilesInfo.data.forEach(fileObj => {
+          //S3 presigned url which is going to expires
+          delete fileObj.location;
+        });
+        await es[socket.userdata.organizationId].index({
+          index: 'message',
+          document: {
+            sender_id: fromUserId,
+            sender_name: fromUserName,
+            receiver_id: targetUserId,
+            receiver_name: targetUserName,
+            message: msg,
+            files: JSON.stringify(parsedFilesInfo),
+            isRead: false,
+          },
+        });
+      } else {
+        io.to(targetSocketId).emit(
+          'checkChatWindow',
+          msg,
+          fromSocketId,
+          fromUserId,
+          fromUserName,
+          targetSocketId,
+          targetUserId,
+          targetUserName,
+          filesInfo
+        );
+      }
+    })
+  );
+}
+
+function groupMsg(socket) {
+  socket.on(
+    'groupmsg',
+    tryCatch(async (msg, groupId, filesInfo) => {
+      const fromSocketId = socket.id;
+      const fromUserId = socket.userdata.id;
+      const fromUserName = socket.userdata.name;
+
+      const result = await es[socket.userdata.organizationId].index({
+        index: 'groupmessage',
         document: {
+          group_id: groupId,
           sender_id: fromUserId,
           sender_name: fromUserName,
-          receiver_id: targetUserId,
-          receiver_name: targetUserName,
           message: msg,
-          files: JSON.stringify(parsedFilesInfo),
-          isRead: false,
+          files: filesInfo,
+          isRead: [socket.userdata.id],
         },
       });
-    } else {
-      io.to(targetSocketId).emit(
-        'checkChatWindow',
+
+      io.to(groupId).emit(
+        'checkGroupChatWindow',
+        msg,
+        fromSocketId,
+        fromUserId,
+        fromUserName,
+        groupId,
+        result._id,
+        filesInfo
+      );
+    })
+  );
+}
+
+async function checkChatWindow(socket) {
+  socket.on(
+    'checkChatWindow',
+    tryCatch(
+      async (
         msg,
         fromSocketId,
         fromUserId,
@@ -54,91 +110,47 @@ function msg(socket) {
         targetSocketId,
         targetUserId,
         targetUserName,
-        filesInfo
-      );
-    }
-  });
-}
+        filesInfo,
+        isAtWindow
+      ) => {
+        const { organizationId } = socket.userdata;
 
-function groupMsg(socket) {
-  socket.on('groupmsg', async (msg, groupId, filesInfo) => {
-    const fromSocketId = socket.id;
-    const fromUserId = socket.userdata.id;
-    const fromUserName = socket.userdata.name;
+        const parsedFilesInfo = await JSON.parse(filesInfo);
+        parsedFilesInfo.data.forEach(fileObj => {
+          //S3 presigned url which is going to expires
+          delete fileObj.location;
+        });
 
-    const result = await es[socket.userdata.organizationId].index({
-      index: 'groupmessage',
-      document: {
-        group_id: groupId,
-        sender_id: fromUserId,
-        sender_name: fromUserName,
-        message: msg,
-        files: filesInfo,
-        isRead: [socket.userdata.id],
-      },
-    });
+        let isRead = true;
+        if (!isAtWindow) isRead = false;
 
-    io.to(groupId).emit(
-      'checkGroupChatWindow',
-      msg,
-      fromSocketId,
-      fromUserId,
-      fromUserName,
-      groupId,
-      result._id,
-      filesInfo
-    );
-  });
-}
+        const allSockets = await io.allSockets();
+        console.log('all sockets: ' + allSockets.has(targetSocketId));
+        console.log('target SocketId:' + targetSocketId);
 
-async function checkChatWindow(socket) {
-  socket.on(
-    'checkChatWindow',
-    async (
-      msg,
-      fromSocketId,
-      fromUserId,
-      fromUserName,
-      targetSocketId,
-      targetUserId,
-      targetUserName,
-      filesInfo,
-      isAtWindow
-    ) => {
-      const { organizationId } = socket.userdata;
-
-      const parsedFilesInfo = await JSON.parse(filesInfo);
-      parsedFilesInfo.data.forEach(fileObj => {
-        //S3 presigned url which is going to expires
-        delete fileObj.location;
-      });
-
-      let isRead = true;
-      if (!isAtWindow) isRead = false;
-
-      const allSockets = await io.allSockets();
-      console.log('all sockets: ' + allSockets.has(targetSocketId));
-      console.log('target SocketId:' + targetSocketId);
-
-      await createMessage(
-        organizationId,
-        fromUserId,
-        fromUserName,
-        targetUserId,
-        targetUserName,
-        msg,
-        JSON.stringify(parsedFilesInfo),
-        isRead
-      );
-    }
+        await createMessage(
+          organizationId,
+          fromUserId,
+          fromUserName,
+          targetUserId,
+          targetUserName,
+          msg,
+          JSON.stringify(parsedFilesInfo),
+          isRead
+        );
+      }
+    )
   );
 }
 
 async function checkGroupChatWindow(socket) {
-  socket.on('checkGroupChatWindow', async (receiverUserId, messageId) => {
-    const { organizationId } = socket.userdata;
-    await updateOneGroupMessageIsRead(organizationId, receiverUserId, messageId);
-  });
+  socket.on(
+    'checkGroupChatWindow',
+    tryCatch(async (receiverUserId, messageId) => {
+      const { organizationId } = socket.userdata;
+      await updateOneGroupMessageIsRead(organizationId, receiverUserId, messageId);
+    })
+  );
 }
 
 async function setOnlineStatus(socket) {
@@ -149,175 +161,214 @@ async function setOnlineStatus(socket) {
 }
 
 async function joinGroup(socket) {
-  socket.on('join', async groups => {
-    const groupIds = groups.map(group => group.id);
+  socket.on(
+    'join',
+    tryCatch(async groups => {
+      const groupIds = groups.map(group => group.id);
 
-    socket.join(groupIds);
-  });
+      socket.join(groupIds);
+    })
+  );
 }
 
 async function joinFirm(socket) {
-  socket.on('joinFirm', async firmId => {
-    socket.join(firmId);
-  });
+  socket.on(
+    'joinFirm',
+    tryCatch(async firmId => {
+      socket.join(firmId);
+    })
+  );
 }
 
 async function drawGroupDiv(socket) {
-  socket.on('drawGroupDiv', async (newParticipantsUserId, hostId, groupId, groupName) => {
-    const { organizationId } = socket.userdata;
+  socket.on(
+    'drawGroupDiv',
+    tryCatch(async (newParticipantsUserId, hostId, groupId, groupName) => {
+      const { organizationId } = socket.userdata;
 
-    const onlineUsers = await pubClient.hgetall('onlineUsers');
+      const onlineUsers = await pubClient.hgetall('onlineUsers');
 
-    const socketIdsOnline = newParticipantsUserId
-      .map(userId => onlineUsers[userId])
-      .filter(userId => userId !== undefined);
+      const socketIdsOnline = newParticipantsUserId
+        .map(userId => onlineUsers[userId])
+        .filter(userId => userId !== undefined);
 
-    if (!socketIdsOnline.length) return;
+      if (!socketIdsOnline.length) return;
 
-    const participantsUserId = [hostId, ...newParticipantsUserId];
+      const participantsUserId = [hostId, ...newParticipantsUserId];
 
-    const usersQuery = participantsUserId.map(userId => ({ term: { _id: userId } }));
+      const usersQuery = participantsUserId.map(userId => ({ term: { _id: userId } }));
 
-    const result = await getUsersByIds(organizationId, usersQuery);
+      const result = await getUsersByIds(organizationId, usersQuery);
 
-    const participants = result.map(user => ({
-      name: user._source.name,
-      email: user._source.email,
-      picture: user._source.picture,
-    }));
+      const participants = result.map(user => ({
+        name: user._source.name,
+        email: user._source.email,
+        picture: user._source.picture,
+      }));
 
-    io.to(socketIdsOnline).emit('drawGroupDiv', groupId, groupName, hostId, participants);
-  });
+      io.to(socketIdsOnline).emit('drawGroupDiv', groupId, groupName, hostId, participants);
+    })
+  );
 }
 
 async function deleteGroupDiv(socket) {
-  socket.on('deleteGroupDiv', async (userIds, groupId) => {
-    //host dissolved the group
-    if (!userIds) return io.to(groupId).emit('deleteGroupDiv', groupId);
+  socket.on(
+    'deleteGroupDiv',
+    tryCatch(async (userIds, groupId) => {
+      //host dissolved the group
+      if (!userIds) return io.to(groupId).emit('deleteGroupDiv', groupId);
 
-    const onlineUsers = await pubClient.hgetall('onlineUsers');
+      const onlineUsers = await pubClient.hgetall('onlineUsers');
 
-    //host deleted certain member
-    const socketIdsOnline = userIds
-      .map(userId => onlineUsers[userId])
-      .filter(userId => userId !== undefined);
+      //host deleted certain member
+      const socketIdsOnline = userIds
+        .map(userId => onlineUsers[userId])
+        .filter(userId => userId !== undefined);
 
-    if (!socketIdsOnline.length) return;
+      if (!socketIdsOnline.length) return;
 
-    io.to(socketIdsOnline).emit('deleteGroupDiv', groupId);
-  });
+      io.to(socketIdsOnline).emit('deleteGroupDiv', groupId);
+    })
+  );
 }
 
 async function disconnection(socket) {
-  socket.on('disconnect', async () => {
-    io.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
+  socket.on(
+    'disconnect',
+    tryCatch(async () => {
+      io.emit('onlineStatus', socket.userdata.id, socket.id, 'off');
 
-    await pubClient.hdel('onlineUsers', socket.userdata.id);
+      await pubClient.hdel('onlineUsers', socket.userdata.id);
 
-    console.log('user disconnected: ' + socket.id);
-  });
+      console.log('user disconnected: ' + socket.id);
+    })
+  );
 }
 
 async function createStarContact(socket) {
-  socket.on('createStarContact', async targetContactUserId => {
-    const { organizationId, id: userId } = socket.userdata;
+  socket.on(
+    'createStarContact',
+    tryCatch(async targetContactUserId => {
+      const { organizationId, id: userId } = socket.userdata;
 
-    const isDuplicate = await getOneStarredUserFromSpecificUser(
-      organizationId,
-      userId,
-      targetContactUserId
-    );
+      const isDuplicate = await getOneStarredUserFromSpecificUser(
+        organizationId,
+        userId,
+        targetContactUserId
+      );
 
-    if (isDuplicate.length) return socket.emit('createStarContact', { error: 'star exists' });
+      if (isDuplicate.length) return socket.emit('createStarContact', { error: 'star exists' });
 
-    const result = await createStarredUser(organizationId, userId, targetContactUserId);
+      const result = await createStarredUser(organizationId, userId, targetContactUserId);
 
-    socket.emit('createStarContact', {
-      data: { result: result.result, targetContactUserId },
-    });
-  });
+      socket.emit('createStarContact', {
+        data: { result: result.result, targetContactUserId },
+      });
+    })
+  );
 }
 
 async function deleteStarContact(socket) {
-  socket.on('deleteStarContact', async targetContactUserId => {
-    const { organizationId, id: userId } = socket.userdata;
+  socket.on(
+    'deleteStarContact',
+    tryCatch(async targetContactUserId => {
+      const { organizationId, id: userId } = socket.userdata;
 
-    const result = await deleteStarredUserFromSpecificUser(
-      organizationId,
-      userId,
-      targetContactUserId
-    );
+      const result = await deleteStarredUserFromSpecificUser(
+        organizationId,
+        userId,
+        targetContactUserId
+      );
 
-    if (!result.deleted) {
+      if (!result.deleted) {
+        socket.emit('deleteStarContact', {
+          error: 'failed',
+        });
+      }
+
       socket.emit('deleteStarContact', {
-        error: 'failed',
+        data: targetContactUserId,
       });
-    }
-
-    socket.emit('deleteStarContact', {
-      data: targetContactUserId,
-    });
-  });
+    })
+  );
 }
 
 async function searchClausesByArticle(socket) {
-  socket.on('suggestion', async (input, index) => {
-    const result = await suggestions(socket.userdata.organizationId, input, index);
+  socket.on(
+    'suggestion',
+    tryCatch(async (input, index) => {
+      const result = await suggestions(socket.userdata.organizationId, input, index);
 
-    if (!index) socket.emit('suggestion', result);
-    else socket.emit('clauses', result);
-  });
+      if (!index) socket.emit('suggestion', result);
+      else socket.emit('clauses', result);
+    })
+  );
 }
 
 async function searchClausesByContent(socket) {
-  socket.on('matchedClauses', async input => {
-    if (!input) return;
-    const result = await matchedClauses(socket.userdata.organizationId, input);
+  socket.on(
+    'matchedClauses',
+    tryCatch(async input => {
+      if (!input) return;
+      const result = await matchedClauses(socket.userdata.organizationId, input);
 
-    socket.emit('matchedClauses', result);
-  });
+      socket.emit('matchedClauses', result);
+    })
+  );
 }
 
 async function updateClausesLastSearchTime(socket) {
-  socket.on('updateMatchedClauses', async (origin, title, number) => {
-    try {
-      const { organizationId } = socket.userdata;
-      await updateMatchedClauseSearchTime(organizationId, origin, title, number);
-    } catch (error) {
-      console.log(error);
-    }
-  });
+  socket.on(
+    'updateMatchedClauses',
+    tryCatch(async (origin, title, number) => {
+      try {
+        const { organizationId } = socket.userdata;
+        await updateMatchedClauseSearchTime(organizationId, origin, title, number);
+      } catch (error) {
+        console.log(error);
+      }
+    })
+  );
 }
 
 async function searchEamil(socket) {
-  socket.on('searchEamil', async input => {
-    const { organizationId } = socket.userdata;
+  socket.on(
+    'searchEamil',
+    tryCatch(async input => {
+      const { organizationId } = socket.userdata;
 
-    console.log('current organizationId: ' + organizationId);
+      console.log('current organizationId: ' + organizationId);
 
-    const result = await getUserByEmailAsYouType(organizationId, input);
+      const result = await getUserByEmailAsYouType(organizationId, input);
 
-    const users = result.map(user => ({
-      id: user._id,
-      name: user._source.name,
-      email: user._source.email,
-      picture: user._source.picture,
-    }));
+      const users = result.map(user => ({
+        id: user._id,
+        name: user._source.name,
+        email: user._source.email,
+        picture: user._source.picture,
+      }));
 
-    socket.emit('searchEamil', users);
-  });
+      socket.emit('searchEamil', users);
+    })
+  );
 }
 
 async function changeProfilePicture(socket) {
-  socket.on('changeProfilePicture', async userId => {
-    io.emit('changeProfilePicture', userId);
-  });
+  socket.on(
+    'changeProfilePicture',
+    tryCatch(async userId => {
+      io.emit('changeProfilePicture', userId);
+    })
+  );
 }
 
 async function changeFirmPicture(socket) {
-  socket.on('changeFirmPicture', async firmId => {
-    io.to(firmId).emit('changeFirmPicture', firmId);
-  });
+  socket.on(
+    'changeFirmPicture',
+    tryCatch(async firmId => {
+      io.to(firmId).emit('changeFirmPicture', firmId);
+    })
+  );
 }
 
 module.exports = ioServer => {
