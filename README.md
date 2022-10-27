@@ -51,23 +51,9 @@ Normal User
   password: 1234
 ```
 
-**Firm 2: davidandduke**
+**Firm 2:**
 
-Admin
-
-```
-  Firm: davidandduke
-  Email: david@dd.com
-  password: 1234
-```
-
-Normal User
-
-```
-  Firm: davidandduke
-  Email: duke@dd.com
-  password: 1234
-```
+For the sake of cost, if you would like to conduct testing on Firm 2 database, please reach out to me via the Contact information [below](https://github.com/morkuo/LawMsger#contact). 
 
 ## How to use Regulation Search
 
@@ -156,7 +142,7 @@ For the Front-End repositories, please refer to:
 - [Web](https://github.com/morkuo/LawMsger_frontend)
 - [Desktop](https://github.com/morkuo/LawMsger_desktop)
 
-## Contacts
+## Contact
 
 If you would like to sign up for the service or provide feedback, please feel free to contact me at:
 
