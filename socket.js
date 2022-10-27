@@ -7,7 +7,9 @@ require('dotenv').config();
 
 async function connect(httpServer) {
   const io = new Server(httpServer, {
-    cors: '*',
+    cors: {
+      origin: process.env.SOCKET_CORS_ORIGIN,
+    },
   });
 
   const ctr = controllers(io);
