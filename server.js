@@ -4,7 +4,11 @@ const cors = require('cors');
 
 app.get('/health', (req, res) => res.end());
 
-app.use(cors());
+app.use(
+  cors({
+    origin: 'https://mortonkuo.solutions',
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -16,7 +20,7 @@ app.use('/1.0', [
   require('./routes/firm'),
 ]);
 
-const PORT = process.argv[2] || 3000;
+const PORT = 3000;
 
 const httpServer = app.listen(PORT, () => {
   console.log('Running!');
