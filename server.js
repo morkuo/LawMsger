@@ -6,7 +6,7 @@ app.get('/health', (req, res) => res.end());
 
 app.use(
   cors({
-    origin: 'https://mortonkuo.solutions',
+    origin: process.env.EXPRESS_CORS_ORIGIN,
   })
 );
 app.use(express.urlencoded({ extended: true }));
