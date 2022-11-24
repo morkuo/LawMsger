@@ -337,9 +337,9 @@ async function searchEamil(socket) {
     tryCatch(async input => {
       const { organizationId } = socket.userdata;
 
-      console.log('current organizationId: ' + organizationId);
+      const email = input.toLowerCase();
 
-      const result = await getUserByEmailAsYouType(organizationId, input);
+      const result = await getUserByEmailAsYouType(organizationId, email);
 
       const users = result.map(user => ({
         id: user._id,
